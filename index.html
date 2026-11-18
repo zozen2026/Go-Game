@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Go Game</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
+    body {
+      background-color: #121216;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      width: 95%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .score-board {
+      font-size: 1.3rem;
+      font-weight: bold;
+      background: #1e1e26;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+
+    .btn-outfit {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-outfit:hover { background: #4f46e5; }
+
+    .game-container {
+      position: relative;
+      width: 95%;
+      max-width: 800px;
+      height: 360px;
+      background: linear-gradient(to bottom, #1e293b, #0f172a);
+      border: 2px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* مربع تبديل ألوان الملابس */
+    .outfit-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e26;
+      border: 2px solid #6366f1;
+      padding: 20px;
+      border-radius: 14px;
+      z-index: 20;
+      text-align: center;
+      width: 280px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .outfit-modal h3 { margin-bottom: 15px; font-size: 1.1rem; }
+    .color-options {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .color-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform 0.2s;
+    }
+    .color-circle:hover { transform: scale(1.15); }
+    .color-circle.active { border-color: #fff; transform: scale(1.1); }
+    .btn-close {
+      background: #334155;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* شاشة الخسارة */
+    .game-over-screen {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+    }
+    .game-over-screen h2 { font-size: 2rem; color: #ef4444; margin-bottom: 10px; }
+    .game-over-screen p { font-size: 1.2rem; margin-bottom: 20px; }
+    .btn-restart {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* زر القفز السفلي */
+    .controls {
+      margin-top: 15px;
+      width: 95%;
+      max-width: 800px;
+      display: flex;
+      justify-content: center;
+    }
+    .btn-jump {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      background: #f59e0b;
+      color: #000;
+      font-size: 1.3rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #b45309;
+    }
+    .btn-jump:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #b45309;
+    }
+
+    .watermark {
+      position: fixed;
+      bottom: 6px;
+      right: 12px;
+      font-size: 11px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="score-board">النقاط: <span id="scoreText">0</span></div>
+    <button class="btn-outfit" onclick="toggleOutfitModal()">👕 ألوان الملابس</button>
+  </div>
+
+  <div class="game-container">
+    <canvas id="gameCanvas" width="800" height="360"></canvas>
+
+    <!-- مربع تبديل ألوان الملابس -->
+    <div class="outfit-modal" id="outfitModal">
+      <h3>اختر لون ملابس الشخصية</h3>
+      <div class="color-options">
+        <div class="color-circle active" style="background: #3b82f6;" onclick="changeOutfit('#3b82f6', this)"></div>
+        <div class="color-circle" style="background: #ef4444;" onclick="changeOutfit('#ef4444', this)"></div>
+        <div class="color-circle" style="background: #10b981;" onclick="changeOutfit('#10b981', this)"></div>
+        <div class="color-circle" style="background: #eab308;" onclick="changeOutfit('#eab308', this)"></div>
+        <div class="color-circle" style="background: #a855f7;" onclick="changeOutfit('#a855f7', this)"></div>
+        <div class="color-circle" style="background: #f97316;" onclick="changeOutfit('#f97316', this)"></div>
+      </div>
+      <button class="btn-close" onclick="toggleOutfitModal()">تم</button>
+    </div>
+
+    <!-- شاشة الخسارة -->
+    <div class="game-over-screen" id="gameOverScreen">
+      <h2>لقد خسرت! أمسك بك الوحش 👾</h2>
+      <p>مجموع نقاطك: <span id="finalScore">0</span></p>
+      <button class="btn-restart" onclick="restartGame()">العب مرة أخرى</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
+  </div>
+
+  <div class="watermark">NC Studio © 2026</div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('scoreText');
+    const finalScore = document.getElementById('finalScore');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const outfitModal = document.getElementById('outfitModal');
+
+    let isPaused = false;
+    let isGameOver = false;
+    let score = 0;
+    let gameSpeed = 6;
+    let frameCount = 0;
+    let shirtColor = '#3b82f6';
+
+    const groundY = 300;
+
+    // خصائص اللاعب
+    const player = {
+      x: 210,
+      y: groundY - 60,
+      width: 34,
+      height: 60,
+      dy: 0,
+      jumpPower: -13.5,
+      gravity: 0.65,
+      grounded: true,
+      legAngle: 0
+    };
+
+    // خصائص الوحش الذي يطارد اللاعب من الخلف
+    const monster = {
+      x: 45,
+      y: groundY - 85,
+      width: 65,
+      height: 85,
+      bounce: 0
+    };
+
+    let obstacles = [];
+
+    function toggleOutfitModal() {
+      if (isGameOver) return;
+      const isVisible = outfitModal.style.display === 'block';
+      outfitModal.style.display = isVisible ? 'none' : 'block';
+      isPaused = !isVisible;
+      if (!isPaused) requestAnimationFrame(update);
+    }
+
+    function changeOutfit(color, element) {
+      shirtColor = color;
+      document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      draw(); // تحديث فوري للون أثناء التوقف
+    }
+
+    function jump() {
+      if (isGameOver || isPaused) return;
+      if (player.grounded) {
+        player.dy = player.jumpPower;
+        player.grounded = false;
+      }
+    }
+
+    // دعم زر المسافة للقفز على الكيبورد
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp') {
+        e.preventDefault();
+        jump();
+      }
+    });
+
+    function spawnObstacle() {
+      const height = Math.floor(Math.random() * 25) + 30;
+      obstacles.push({
+        x: canvas.width + 20,
+        y: groundY - height,
+        width: 28,
+        height: height
+      });
+    }
+
+    function drawPlayer() {
+      ctx.save();
+      // حركة الأرجل أثناء الركض
+      const swing = player.grounded ? Math.sin(frameCount * 0.25) * 8 : 5;
+
+      // الأرجل (بنطال داكن)
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(player.x + 6 + swing, player.y + 40, 8, 20);
+      ctx.fillRect(player.x + 20 - swing, player.y + 40, 8, 20);
+
+      // الجسم (الملابس القابلة لتغيير اللون)
+      ctx.fillStyle = shirtColor;
+      ctx.fillRect(player.x + 4, player.y + 18, 26, 24);
+
+      // الرأس
+      ctx.fillStyle = '#fcd34d';
+      ctx.beginPath();
+      ctx.arc(player.x + 17, player.y + 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // العين تنظر للأمام (يمين)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
+      ctx.restore();
+    }
+
+    function drawMonster() {
+      ctx.save();
+      const bounceY = Math.abs(Math.sin(frameCount * 0.2)) * 8;
+      const mx = monster.x;
+      const my = monster.y - bounceY;
+
+      // جسم الوحش
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.roundRect(mx, my, monster.width, monster.height, [25, 25, 5, 5]);
+      ctx.fill();
+
+      // قرون الوحش
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.moveTo(mx + 10, my + 5);
+      ctx.lineTo(mx + 2, my - 15);
+      ctx.lineTo(mx + 22, my + 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(mx + 45, my + 5);
+      ctx.lineTo(mx + 58, my - 15);
+      ctx.lineTo(mx + 55, my + 5);
+      ctx.fill();
+
+      // عيون الوحش الغاضبة
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(mx + 35, my + 20, 16, 10);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(mx + 44, my + 22, 6, 6);
+
+      // فم وأسنان الوحش
+      ctx.fillStyle = '#450a0a';
+      ctx.fillRect(mx + 25, my + 42, 35, 18);
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < 4; i++) {
+        ctx.fillRect(mx + 28 + (i * 8), my + 42, 4, 6);
+      }
+      ctx.restore();
+    }
+
+    function drawObstacles() {
+      ctx.fillStyle = '#f43f5e';
+      obstacles.forEach(obs => {
+        // رسم عائق بشكل شوكة/حاجز مدبب
+        ctx.beginPath();
+        ctx.moveTo(obs.x, obs.y + obs.height);
+        ctx.lineTo(obs.x + obs.width / 2, obs.y);
+        ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
+        ctx.closePath();
+        ctx.fill();
+      });
+    }
+
+    function drawGround() {
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+      // خطوط حركة الأرضية
+      ctx.fillStyle = '#475569';
+      const offset = (frameCount * gameSpeed) % 40;
+      for (let x = -offset; x < canvas.width; x += 40) {
+        ctx.fillRect(x, groundY + 10, 20, 4);
+      }
+    }
+
+    function checkCollision(rect1, rect2) {
+      // تقليص بسيط لصندوق التصادم لجعل اللعب عادلاً وممتعاً
+      const pad = 6;
+      return (
+        rect1.x + pad < rect2.x + rect2.width - pad &&
+        rect1.x + rect1.width - pad > rect2.x + pad &&
+        rect1.y + pad < rect2.y + rect2.height - pad &&
+        rect1.y + rect1.height - pad > rect2.y + pad
+      );
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGround();
+      drawMonster();
+      drawPlayer();
+      drawObstacles();
+    }
+
+    function update() {
+      if (isPaused || isGameOver) return;
+
+      frameCount++;
+
+      // تحديث فيزياء قفز اللاعب
+      player.dy += player.gravity;
+      player.y += player.dy;
+
+      if (player.y + player.height >= groundY) {
+        player.y = groundY - player.height;
+        player.dy = 0;
+        player.grounded = true;
+      }
+
+      // توليد العوائق بمسافات عشوائية مناسبة
+      if (frameCount % Math.floor(Math.random() * 40 + 85) === 0) {
+        spawnObstacle();
+      }
+
+      // تحريك العوائق وفحص التصادم
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        obstacles[i].x -= gameSpeed;
+
+        if (checkCollision(player, obstacles[i])) {
+          triggerGameOver();
+          return;
+        }
+
+        if (obstacles[i].x + obstacles[i].width < 0) {
+          obstacles.splice(i, 1);
+          score += 10;
+          scoreText.textContent = score;
+          // زيادة تدريجية طفيفة في السرعة
+          if (score % 100 === 0) gameSpeed += 0.4;
+        }
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    function triggerGameOver() {
+      isGameOver = true;
+      // الوحش يقترب من اللاعب عند الخسارة
+      monster.x = player.x - 45;
+      draw();
+      finalScore.textContent = score;
+      gameOverScreen.style.display = 'flex';
+    }
+
+    function restartGame() {
+      isGameOver = false;
+      isPaused = false;
+      score = 0;
+      gameSpeed = 6;
+      frameCount = 0;
+      obstacles = [];
+      player.y = groundY - player.height;
+      player.dy = 0;
+      player.grounded = true;
+      monster.x = 45;
+      scoreText.textContent = '0';
+      gameOverScreen.style.display = 'none';
+      requestAnimationFrame(update);
+    }
+
+    // بدء اللعبة
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>
