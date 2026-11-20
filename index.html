@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Go Game - 3 Modes & Backgrounds</title>
+  <title>Go Game - 3 Modes, Backgrounds & SFX</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
     body {
@@ -13,8 +13,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100dvh;
+      padding: 10px 0 24px;
+      overflow-x: hidden;
     }
 
     .top-bar {
@@ -35,10 +36,10 @@
     }
 
     .score-board {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: bold;
       background: #1e1e26;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 10px;
       border: 1px solid #333;
     }
@@ -51,15 +52,16 @@
     .actions-group {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
 
     .btn-top {
       background: #6366f1;
       color: white;
       border: none;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
@@ -70,6 +72,8 @@
     .btn-shop:hover { background: #ca8a04; }
     .btn-modes { background: #334155; }
     .btn-modes:hover { background: #475569; }
+    .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
+    .btn-sound.muted { opacity: 0.65; }
 
     .game-container {
       position: relative;
@@ -93,25 +97,27 @@
       display: flex;
       position: absolute;
       inset: 0;
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.95);
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 25;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .overlay-screen h2 {
-      font-size: 1.7rem;
-      margin-bottom: 8px;
+      font-size: 1.5rem;
+      margin-bottom: 4px;
       color: #f8fafc;
     }
 
     .overlay-screen p.subtitle {
       color: #94a3b8;
-      margin-bottom: 18px;
-      font-size: 0.95rem;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
     }
 
     .mode-cards {
@@ -143,6 +149,56 @@
     .mode-card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #fff; }
     .mode-card p { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
 
+    /* تحسين عرض خيارات اللعب في شاشات الموبايل لتكون واضحة وقابلة للتصفح */
+    @media (max-width: 680px) {
+      .game-container {
+        height: 320px;
+      }
+      .overlay-screen {
+        justify-content: flex-start;
+        padding: 14px 12px 22px;
+      }
+      .overlay-screen h2 {
+        font-size: 1.3rem;
+      }
+      .overlay-screen p.subtitle {
+        margin-bottom: 10px;
+        font-size: 0.85rem;
+      }
+      .mode-cards {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .mode-card {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        text-align: right;
+        padding: 12px 14px;
+        gap: 12px;
+      }
+      .mode-card:hover {
+        transform: none;
+      }
+      .mode-card .icon {
+        font-size: 1.9rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      .mode-card-text {
+        display: flex;
+        flex-direction: column;
+      }
+      .mode-card h3 {
+        font-size: 1rem;
+        margin-bottom: 3px;
+      }
+      .mode-card p {
+        font-size: 0.8rem;
+      }
+    }
+
     /* نافذة المتجر والملابس والخلفيات */
     .shop-modal {
       display: none;
@@ -152,18 +208,19 @@
       transform: translate(-50%, -50%);
       background: #1e1e26;
       border: 2px solid #eab308;
-      padding: 18px;
+      padding: 16px;
       border-radius: 14px;
       z-index: 30;
       text-align: center;
       width: 92%;
       max-width: 450px;
-      max-height: 334px;
+      max-height: 90%;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       box-shadow: 0 10px 30px rgba(0,0,0,0.85);
     }
-    .shop-modal h3 { margin-bottom: 6px; font-size: 1.2rem; color: #fbbf24; }
-    .shop-modal .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; }
+    .shop-modal h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
+    .shop-modal .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
     
     .shop-section-title {
       text-align: right;
@@ -227,7 +284,7 @@
       display: none;
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.82);
+      background: rgba(0, 0, 0, 0.84);
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -235,9 +292,9 @@
       text-align: center;
       padding: 20px;
     }
-    .end-screen h2 { font-size: 1.9rem; margin-bottom: 10px; }
-    .end-screen p { font-size: 1.15rem; margin-bottom: 18px; color: #e2e8f0; }
-    .end-buttons { display: flex; gap: 10px; }
+    .end-screen h2 { font-size: 1.7rem; margin-bottom: 10px; }
+    .end-screen p { font-size: 1.05rem; margin-bottom: 18px; color: #e2e8f0; }
+    .end-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
     .btn-restart {
       background: #10b981;
       color: #fff;
@@ -261,20 +318,20 @@
 
     /* أزرار التحكم السفلية */
     .controls {
-      margin-top: 14px;
+      margin-top: 12px;
       width: 95%;
       max-width: 800px;
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
     }
     .btn-jump {
       flex: 2;
       max-width: 320px;
-      padding: 15px;
+      padding: 14px;
       background: #f59e0b;
       color: #000;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 900;
       border: none;
       border-radius: 14px;
@@ -289,10 +346,10 @@
     .btn-stop-run {
       flex: 1;
       max-width: 170px;
-      padding: 15px;
+      padding: 14px;
       background: #3b82f6;
       color: #fff;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: bold;
       border: none;
       border-radius: 14px;
@@ -306,7 +363,7 @@
 
     .watermark {
       position: fixed;
-      bottom: 6px;
+      bottom: 4px;
       right: 12px;
       font-size: 11px;
       color: #64748b;
@@ -321,6 +378,7 @@
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
     </div>
     <div class="actions-group">
+      <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()" title="تشغيل أو كتم الأصوات">🔊</button>
       <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر والملابس</button>
       <button class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
     </div>
@@ -332,22 +390,28 @@
     <!-- قائمة اختيار الأطوار الثلاثة -->
     <div class="overlay-screen" id="modeMenu">
       <h2>اختر طور اللعب</h2>
-      <p class="subtitle">اختر التحدي الذي يناسبك الآن</p>
+      <p class="subtitle">اسحب لتصفح الأطوار واختر التحدي المناسب</p>
       <div class="mode-cards">
         <div class="mode-card" onclick="startGame('monster')">
           <div class="icon">👾</div>
-          <h3>1. الهروب من الوحش</h3>
-          <p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p>
+          <div class="mode-card-text">
+            <h3>1. الهروب من الوحش</h3>
+            <p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p>
+          </div>
         </div>
         <div class="mode-card" onclick="startGame('rescue')">
           <div class="icon">🦸‍♂️</div>
-          <h3>2. إنقاذ الصديق</h3>
-          <p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p>
+          <div class="mode-card-text">
+            <h3>2. إنقاذ الصديق</h3>
+            <p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p>
+          </div>
         </div>
         <div class="mode-card" onclick="startGame('coins')">
           <div class="icon">🪙</div>
-          <h3>3. جمع الأموال والمتجر</h3>
-          <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p>
+          <div class="mode-card-text">
+            <h3>3. جمع الأموال والمتجر</h3>
+            <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p>
+          </div>
         </div>
       </div>
     </div>
@@ -399,8 +463,80 @@
     const endScreen = document.getElementById('endScreen');
     const endTitle = document.getElementById('endTitle');
     const endMessage = document.getElementById('endMessage');
+    const soundBtn = document.getElementById('soundBtn');
 
-    // حالة اللعبة
+    // نظام المؤثرات الصوتية فقط (بدون موسيقى)
+    let soundEnabled = localStorage.getItem('gogame_sfx') !== 'false';
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, endFreq, duration, type = 'sine', delay = 0, volume = 0.12) {
+      if (!soundEnabled) return;
+      const ctxAudio = getAudioCtx();
+      if (!ctxAudio) return;
+
+      const startTime = ctxAudio.currentTime + delay;
+      const osc = ctxAudio.createOscillator();
+      const gain = ctxAudio.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+      if (endFreq !== null) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), startTime + duration);
+      }
+
+      gain.gain.setValueAtTime(volume, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctxAudio.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    }
+
+    const sfx = {
+      jump: () => playTone(260, 520, 0.13, 'triangle', 0, 0.12),
+      coin: () => {
+        playTone(780, 980, 0.07, 'sine', 0, 0.11);
+        playTone(1040, 1250, 0.09, 'sine', 0.06, 0.11);
+      },
+      buy: () => {
+        playTone(520, 680, 0.08, 'triangle', 0, 0.11);
+        playTone(780, 920, 0.1, 'triangle', 0.07, 0.11);
+      },
+      win: () => {
+        playTone(523, 523, 0.1, 'triangle', 0, 0.12);
+        playTone(659, 659, 0.1, 'triangle', 0.1, 0.12);
+        playTone(784, 1046, 0.22, 'triangle', 0.2, 0.13);
+      },
+      lose: () => {
+        playTone(280, 110, 0.25, 'sawtooth', 0, 0.11);
+      }
+    };
+
+    function updateSoundButton() {
+      soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+      soundBtn.classList.toggle('muted', !soundEnabled);
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem('gogame_sfx', soundEnabled);
+      updateSoundButton();
+      if (soundEnabled) sfx.buy();
+    }
+
     let currentMode = null;
     let isPaused = true;
     let isGameOver = false;
@@ -410,7 +546,6 @@
     let frameCount = 0;
     let animationId = null;
 
-    // بيانات المتجر والمقتنيات
     let ownedShirts = JSON.parse(localStorage.getItem('gogame_shirts')) || ['#3b82f6'];
     let equippedShirt = localStorage.getItem('gogame_eq_shirt') || '#3b82f6';
 
@@ -445,7 +580,6 @@
     const groundY = 300;
     const RESCUE_TARGET_SCORE = 100;
 
-    // نجوم ثابتة لخلفية الفضاء
     const stars = Array.from({ length: 35 }, (_, i) => ({
       x: (i * 97) % 800,
       y: (i * 53) % 260,
@@ -554,10 +688,12 @@
     function buyOrEquipShirt(item) {
       if (ownedShirts.includes(item.id)) {
         equippedShirt = item.id;
+        sfx.buy();
       } else if (coins >= item.price) {
         coins -= item.price;
         ownedShirts.push(item.id);
         equippedShirt = item.id;
+        sfx.buy();
       } else {
         alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
         return;
@@ -570,10 +706,12 @@
     function buyOrEquipHat(item) {
       if (ownedHats.includes(item.id)) {
         equippedHat = item.id;
+        sfx.buy();
       } else if (coins >= item.price) {
         coins -= item.price;
         ownedHats.push(item.id);
         equippedHat = item.id;
+        sfx.buy();
       } else {
         alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
         return;
@@ -586,10 +724,12 @@
     function buyOrEquipBg(item) {
       if (ownedBgs.includes(item.id)) {
         equippedBg = item.id;
+        sfx.buy();
       } else if (coins >= item.price) {
         coins -= item.price;
         ownedBgs.push(item.id);
         equippedBg = item.id;
+        sfx.buy();
       } else {
         alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
         return;
@@ -619,9 +759,11 @@
       shopModal.style.display = 'none';
       endScreen.style.display = 'none';
       modeMenu.style.display = 'flex';
+      modeMenu.scrollTop = 0;
     }
 
     function startGame(mode) {
+      getAudioCtx();
       currentMode = mode;
       modeMenu.style.display = 'none';
       restartCurrentMode();
@@ -661,6 +803,7 @@
       if (player.grounded) {
         player.dy = player.jumpPower;
         player.grounded = false;
+        sfx.jump();
       }
     }
 
@@ -703,7 +846,6 @@
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, canvas.width, groundY);
 
-        // كثبان رملية متحركة
         ctx.fillStyle = '#d97706';
         const duneOffset = (scroll * 0.25) % 260;
         for (let x = -duneOffset; x < canvas.width + 260; x += 260) {
@@ -713,7 +855,6 @@
           ctx.fill();
         }
 
-        // أرضية الصحراء
         ctx.fillStyle = '#b45309';
         ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
         ctx.fillStyle = '#fbbf24';
@@ -728,7 +869,6 @@
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, canvas.width, groundY);
 
-        // أشجار متحركة في الخلفية
         const treeOffset = (scroll * 0.35) % 140;
         for (let x = -treeOffset; x < canvas.width + 140; x += 140) {
           ctx.fillStyle = '#14532d';
@@ -740,7 +880,6 @@
           ctx.fill();
         }
 
-        // أرضية الغابة
         ctx.fillStyle = '#166534';
         ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
         ctx.fillStyle = '#4ade80';
@@ -755,7 +894,6 @@
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, canvas.width, groundY);
 
-        // نجوم متحركة
         ctx.fillStyle = '#f8fafc';
         stars.forEach(s => {
           const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width;
@@ -764,7 +902,6 @@
           ctx.fill();
         });
 
-        // أرضية الفضاء
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
         ctx.fillStyle = '#38bdf8';
@@ -773,7 +910,6 @@
           ctx.fillRect(x, groundY + 10, 22, 4);
         }
       } else {
-        // ليل المدينة (الافتراضي)
         const sky = ctx.createLinearGradient(0, 0, 0, groundY);
         sky.addColorStop(0, '#1e293b');
         sky.addColorStop(1, '#0f172a');
@@ -998,6 +1134,7 @@
           coins += 5;
           score += 5;
           document.getElementById('scoreText').textContent = score;
+          sfx.coin();
           saveProgress();
           continue;
         }
@@ -1026,10 +1163,12 @@
       cancelAnimationFrame(animationId);
 
       if (isWin) {
+        sfx.win();
         endTitle.style.color = '#10b981';
         endTitle.textContent = 'أحسنت! أنقذت صديقك بنجاح 🦸‍♂️🎉';
         endMessage.textContent = 'حصلت على مكافأة +30 عملة ذهبية!';
       } else {
+        sfx.lose();
         endTitle.style.color = '#ef4444';
         if (currentMode === 'monster') {
           monster.x = player.x - 45;
@@ -1046,6 +1185,7 @@
       endScreen.style.display = 'flex';
     }
 
+    updateSoundButton();
     coinText.textContent = coins;
     drawBackgroundAndGround();
     drawPlayer();
