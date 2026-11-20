@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Go Game - 3 Modes</title>
+  <title>Go Game - 3 Modes & Backgrounds</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
     body {
@@ -76,7 +76,7 @@
       width: 95%;
       max-width: 800px;
       height: 360px;
-      background: linear-gradient(to bottom, #1e293b, #0f172a);
+      background: #0f172a;
       border: 2px solid #334155;
       border-radius: 16px;
       overflow: hidden;
@@ -143,7 +143,7 @@
     .mode-card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #fff; }
     .mode-card p { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
 
-    /* نافذة المتجر والملابس */
+    /* نافذة المتجر والملابس والخلفيات */
     .shop-modal {
       display: none;
       position: absolute;
@@ -156,9 +156,9 @@
       border-radius: 14px;
       z-index: 30;
       text-align: center;
-      width: 90%;
-      max-width: 420px;
-      max-height: 330px;
+      width: 92%;
+      max-width: 450px;
+      max-height: 334px;
       overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0,0,0,0.85);
     }
@@ -169,7 +169,7 @@
       text-align: right;
       font-size: 0.9rem;
       color: #cbd5e1;
-      margin: 10px 0 8px;
+      margin: 12px 0 8px;
       border-bottom: 1px solid #334155;
       padding-bottom: 4px;
     }
@@ -177,6 +177,13 @@
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .bg-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -195,6 +202,12 @@
     }
     .shop-item.equipped { border-color: #10b981; background: #064e3b44; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
+    .bg-preview {
+      width: 100%;
+      height: 34px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
     .item-price { color: #fbbf24; font-weight: bold; font-size: 0.78rem; }
     .item-owned { color: #10b981; font-weight: bold; font-size: 0.78rem; }
 
@@ -209,7 +222,7 @@
       margin-top: 6px;
     }
 
-    /* شاشة النهاية (خسارة أو فوز) */
+    /* شاشة النهاية */
     .end-screen {
       display: none;
       position: absolute;
@@ -334,12 +347,12 @@
         <div class="mode-card" onclick="startGame('coins')">
           <div class="icon">🪙</div>
           <h3>3. جمع الأموال والمتجر</h3>
-          <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والإضافات!</p>
+          <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p>
         </div>
       </div>
     </div>
 
-    <!-- نافذة المتجر وتبديل الملابس -->
+    <!-- نافذة المتجر وتبديل الملابس والخلفيات -->
     <div class="shop-modal" id="shopModal">
       <h3>🛒 متجر Go Game</h3>
       <p class="shop-info">اللعبة متوقفة مؤقتاً — رصيدك: <span id="shopCoinText" style="color:#fbbf24;font-weight:bold;">0</span> 🪙</p>
@@ -349,6 +362,9 @@
 
       <div class="shop-section-title">🎩 القبعات والإضافات</div>
       <div class="shop-grid" id="hatsGrid"></div>
+
+      <div class="shop-section-title">🖼️ الخلفيات</div>
+      <div class="bg-grid" id="backgroundsGrid"></div>
 
       <button class="btn-close" onclick="toggleShopModal()">متابعة الركض ▶️</button>
     </div>
@@ -385,11 +401,11 @@
     const endMessage = document.getElementById('endMessage');
 
     // حالة اللعبة
-    let currentMode = null; // 'monster' | 'rescue' | 'coins'
+    let currentMode = null;
     let isPaused = true;
     let isGameOver = false;
     let score = 0;
-    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30; // رصيد ابتدائي 30 عملة للتجربة
+    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30;
     let gameSpeed = 6;
     let frameCount = 0;
     let animationId = null;
@@ -400,6 +416,9 @@
 
     let ownedHats = JSON.parse(localStorage.getItem('gogame_hats')) || ['none'];
     let equippedHat = localStorage.getItem('gogame_eq_hat') || 'none';
+
+    let ownedBgs = JSON.parse(localStorage.getItem('gogame_bgs')) || ['night'];
+    let equippedBg = localStorage.getItem('gogame_eq_bg') || 'night';
 
     const shopCatalog = {
       shirts: [
@@ -414,13 +433,25 @@
         { id: 'none', name: 'بدون قبعة', icon: '🚫', price: 0 },
         { id: 'cap', name: 'كاب رياضي', icon: '🧢', price: 40 },
         { id: 'crown', name: 'تاج البطل', icon: '👑', price: 100 }
+      ],
+      backgrounds: [
+        { id: 'night', name: 'ليل المدينة', price: 0, preview: 'linear-gradient(to bottom, #1e293b, #0f172a)' },
+        { id: 'desert', name: 'غروب الصحراء', price: 35, preview: 'linear-gradient(to bottom, #f97316, #fef08a)' },
+        { id: 'forest', name: 'غابة الشفق', price: 60, preview: 'linear-gradient(to bottom, #4c1d95, #1e1b4b)' },
+        { id: 'space', name: 'فضاء النجوم', price: 85, preview: 'linear-gradient(to bottom, #020617, #172554)' }
       ]
     };
 
     const groundY = 300;
     const RESCUE_TARGET_SCORE = 100;
 
-    // خصائص اللاعب
+    // نجوم ثابتة لخلفية الفضاء
+    const stars = Array.from({ length: 35 }, (_, i) => ({
+      x: (i * 97) % 800,
+      y: (i * 53) % 260,
+      r: (i % 2) + 1.2
+    }));
+
     const player = {
       x: 210,
       y: groundY - 60,
@@ -432,7 +463,6 @@
       grounded: true
     };
 
-    // خصائص الوحش (لطور الوحش)
     const monster = {
       x: 45,
       y: groundY - 85,
@@ -440,7 +470,6 @@
       height: 85
     };
 
-    // خصائص الصديق المحتجز (لطور الإنقاذ)
     const friend = {
       active: false,
       x: 850,
@@ -458,6 +487,8 @@
       localStorage.setItem('gogame_eq_shirt', equippedShirt);
       localStorage.setItem('gogame_hats', JSON.stringify(ownedHats));
       localStorage.setItem('gogame_eq_hat', equippedHat);
+      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs));
+      localStorage.setItem('gogame_eq_bg', equippedBg);
       coinText.textContent = coins;
       shopCoinText.textContent = coins;
     }
@@ -466,8 +497,10 @@
       shopCoinText.textContent = coins;
       const shirtsGrid = document.getElementById('shirtsGrid');
       const hatsGrid = document.getElementById('hatsGrid');
+      const bgsGrid = document.getElementById('backgroundsGrid');
       shirtsGrid.innerHTML = '';
       hatsGrid.innerHTML = '';
+      bgsGrid.innerHTML = '';
 
       shopCatalog.shirts.forEach(item => {
         const owned = ownedShirts.includes(item.id);
@@ -500,6 +533,22 @@
         div.onclick = () => buyOrEquipHat(item);
         hatsGrid.appendChild(div);
       });
+
+      shopCatalog.backgrounds.forEach(item => {
+        const owned = ownedBgs.includes(item.id);
+        const equipped = equippedBg === item.id;
+        const div = document.createElement('div');
+        div.className = 'shop-item' + (equipped ? ' equipped' : '');
+        div.innerHTML = `
+          <div class="bg-preview" style="background:${item.preview}"></div>
+          <span>${item.name}</span>
+          ${equipped ? '<span class="item-owned">مُفعّل ✓</span>' :
+            owned ? '<span class="item-owned">مملوك</span>' :
+            `<span class="item-price">🪙 ${item.price}</span>`}
+        `;
+        div.onclick = () => buyOrEquipBg(item);
+        bgsGrid.appendChild(div);
+      });
     }
 
     function buyOrEquipShirt(item) {
@@ -525,6 +574,22 @@
         coins -= item.price;
         ownedHats.push(item.id);
         equippedHat = item.id;
+      } else {
+        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
+        return;
+      }
+      saveProgress();
+      renderShop();
+      draw();
+    }
+
+    function buyOrEquipBg(item) {
+      if (ownedBgs.includes(item.id)) {
+        equippedBg = item.id;
+      } else if (coins >= item.price) {
+        coins -= item.price;
+        ownedBgs.push(item.id);
+        equippedBg = item.id;
       } else {
         alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
         return;
@@ -628,30 +693,122 @@
       }
     }
 
+    function drawBackgroundAndGround() {
+      const scroll = frameCount * gameSpeed;
+
+      if (equippedBg === 'desert') {
+        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+        sky.addColorStop(0, '#ea580c');
+        sky.addColorStop(1, '#fde047');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        // كثبان رملية متحركة
+        ctx.fillStyle = '#d97706';
+        const duneOffset = (scroll * 0.25) % 260;
+        for (let x = -duneOffset; x < canvas.width + 260; x += 260) {
+          ctx.beginPath();
+          ctx.moveTo(x, groundY);
+          ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY);
+          ctx.fill();
+        }
+
+        // أرضية الصحراء
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#fbbf24';
+        const lineOffset = scroll % 40;
+        for (let x = -lineOffset; x < canvas.width; x += 40) {
+          ctx.fillRect(x, groundY + 10, 20, 4);
+        }
+      } else if (equippedBg === 'forest') {
+        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+        sky.addColorStop(0, '#3b0764');
+        sky.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        // أشجار متحركة في الخلفية
+        const treeOffset = (scroll * 0.35) % 140;
+        for (let x = -treeOffset; x < canvas.width + 140; x += 140) {
+          ctx.fillStyle = '#14532d';
+          ctx.beginPath();
+          ctx.moveTo(x + 25, groundY - 85);
+          ctx.lineTo(x, groundY);
+          ctx.lineTo(x + 50, groundY);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // أرضية الغابة
+        ctx.fillStyle = '#166534';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#4ade80';
+        const lineOffset = scroll % 40;
+        for (let x = -lineOffset; x < canvas.width; x += 40) {
+          ctx.fillRect(x, groundY + 10, 20, 4);
+        }
+      } else if (equippedBg === 'space') {
+        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+        sky.addColorStop(0, '#020617');
+        sky.addColorStop(1, '#172554');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        // نجوم متحركة
+        ctx.fillStyle = '#f8fafc';
+        stars.forEach(s => {
+          const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width;
+          ctx.beginPath();
+          ctx.arc(sx, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // أرضية الفضاء
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#38bdf8';
+        const lineOffset = scroll % 40;
+        for (let x = -lineOffset; x < canvas.width; x += 40) {
+          ctx.fillRect(x, groundY + 10, 22, 4);
+        }
+      } else {
+        // ليل المدينة (الافتراضي)
+        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+        sky.addColorStop(0, '#1e293b');
+        sky.addColorStop(1, '#0f172a');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#475569';
+        const lineOffset = scroll % 40;
+        for (let x = -lineOffset; x < canvas.width; x += 40) {
+          ctx.fillRect(x, groundY + 10, 20, 4);
+        }
+      }
+    }
+
     function drawPlayer() {
       ctx.save();
       const swing = (player.grounded && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
 
-      // الأرجل
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(player.x + 6 + swing, player.y + 40, 8, 20);
       ctx.fillRect(player.x + 20 - swing, player.y + 40, 8, 20);
 
-      // القميص
       ctx.fillStyle = equippedShirt;
       ctx.fillRect(player.x + 4, player.y + 18, 26, 24);
 
-      // الرأس
       ctx.fillStyle = '#fcd34d';
       ctx.beginPath();
       ctx.arc(player.x + 17, player.y + 10, 10, 0, Math.PI * 2);
       ctx.fill();
 
-      // العين
       ctx.fillStyle = '#000';
       ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
 
-      // رسم القبعة المختارة
       if (equippedHat === 'cap') {
         ctx.fillStyle = '#ef4444';
         ctx.fillRect(player.x + 8, player.y - 2, 18, 6);
@@ -714,7 +871,6 @@
     function drawFriendCage() {
       if (currentMode !== 'rescue' || !friend.active) return;
       ctx.save();
-      // الصديق داخل القفص
       ctx.fillStyle = '#10b981';
       ctx.fillRect(friend.x + 12, friend.y + 22, 24, 24);
       ctx.fillStyle = '#fcd34d';
@@ -722,7 +878,6 @@
       ctx.arc(friend.x + 24, friend.y + 14, 9, 0, Math.PI * 2);
       ctx.fill();
 
-      // قضبان القفص
       ctx.strokeStyle = '#94a3b8';
       ctx.lineWidth = 3;
       ctx.strokeRect(friend.x, friend.y, friend.width, friend.height);
@@ -764,16 +919,6 @@
       });
     }
 
-    function drawGround() {
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-      ctx.fillStyle = '#475569';
-      const offset = (frameCount * gameSpeed) % 40;
-      for (let x = -offset; x < canvas.width; x += 40) {
-        ctx.fillRect(x, groundY + 10, 20, 4);
-      }
-    }
-
     function checkCollision(rect1, rect2) {
       const pad = 6;
       return (
@@ -786,7 +931,7 @@
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGround();
+      drawBackgroundAndGround();
       drawMonster();
       drawFriendCage();
       drawCoins();
@@ -798,7 +943,6 @@
       if (isPaused || isGameOver) return;
       frameCount++;
 
-      // فيزياء القفز
       player.dy += player.gravity;
       player.y += player.dy;
       if (player.y + player.height >= groundY) {
@@ -807,7 +951,6 @@
         player.grounded = true;
       }
 
-      // منطق توليد العناصر حسب الطور
       if (currentMode === 'monster') {
         if (frameCount % Math.floor(Math.random() * 35 + 85) === 0) spawnObstacle();
       } else if (currentMode === 'rescue') {
@@ -825,7 +968,6 @@
         }
       }
 
-      // تحريك العوائق وفحص التصادم
       for (let i = obstacles.length - 1; i >= 0; i--) {
         obstacles[i].x -= gameSpeed;
 
@@ -842,7 +984,6 @@
         }
       }
 
-      // تحريك العملات والتقاطها
       for (let i = coinItems.length - 1; i >= 0; i--) {
         coinItems[i].x -= gameSpeed;
         const cBox = {
@@ -866,11 +1007,10 @@
         }
       }
 
-      // تحريك قفص الصديق في طور الإنقاذ
       if (friend.active) {
         friend.x -= gameSpeed;
         if (checkCollision(player, friend)) {
-          coins += 30; // مكافأة إنقاذ الصديق
+          coins += 30;
           saveProgress();
           triggerEnd(true);
           return;
@@ -906,9 +1046,8 @@
       endScreen.style.display = 'flex';
     }
 
-    // تهيئة أولية
     coinText.textContent = coins;
-    drawGround();
+    drawBackgroundAndGround();
     drawPlayer();
   </script>
 </body>
