@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Go Game</title>
+  <title>Go Game - 3 Modes</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
     body {
@@ -24,29 +24,52 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .score-board {
-      font-size: 1.3rem;
+      font-size: 1.05rem;
       font-weight: bold;
       background: #1e1e26;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 10px;
       border: 1px solid #333;
     }
 
-    .btn-outfit {
+    .coin-board {
+      color: #fbbf24;
+      border-color: #78350f;
+    }
+
+    .actions-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-top {
       background: #6366f1;
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 8px 14px;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
-    .btn-outfit:hover { background: #4f46e5; }
+    .btn-top:hover { background: #4f46e5; }
+    .btn-top:active { transform: scale(0.96); }
+    .btn-shop { background: #eab308; color: #000; }
+    .btn-shop:hover { background: #ca8a04; }
+    .btn-modes { background: #334155; }
+    .btn-modes:hover { background: #475569; }
 
     .game-container {
       position: relative;
@@ -65,89 +88,180 @@
       height: 100%;
     }
 
-    /* مربع تبديل ألوان الملابس */
-    .outfit-modal {
+    /* شاشة اختيار الطور */
+    .overlay-screen {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .overlay-screen h2 {
+      font-size: 1.7rem;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+
+    .overlay-screen p.subtitle {
+      color: #94a3b8;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    .mode-cards {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 680px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-card {
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 14px;
+      padding: 16px 14px;
+      width: 200px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-card:hover {
+      border-color: #6366f1;
+      transform: translateY(-4px);
+      background: #263349;
+    }
+
+    .mode-card .icon { font-size: 2rem; margin-bottom: 8px; }
+    .mode-card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #fff; }
+    .mode-card p { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
+
+    /* نافذة المتجر والملابس */
+    .shop-modal {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: #1e1e26;
-      border: 2px solid #6366f1;
-      padding: 20px;
+      border: 2px solid #eab308;
+      padding: 18px;
       border-radius: 14px;
-      z-index: 20;
+      z-index: 30;
       text-align: center;
-      width: 280px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      width: 90%;
+      max-width: 420px;
+      max-height: 330px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
     }
-    .outfit-modal h3 { margin-bottom: 15px; font-size: 1.1rem; }
-    .color-options {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
+    .shop-modal h3 { margin-bottom: 6px; font-size: 1.2rem; color: #fbbf24; }
+    .shop-modal .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; }
+    
+    .shop-section-title {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 10px 0 8px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 4px;
     }
-    .color-circle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .shop-item {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 10px;
+      padding: 8px 6px;
       cursor: pointer;
-      border: 3px solid transparent;
-      transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.82rem;
     }
-    .color-circle:hover { transform: scale(1.15); }
-    .color-circle.active { border-color: #fff; transform: scale(1.1); }
+    .shop-item.equipped { border-color: #10b981; background: #064e3b44; }
+    .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
+    .item-price { color: #fbbf24; font-weight: bold; font-size: 0.78rem; }
+    .item-owned { color: #10b981; font-weight: bold; font-size: 0.78rem; }
+
     .btn-close {
-      background: #334155;
+      background: #10b981;
       color: #fff;
       border: none;
-      padding: 8px 20px;
+      padding: 9px 24px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 6px;
     }
 
-    /* شاشة الخسارة */
-    .game-over-screen {
+    /* شاشة النهاية (خسارة أو فوز) */
+    .end-screen {
       display: none;
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.78);
+      background: rgba(0, 0, 0, 0.82);
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 15;
+      z-index: 20;
+      text-align: center;
+      padding: 20px;
     }
-    .game-over-screen h2 { font-size: 2rem; color: #ef4444; margin-bottom: 10px; }
-    .game-over-screen p { font-size: 1.2rem; margin-bottom: 20px; }
+    .end-screen h2 { font-size: 1.9rem; margin-bottom: 10px; }
+    .end-screen p { font-size: 1.15rem; margin-bottom: 18px; color: #e2e8f0; }
+    .end-buttons { display: flex; gap: 10px; }
     .btn-restart {
       background: #10b981;
       color: #fff;
       border: none;
-      padding: 12px 26px;
+      padding: 11px 22px;
       border-radius: 10px;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-menu {
+      background: #475569;
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
     }
 
-    /* زر القفز السفلي */
+    /* أزرار التحكم السفلية */
     .controls {
-      margin-top: 15px;
+      margin-top: 14px;
       width: 95%;
       max-width: 800px;
       display: flex;
       justify-content: center;
+      gap: 12px;
     }
     .btn-jump {
-      width: 100%;
+      flex: 2;
       max-width: 320px;
-      padding: 16px;
+      padding: 15px;
       background: #f59e0b;
       color: #000;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 900;
       border: none;
       border-radius: 14px;
@@ -157,6 +271,24 @@
     .btn-jump:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 #b45309;
+    }
+
+    .btn-stop-run {
+      flex: 1;
+      max-width: 170px;
+      padding: 15px;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #1d4ed8;
+    }
+    .btn-stop-run:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #1d4ed8;
     }
 
     .watermark {
@@ -171,37 +303,70 @@
 <body>
 
   <div class="top-bar">
-    <div class="score-board">النقاط: <span id="scoreText">0</span></div>
-    <button class="btn-outfit" onclick="toggleOutfitModal()">👕 ألوان الملابس</button>
+    <div class="stats-group">
+      <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
+      <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
+    </div>
+    <div class="actions-group">
+      <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر والملابس</button>
+      <button class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
+    </div>
   </div>
 
   <div class="game-container">
     <canvas id="gameCanvas" width="800" height="360"></canvas>
 
-    <!-- مربع تبديل ألوان الملابس -->
-    <div class="outfit-modal" id="outfitModal">
-      <h3>اختر لون ملابس الشخصية</h3>
-      <div class="color-options">
-        <div class="color-circle active" style="background: #3b82f6;" onclick="changeOutfit('#3b82f6', this)"></div>
-        <div class="color-circle" style="background: #ef4444;" onclick="changeOutfit('#ef4444', this)"></div>
-        <div class="color-circle" style="background: #10b981;" onclick="changeOutfit('#10b981', this)"></div>
-        <div class="color-circle" style="background: #eab308;" onclick="changeOutfit('#eab308', this)"></div>
-        <div class="color-circle" style="background: #a855f7;" onclick="changeOutfit('#a855f7', this)"></div>
-        <div class="color-circle" style="background: #f97316;" onclick="changeOutfit('#f97316', this)"></div>
+    <!-- قائمة اختيار الأطوار الثلاثة -->
+    <div class="overlay-screen" id="modeMenu">
+      <h2>اختر طور اللعب</h2>
+      <p class="subtitle">اختر التحدي الذي يناسبك الآن</p>
+      <div class="mode-cards">
+        <div class="mode-card" onclick="startGame('monster')">
+          <div class="icon">👾</div>
+          <h3>1. الهروب من الوحش</h3>
+          <p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p>
+        </div>
+        <div class="mode-card" onclick="startGame('rescue')">
+          <div class="icon">🦸‍♂️</div>
+          <h3>2. إنقاذ الصديق</h3>
+          <p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p>
+        </div>
+        <div class="mode-card" onclick="startGame('coins')">
+          <div class="icon">🪙</div>
+          <h3>3. جمع الأموال والمتجر</h3>
+          <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والإضافات!</p>
+        </div>
       </div>
-      <button class="btn-close" onclick="toggleOutfitModal()">تم</button>
     </div>
 
-    <!-- شاشة الخسارة -->
-    <div class="game-over-screen" id="gameOverScreen">
-      <h2>لقد خسرت! أمسك بك الوحش 👾</h2>
-      <p>مجموع نقاطك: <span id="finalScore">0</span></p>
-      <button class="btn-restart" onclick="restartGame()">العب مرة أخرى</button>
+    <!-- نافذة المتجر وتبديل الملابس -->
+    <div class="shop-modal" id="shopModal">
+      <h3>🛒 متجر Go Game</h3>
+      <p class="shop-info">اللعبة متوقفة مؤقتاً — رصيدك: <span id="shopCoinText" style="color:#fbbf24;font-weight:bold;">0</span> 🪙</p>
+      
+      <div class="shop-section-title">👕 ألوان الملابس</div>
+      <div class="shop-grid" id="shirtsGrid"></div>
+
+      <div class="shop-section-title">🎩 القبعات والإضافات</div>
+      <div class="shop-grid" id="hatsGrid"></div>
+
+      <button class="btn-close" onclick="toggleShopModal()">متابعة الركض ▶️</button>
+    </div>
+
+    <!-- شاشة النهاية -->
+    <div class="end-screen" id="endScreen">
+      <h2 id="endTitle">لقد خسرت!</h2>
+      <p id="endMessage">مجموع نقاطك: 0</p>
+      <div class="end-buttons">
+        <button class="btn-restart" onclick="restartCurrentMode()">العب مرة أخرى</button>
+        <button class="btn-menu" onclick="openModeMenu()">تغيير الطور</button>
+      </div>
     </div>
   </div>
 
   <div class="controls">
     <button class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
+    <button class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
   </div>
 
   <div class="watermark">NC Studio © 2026</div>
@@ -210,18 +375,50 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreText = document.getElementById('scoreText');
-    const finalScore = document.getElementById('finalScore');
-    const gameOverScreen = document.getElementById('gameOverScreen');
-    const outfitModal = document.getElementById('outfitModal');
+    const goalDisplay = document.getElementById('goalDisplay');
+    const coinText = document.getElementById('coinText');
+    const shopCoinText = document.getElementById('shopCoinText');
+    const modeMenu = document.getElementById('modeMenu');
+    const shopModal = document.getElementById('shopModal');
+    const endScreen = document.getElementById('endScreen');
+    const endTitle = document.getElementById('endTitle');
+    const endMessage = document.getElementById('endMessage');
 
-    let isPaused = false;
+    // حالة اللعبة
+    let currentMode = null; // 'monster' | 'rescue' | 'coins'
+    let isPaused = true;
     let isGameOver = false;
     let score = 0;
+    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30; // رصيد ابتدائي 30 عملة للتجربة
     let gameSpeed = 6;
     let frameCount = 0;
-    let shirtColor = '#3b82f6';
+    let animationId = null;
+
+    // بيانات المتجر والمقتنيات
+    let ownedShirts = JSON.parse(localStorage.getItem('gogame_shirts')) || ['#3b82f6'];
+    let equippedShirt = localStorage.getItem('gogame_eq_shirt') || '#3b82f6';
+
+    let ownedHats = JSON.parse(localStorage.getItem('gogame_hats')) || ['none'];
+    let equippedHat = localStorage.getItem('gogame_eq_hat') || 'none';
+
+    const shopCatalog = {
+      shirts: [
+        { id: '#3b82f6', name: 'أزرق كلاسيك', price: 0 },
+        { id: '#ef4444', name: 'أحمر ناري', price: 20 },
+        { id: '#10b981', name: 'أخضر زمردي', price: 30 },
+        { id: '#eab308', name: 'ذهبي ملكي', price: 50 },
+        { id: '#a855f7', name: 'بنفسجي', price: 70 },
+        { id: '#f97316', name: 'برتقالي', price: 90 }
+      ],
+      hats: [
+        { id: 'none', name: 'بدون قبعة', icon: '🚫', price: 0 },
+        { id: 'cap', name: 'كاب رياضي', icon: '🧢', price: 40 },
+        { id: 'crown', name: 'تاج البطل', icon: '👑', price: 100 }
+      ]
+    };
 
     const groundY = 300;
+    const RESCUE_TARGET_SCORE = 100;
 
     // خصائص اللاعب
     const player = {
@@ -232,34 +429,166 @@
       dy: 0,
       jumpPower: -13.5,
       gravity: 0.65,
-      grounded: true,
-      legAngle: 0
+      grounded: true
     };
 
-    // خصائص الوحش الذي يطارد اللاعب من الخلف
+    // خصائص الوحش (لطور الوحش)
     const monster = {
       x: 45,
       y: groundY - 85,
       width: 65,
-      height: 85,
-      bounce: 0
+      height: 85
+    };
+
+    // خصائص الصديق المحتجز (لطور الإنقاذ)
+    const friend = {
+      active: false,
+      x: 850,
+      y: groundY - 65,
+      width: 48,
+      height: 65
     };
 
     let obstacles = [];
+    let coinItems = [];
 
-    function toggleOutfitModal() {
-      if (isGameOver) return;
-      const isVisible = outfitModal.style.display === 'block';
-      outfitModal.style.display = isVisible ? 'none' : 'block';
-      isPaused = !isVisible;
-      if (!isPaused) requestAnimationFrame(update);
+    function saveProgress() {
+      localStorage.setItem('gogame_coins', coins);
+      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts));
+      localStorage.setItem('gogame_eq_shirt', equippedShirt);
+      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats));
+      localStorage.setItem('gogame_eq_hat', equippedHat);
+      coinText.textContent = coins;
+      shopCoinText.textContent = coins;
     }
 
-    function changeOutfit(color, element) {
-      shirtColor = color;
-      document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
-      element.classList.add('active');
-      draw(); // تحديث فوري للون أثناء التوقف
+    function renderShop() {
+      shopCoinText.textContent = coins;
+      const shirtsGrid = document.getElementById('shirtsGrid');
+      const hatsGrid = document.getElementById('hatsGrid');
+      shirtsGrid.innerHTML = '';
+      hatsGrid.innerHTML = '';
+
+      shopCatalog.shirts.forEach(item => {
+        const owned = ownedShirts.includes(item.id);
+        const equipped = equippedShirt === item.id;
+        const div = document.createElement('div');
+        div.className = 'shop-item' + (equipped ? ' equipped' : '');
+        div.innerHTML = `
+          <div class="color-dot" style="background:${item.id}"></div>
+          <span>${item.name}</span>
+          ${equipped ? '<span class="item-owned">مُرتدى ✓</span>' :
+            owned ? '<span class="item-owned">مملوك</span>' :
+            `<span class="item-price">🪙 ${item.price}</span>`}
+        `;
+        div.onclick = () => buyOrEquipShirt(item);
+        shirtsGrid.appendChild(div);
+      });
+
+      shopCatalog.hats.forEach(item => {
+        const owned = ownedHats.includes(item.id);
+        const equipped = equippedHat === item.id;
+        const div = document.createElement('div');
+        div.className = 'shop-item' + (equipped ? ' equipped' : '');
+        div.innerHTML = `
+          <div style="font-size:1.3rem">${item.icon}</div>
+          <span>${item.name}</span>
+          ${equipped ? '<span class="item-owned">مُرتدى ✓</span>' :
+            owned ? '<span class="item-owned">مملوك</span>' :
+            `<span class="item-price">🪙 ${item.price}</span>`}
+        `;
+        div.onclick = () => buyOrEquipHat(item);
+        hatsGrid.appendChild(div);
+      });
+    }
+
+    function buyOrEquipShirt(item) {
+      if (ownedShirts.includes(item.id)) {
+        equippedShirt = item.id;
+      } else if (coins >= item.price) {
+        coins -= item.price;
+        ownedShirts.push(item.id);
+        equippedShirt = item.id;
+      } else {
+        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
+        return;
+      }
+      saveProgress();
+      renderShop();
+      draw();
+    }
+
+    function buyOrEquipHat(item) {
+      if (ownedHats.includes(item.id)) {
+        equippedHat = item.id;
+      } else if (coins >= item.price) {
+        coins -= item.price;
+        ownedHats.push(item.id);
+        equippedHat = item.id;
+      } else {
+        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
+        return;
+      }
+      saveProgress();
+      renderShop();
+      draw();
+    }
+
+    function toggleShopModal() {
+      if (!currentMode || isGameOver) return;
+      const isVisible = shopModal.style.display === 'block';
+      if (!isVisible) {
+        isPaused = true;
+        renderShop();
+        shopModal.style.display = 'block';
+      } else {
+        shopModal.style.display = 'none';
+        isPaused = false;
+        animationId = requestAnimationFrame(update);
+      }
+    }
+
+    function openModeMenu() {
+      isPaused = true;
+      cancelAnimationFrame(animationId);
+      shopModal.style.display = 'none';
+      endScreen.style.display = 'none';
+      modeMenu.style.display = 'flex';
+    }
+
+    function startGame(mode) {
+      currentMode = mode;
+      modeMenu.style.display = 'none';
+      restartCurrentMode();
+    }
+
+    function restartCurrentMode() {
+      isGameOver = false;
+      isPaused = false;
+      score = 0;
+      gameSpeed = 6;
+      frameCount = 0;
+      obstacles = [];
+      coinItems = [];
+      friend.active = false;
+      friend.x = 860;
+
+      player.x = currentMode === 'monster' ? 210 : 120;
+      player.y = groundY - player.height;
+      player.dy = 0;
+      player.grounded = true;
+      monster.x = 45;
+
+      if (currentMode === 'rescue') {
+        goalDisplay.innerHTML = `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}`;
+      } else {
+        goalDisplay.innerHTML = `النقاط: <span id="scoreText">0</span>`;
+      }
+
+      endScreen.style.display = 'none';
+      shopModal.style.display = 'none';
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(update);
     }
 
     function jump() {
@@ -270,7 +599,6 @@
       }
     }
 
-    // دعم زر المسافة للقفز على الكيبورد
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
         e.preventDefault();
@@ -288,18 +616,29 @@
       });
     }
 
+    function spawnCoinLine() {
+      const count = Math.floor(Math.random() * 3) + 3;
+      const highArc = Math.random() > 0.5;
+      for (let i = 0; i < count; i++) {
+        coinItems.push({
+          x: canvas.width + 20 + (i * 34),
+          y: highArc ? groundY - 95 : groundY - 35,
+          radius: 10
+        });
+      }
+    }
+
     function drawPlayer() {
       ctx.save();
-      // حركة الأرجل أثناء الركض
-      const swing = player.grounded ? Math.sin(frameCount * 0.25) * 8 : 5;
+      const swing = (player.grounded && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
 
-      // الأرجل (بنطال داكن)
+      // الأرجل
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(player.x + 6 + swing, player.y + 40, 8, 20);
       ctx.fillRect(player.x + 20 - swing, player.y + 40, 8, 20);
 
-      // الجسم (الملابس القابلة لتغيير اللون)
-      ctx.fillStyle = shirtColor;
+      // القميص
+      ctx.fillStyle = equippedShirt;
       ctx.fillRect(player.x + 4, player.y + 18, 26, 24);
 
       // الرأس
@@ -308,25 +647,43 @@
       ctx.arc(player.x + 17, player.y + 10, 10, 0, Math.PI * 2);
       ctx.fill();
 
-      // العين تنظر للأمام (يمين)
+      // العين
       ctx.fillStyle = '#000';
       ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
+
+      // رسم القبعة المختارة
+      if (equippedHat === 'cap') {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(player.x + 8, player.y - 2, 18, 6);
+        ctx.fillRect(player.x + 18, player.y + 2, 13, 3);
+      } else if (equippedHat === 'crown') {
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.moveTo(player.x + 8, player.y + 2);
+        ctx.lineTo(player.x + 8, player.y - 8);
+        ctx.lineTo(player.x + 13, player.y - 3);
+        ctx.lineTo(player.x + 17, player.y - 10);
+        ctx.lineTo(player.x + 21, player.y - 3);
+        ctx.lineTo(player.x + 26, player.y - 8);
+        ctx.lineTo(player.x + 26, player.y + 2);
+        ctx.closePath();
+        ctx.fill();
+      }
       ctx.restore();
     }
 
     function drawMonster() {
+      if (currentMode !== 'monster') return;
       ctx.save();
       const bounceY = Math.abs(Math.sin(frameCount * 0.2)) * 8;
       const mx = monster.x;
       const my = monster.y - bounceY;
 
-      // جسم الوحش
       ctx.fillStyle = '#dc2626';
       ctx.beginPath();
       ctx.roundRect(mx, my, monster.width, monster.height, [25, 25, 5, 5]);
       ctx.fill();
 
-      // قرون الوحش
       ctx.fillStyle = '#fef08a';
       ctx.beginPath();
       ctx.moveTo(mx + 10, my + 5);
@@ -340,13 +697,11 @@
       ctx.lineTo(mx + 55, my + 5);
       ctx.fill();
 
-      // عيون الوحش الغاضبة
       ctx.fillStyle = '#fef08a';
       ctx.fillRect(mx + 35, my + 20, 16, 10);
       ctx.fillStyle = '#000';
       ctx.fillRect(mx + 44, my + 22, 6, 6);
 
-      // فم وأسنان الوحش
       ctx.fillStyle = '#450a0a';
       ctx.fillRect(mx + 25, my + 42, 35, 18);
       ctx.fillStyle = '#fff';
@@ -356,10 +711,50 @@
       ctx.restore();
     }
 
+    function drawFriendCage() {
+      if (currentMode !== 'rescue' || !friend.active) return;
+      ctx.save();
+      // الصديق داخل القفص
+      ctx.fillStyle = '#10b981';
+      ctx.fillRect(friend.x + 12, friend.y + 22, 24, 24);
+      ctx.fillStyle = '#fcd34d';
+      ctx.beginPath();
+      ctx.arc(friend.x + 24, friend.y + 14, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      // قضبان القفص
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(friend.x, friend.y, friend.width, friend.height);
+      for (let i = 10; i < friend.width; i += 10) {
+        ctx.beginPath();
+        ctx.moveTo(friend.x + i, friend.y);
+        ctx.lineTo(friend.x + i, friend.y + friend.height);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawCoins() {
+      coinItems.forEach(c => {
+        ctx.save();
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#b45309';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#78350f';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('$', c.x - 3.5, c.y + 4);
+        ctx.restore();
+      });
+    }
+
     function drawObstacles() {
       ctx.fillStyle = '#f43f5e';
       obstacles.forEach(obs => {
-        // رسم عائق بشكل شوكة/حاجز مدبب
         ctx.beginPath();
         ctx.moveTo(obs.x, obs.y + obs.height);
         ctx.lineTo(obs.x + obs.width / 2, obs.y);
@@ -372,8 +767,6 @@
     function drawGround() {
       ctx.fillStyle = '#334155';
       ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-
-      // خطوط حركة الأرضية
       ctx.fillStyle = '#475569';
       const offset = (frameCount * gameSpeed) % 40;
       for (let x = -offset; x < canvas.width; x += 40) {
@@ -382,7 +775,6 @@
     }
 
     function checkCollision(rect1, rect2) {
-      // تقليص بسيط لصندوق التصادم لجعل اللعب عادلاً وممتعاً
       const pad = 6;
       return (
         rect1.x + pad < rect2.x + rect2.width - pad &&
@@ -396,28 +788,41 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawGround();
       drawMonster();
+      drawFriendCage();
+      drawCoins();
       drawPlayer();
       drawObstacles();
     }
 
     function update() {
       if (isPaused || isGameOver) return;
-
       frameCount++;
 
-      // تحديث فيزياء قفز اللاعب
+      // فيزياء القفز
       player.dy += player.gravity;
       player.y += player.dy;
-
       if (player.y + player.height >= groundY) {
         player.y = groundY - player.height;
         player.dy = 0;
         player.grounded = true;
       }
 
-      // توليد العوائق بمسافات عشوائية مناسبة
-      if (frameCount % Math.floor(Math.random() * 40 + 85) === 0) {
-        spawnObstacle();
+      // منطق توليد العناصر حسب الطور
+      if (currentMode === 'monster') {
+        if (frameCount % Math.floor(Math.random() * 35 + 85) === 0) spawnObstacle();
+      } else if (currentMode === 'rescue') {
+        if (!friend.active && frameCount % Math.floor(Math.random() * 35 + 90) === 0) {
+          spawnObstacle();
+        }
+        if (score >= RESCUE_TARGET_SCORE && !friend.active) {
+          friend.active = true;
+          friend.x = canvas.width + 40;
+        }
+      } else if (currentMode === 'coins') {
+        if (frameCount % 95 === 0) {
+          if (Math.random() > 0.35) spawnCoinLine();
+          else spawnObstacle();
+        }
       }
 
       // تحريك العوائق وفحص التصادم
@@ -425,50 +830,86 @@
         obstacles[i].x -= gameSpeed;
 
         if (checkCollision(player, obstacles[i])) {
-          triggerGameOver();
+          triggerEnd(false);
           return;
         }
 
         if (obstacles[i].x + obstacles[i].width < 0) {
           obstacles.splice(i, 1);
           score += 10;
-          scoreText.textContent = score;
-          // زيادة تدريجية طفيفة في السرعة
-          if (score % 100 === 0) gameSpeed += 0.4;
+          document.getElementById('scoreText').textContent = score;
+          if (score % 100 === 0 && currentMode === 'monster') gameSpeed += 0.4;
+        }
+      }
+
+      // تحريك العملات والتقاطها
+      for (let i = coinItems.length - 1; i >= 0; i--) {
+        coinItems[i].x -= gameSpeed;
+        const cBox = {
+          x: coinItems[i].x - coinItems[i].radius,
+          y: coinItems[i].y - coinItems[i].radius,
+          width: coinItems[i].radius * 2,
+          height: coinItems[i].radius * 2
+        };
+
+        if (checkCollision(player, cBox)) {
+          coinItems.splice(i, 1);
+          coins += 5;
+          score += 5;
+          document.getElementById('scoreText').textContent = score;
+          saveProgress();
+          continue;
+        }
+
+        if (coinItems[i].x + coinItems[i].radius < 0) {
+          coinItems.splice(i, 1);
+        }
+      }
+
+      // تحريك قفص الصديق في طور الإنقاذ
+      if (friend.active) {
+        friend.x -= gameSpeed;
+        if (checkCollision(player, friend)) {
+          coins += 30; // مكافأة إنقاذ الصديق
+          saveProgress();
+          triggerEnd(true);
+          return;
         }
       }
 
       draw();
-      requestAnimationFrame(update);
+      animationId = requestAnimationFrame(update);
     }
 
-    function triggerGameOver() {
+    function triggerEnd(isWin) {
       isGameOver = true;
-      // الوحش يقترب من اللاعب عند الخسارة
-      monster.x = player.x - 45;
-      draw();
-      finalScore.textContent = score;
-      gameOverScreen.style.display = 'flex';
+      cancelAnimationFrame(animationId);
+
+      if (isWin) {
+        endTitle.style.color = '#10b981';
+        endTitle.textContent = 'أحسنت! أنقذت صديقك بنجاح 🦸‍♂️🎉';
+        endMessage.textContent = 'حصلت على مكافأة +30 عملة ذهبية!';
+      } else {
+        endTitle.style.color = '#ef4444';
+        if (currentMode === 'monster') {
+          monster.x = player.x - 45;
+          draw();
+          endTitle.textContent = 'لقد خسرت! أمسك بك الوحش 👾';
+        } else if (currentMode === 'rescue') {
+          endTitle.textContent = 'اصطدمت بعائق قبل الوصول لصديقك! 💥';
+        } else {
+          endTitle.textContent = 'انتهت الجولة! 💥';
+        }
+        endMessage.textContent = `نقاطك: ${score} | رصيد عملاتك الحالي: ${coins} 🪙`;
+      }
+
+      endScreen.style.display = 'flex';
     }
 
-    function restartGame() {
-      isGameOver = false;
-      isPaused = false;
-      score = 0;
-      gameSpeed = 6;
-      frameCount = 0;
-      obstacles = [];
-      player.y = groundY - player.height;
-      player.dy = 0;
-      player.grounded = true;
-      monster.x = 45;
-      scoreText.textContent = '0';
-      gameOverScreen.style.display = 'none';
-      requestAnimationFrame(update);
-    }
-
-    // بدء اللعبة
-    requestAnimationFrame(update);
+    // تهيئة أولية
+    coinText.textContent = coins;
+    drawGround();
+    drawPlayer();
   </script>
 </body>
 </html>
