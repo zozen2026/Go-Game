@@ -555,7 +555,7 @@
       const parsedX = Number(data.world_x);
       const nextWorldX = Number.isFinite(parsedX)
         ? parsedX
-        : (existing ? existing.world_x : (player.worldX + 90));
+        : (existing ? existing.world_x : 0);
 
       const entry = {
         id: data.id,
@@ -1241,21 +1241,31 @@
 
     function drawChatPlazaPlayers() {
       if (currentMode !== 'chat') return;
-      let slot = 0;
       const floorY = getGroundCharacterY();
       remoteAccounts.forEach((p) => {
-        const rawScreenX = canvas.width * 0.5 + (p.world_x - player.worldX) - player.width * 0.5;
-        const isOutside = rawScreenX < 24 || rawScreenX > canvas.width - 58;
+        const screenX = canvas.width * 0.5 + (p.world_x - player.worldX) - player.width * 0.5;
+        const bubble = getActiveBubble(p.id, p.username);
 
-        let screenX = rawScreenX;
-        if (isOutside) {
-          const dir = rawScreenX < 24 ? -1 : 1;
-          const offset = 68 + (slot % 3) * 46;
-          screenX = Math.min(canvas.width - 60, Math.max(24, canvas.width * 0.5 + dir * offset));
-          slot++;
+        if (screenX < -player.width) {
+          ctx.save();
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillStyle = '#fde047';
+          ctx.textAlign = 'left';
+          ctx.fillText(`⬅️ ${p.username || 'Player'}`, 10, floorY - 12);
+          ctx.restore();
+          return;
         }
 
-        const bubble = getActiveBubble(p.id, p.username);
+        if (screenX > canvas.width) {
+          ctx.save();
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillStyle = '#fde047';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${p.username || 'Player'} ➡️`, canvas.width - 10, floorY - 12);
+          ctx.restore();
+          return;
+        }
+
         drawCharacterSprite(screenX, floorY, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble);
       });
     }
