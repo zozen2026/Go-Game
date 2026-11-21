@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - 3 Modes, Backgrounds & SFX</title>
+  <title>NC Go - 4 Modes, 10v10 War, Backgrounds & SFX</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -21,9 +21,10 @@
     }
     .top-bar { width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
     .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .score-board { font-size: 1rem; font-weight: bold; background: #1e1e26; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; }
+    .score-board { font-size: 0.95rem; font-weight: bold; background: #1e1e26; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; }
     .coin-board { color: #fbbf24; border-color: #78350f; }
     .online-board { color: #34d399; border-color: #065f46; }
+    .war-board { color: #f87171; border-color: #7f1d1d; }
     .btn-top { background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
     .btn-shop { background: #eab308; color: #000; }
     .btn-modes { background: #334155; }
@@ -34,18 +35,18 @@
     .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
     .overlay-screen h2 { font-size: 1.5rem; margin-bottom: 4px; color: #f8fafc; }
     .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 14px; font-size: 0.9rem; }
-    .mode-cards { display: flex; gap: 12px; width: 100%; max-width: 680px; justify-content: center; flex-wrap: wrap; }
-    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 16px 14px; width: 200px; cursor: pointer; }
+    .mode-cards { display: flex; gap: 10px; width: 100%; max-width: 740px; justify-content: center; flex-wrap: wrap; }
+    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 14px 12px; width: 170px; cursor: pointer; }
     .mode-card:hover { border-color: #6366f1; background: #263349; }
-    .mode-card .icon { font-size: 2rem; margin-bottom: 8px; }
-    .mode-card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #fff; }
-    .mode-card p { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
+    .mode-card .icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .mode-card h3 { font-size: 1rem; margin-bottom: 4px; color: #fff; }
+    .mode-card p { font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; }
     @media (max-width: 680px) {
       .game-container { height: 320px; }
       .overlay-screen { justify-content: flex-start; padding: 14px 12px 22px; }
-      .mode-cards { flex-direction: column; align-items: stretch; gap: 10px; }
-      .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 12px 14px; gap: 12px; }
-      .mode-card .icon { font-size: 1.9rem; margin-bottom: 0; flex-shrink: 0; }
+      .mode-cards { flex-direction: column; align-items: stretch; gap: 8px; }
+      .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 10px 12px; gap: 10px; }
+      .mode-card .icon { font-size: 1.7rem; margin-bottom: 0; flex-shrink: 0; }
       .mode-card-text { display: flex; flex-direction: column; }
     }
     .shop-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 30; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
@@ -68,72 +69,52 @@
     .btn-restart, .btn-menu { color: #fff; border: none; padding: 11px 22px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; }
     .btn-restart { background: #10b981; }
     .btn-menu { background: #475569; }
-    .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
-    .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
-    .btn-stop-run { flex: 1; max-width: 170px; padding: 14px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
 
-    /* صندوق مشاركة الرابط */
-    .share-box {
-      margin-top: 14px;
+    /* شريط أزرار الأسلحة في طور الحرب */
+    .weapons-bar {
+      display: none;
+      margin-top: 10px;
       width: 95%;
       max-width: 800px;
       background: #1e1e26;
-      border: 1px solid #334155;
+      border: 1px solid #475569;
       border-radius: 14px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .share-label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #e2e8f0;
-    }
-    .share-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+      padding: 10px 12px;
+      justify-content: center;
+      gap: 10px;
       flex-wrap: wrap;
     }
-    .share-input {
-      flex: 1;
-      min-width: 210px;
-      background: #0f172a;
-      color: #93c5fd;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 0.88rem;
-      direction: ltr;
-      text-align: left;
-      user-select: text;
-    }
-    .btn-copy, .btn-share-native {
+    .weapons-bar.active { display: flex; }
+    .btn-weapon {
       border: none;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 0.88rem;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
-      white-space: nowrap;
-    }
-    .btn-copy {
-      background: #334155;
       color: #fff;
+      transition: transform 0.1s, opacity 0.2s;
     }
-    .btn-copy:hover { background: #475569; }
-    .btn-share-native {
-      background: #10b981;
-      color: #fff;
-    }
-    .btn-share-native:hover { background: #059669; }
-    .share-status {
-      font-size: 0.8rem;
-      color: #34d399;
-      min-height: 18px;
-    }
+    .btn-weapon:active { transform: scale(0.96); }
+    .btn-weapon:disabled { opacity: 0.45; cursor: not-allowed; }
+    .w-gun { background: #2563eb; box-shadow: 0 4px 0 #1e40af; }
+    .w-rocket { background: #dc2626; box-shadow: 0 4px 0 #991b1b; }
+    .w-laser { background: #7c3aed; box-shadow: 0 4px 0 #5b21b6; }
 
+    .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
+    .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
+    .btn-jump:active { transform: translateY(4px); box-shadow: 0 1px 0 #b45309; }
+    .btn-stop-run { flex: 1; max-width: 170px; padding: 14px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
+    .btn-stop-run:active { transform: translateY(4px); box-shadow: 0 1px 0 #1d4ed8; }
+
+    .share-box { margin-top: 14px; width: 95%; max-width: 800px; background: #1e1e26; border: 1px solid #334155; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .share-label { font-size: 0.9rem; font-weight: bold; color: #e2e8f0; }
+    .share-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .share-input { flex: 1; min-width: 210px; background: #0f172a; color: #93c5fd; border: 1px solid #334155; border-radius: 10px; padding: 9px 12px; font-size: 0.88rem; direction: ltr; text-align: left; user-select: text; }
+    .btn-copy, .btn-share-native { border: none; border-radius: 10px; padding: 9px 14px; font-size: 0.88rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .btn-copy { background: #334155; color: #fff; }
+    .btn-share-native { background: #10b981; color: #fff; }
+    .share-status { font-size: 0.8rem; color: #34d399; min-height: 18px; }
     .watermark { position: fixed; bottom: 4px; right: 12px; font-size: 11px; color: #64748b; }
   </style>
 </head>
@@ -143,6 +124,7 @@
       <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
       <div class="score-board online-board">🟢 نشط الآن: <span id="onlineCount">1</span></div>
+      <div class="score-board war-board" id="warTeamStatus" style="display:none;">⚔️ فريقنا: <span id="allyAliveCount">10</span> | الأعداء: <span id="enemyAliveCount">10</span></div>
     </div>
     <div class="actions-group">
       <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
@@ -169,6 +151,10 @@
           <div class="icon">🪙</div>
           <div class="mode-card-text"><h3>3. جمع الأموال والمتجر</h3><p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p></div>
         </div>
+        <div class="mode-card" onclick="startGame('war')">
+          <div class="icon">⚔️</div>
+          <div class="mode-card-text"><h3>4. حرب 10 ضد 10</h3><p>قُد فريقك المكون من 10 مقاتلين ضد 10 أعداء واستخدم أزرار الأسلحة!</p></div>
+        </div>
       </div>
     </div>
 
@@ -194,6 +180,13 @@
     </div>
   </div>
 
+  <!-- أزرار الأسلحة الخاصة بطور الحرب 10 ضد 10 -->
+  <div class="weapons-bar" id="weaponsBar">
+    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireWeapon('gun')">🔫 مسدس سريع</button>
+    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireWeapon('rocket')">💥 صاروخ جماعي</button>
+    <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireWeapon('laser')">⚡ شعاع طاقة</button>
+  </div>
+
   <div class="controls">
     <button class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
     <button class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
@@ -217,46 +210,30 @@
     const shopCoinText = document.getElementById('shopCoinText'), modeMenu = document.getElementById('modeMenu');
     const shopModal = document.getElementById('shopModal'), endScreen = document.getElementById('endScreen');
     const endTitle = document.getElementById('endTitle'), endMessage = document.getElementById('endMessage');
-    const soundBtn = document.getElementById('soundBtn');
+    const soundBtn = document.getElementById('soundBtn'), weaponsBar = document.getElementById('weaponsBar');
+    const warTeamStatus = document.getElementById('warTeamStatus');
+    const allyAliveCountEl = document.getElementById('allyAliveCount'), enemyAliveCountEl = document.getElementById('enemyAliveCount');
     const SHARE_URL = 'https://zozen2026.github.io/Go-Game/';
 
     function showShareStatus(msg) {
       const el = document.getElementById('shareStatus');
       if (el) el.textContent = msg;
     }
-
     async function copyShareLink() {
       const input = document.getElementById('shareUrlInput');
-      if (input) {
-        input.focus();
-        input.select();
-      }
+      if (input) { input.focus(); input.select(); }
       try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(SHARE_URL);
-        } else {
-          document.execCommand('copy');
-        }
+        if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(SHARE_URL);
+        else document.execCommand('copy');
         showShareStatus('تم نسخ الرابط بنجاح! يمكنك لصقه في واتساب أو تيليجرام أو سناب.');
       } catch (_) {
         showShareStatus('حدد الرابط واضغط نسخ يدوياً.');
       }
     }
-
     async function shareGameLink() {
-      const shareData = {
-        title: 'NC Go',
-        text: 'العب لعبة NC Go وشارك التحدي!',
-        url: SHARE_URL
-      };
       if (navigator.share) {
-        try {
-          await navigator.share(shareData);
-          showShareStatus('تم فتح قائمة المشاركة.');
-          return;
-        } catch (err) {
-          if (err && err.name === 'AbortError') return;
-        }
+        try { await navigator.share({ title: 'NC Go', text: 'العب لعبة NC Go وشارك التحدي!', url: SHARE_URL }); return; }
+        catch (err) { if (err && err.name === 'AbortError') return; }
       }
       await copyShareLink();
     }
@@ -268,41 +245,18 @@
     sessionStorage.setItem('ncgo_sid', sessionId);
 
     async function syncActivePlayers() {
-      const headers = {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      };
+      const headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' };
       try {
-        const postRes = await fetch(`${SUPABASE_URL}/rest/v1/active_players`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ session_id: sessionId, last_seen: new Date().toISOString() })
-        });
-        if (!postRes.ok) {
-          console.error('Supabase POST failed:', postRes.status, await postRes.text());
-          return;
-        }
-
+        const postRes = await fetch(`${SUPABASE_URL}/rest/v1/active_players`, { method: 'POST', headers, body: JSON.stringify({ session_id: sessionId, last_seen: new Date().toISOString() }) });
+        if (!postRes.ok) return;
         const cutoff = new Date(Date.now() - 45000).toISOString();
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/active_players?last_seen=gte.${encodeURIComponent(cutoff)}&select=session_id`,
-          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY } }
-        );
-        if (!res.ok) {
-          console.error('Supabase GET failed:', res.status, await res.text());
-          return;
-        }
-
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/active_players?last_seen=gte.${encodeURIComponent(cutoff)}&select=session_id`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY } });
+        if (!res.ok) return;
         const rows = await res.json();
         const el = document.getElementById('onlineCount');
         if (el && Array.isArray(rows)) el.textContent = rows.length;
-      } catch (err) {
-        console.error('Supabase error:', err);
-      }
+      } catch (_) {}
     }
-
     syncActivePlayers();
     setInterval(syncActivePlayers, 15000);
 
@@ -325,6 +279,9 @@
       jump: () => playTone(260, 520, 0.13, 'triangle', 0, 0.12),
       coin: () => { playTone(780, 980, 0.07, 'sine', 0, 0.11); playTone(1040, 1250, 0.09, 'sine', 0.06, 0.11); },
       buy: () => { playTone(520, 680, 0.08, 'triangle', 0, 0.11); playTone(780, 920, 0.1, 'triangle', 0.07, 0.11); },
+      gun: () => playTone(640, 210, 0.09, 'square', 0, 0.08),
+      rocket: () => playTone(190, 65, 0.24, 'sawtooth', 0, 0.12),
+      laser: () => playTone(980, 320, 0.15, 'triangle', 0, 0.1),
       win: () => { playTone(523, 523, 0.1, 'triangle', 0, 0.12); playTone(659, 659, 0.1, 'triangle', 0.1, 0.12); playTone(784, 1046, 0.22, 'triangle', 0.2, 0.13); },
       lose: () => playTone(280, 110, 0.25, 'sawtooth', 0, 0.11)
     };
@@ -361,6 +318,94 @@
     const monster = { x: 45, y: groundY - 85, width: 65, height: 85 };
     const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
     let obstacles = [], coinItems = [];
+
+    // حالة طور الحرب 10 ضد 10
+    let allies = [], enemies = [], projectiles = [], laserBeamTimer = 0;
+    let cooldowns = { gun: 0, rocket: 0, laser: 0 };
+
+    function initWarSquads() {
+      allies = [];
+      enemies = [];
+      projectiles = [];
+      laserBeamTimer = 0;
+      cooldowns = { gun: 0, rocket: 0, laser: 0 };
+
+      // 10 مقاتلين في فريقك (اللاعب رقم 0 في المقدمة + 9 رفاق)
+      for (let i = 0; i < 10; i++) {
+        allies.push({
+          isPlayer: i === 0,
+          x: i === 0 ? 190 : 30 + (i % 3) * 42,
+          y: groundY - 42,
+          width: 24,
+          height: 42,
+          hp: i === 0 ? 120 : 60,
+          alive: true,
+          fireTimer: i * 14
+        });
+      }
+
+      // 10 أعداء في الفريق المقابل
+      for (let i = 0; i < 10; i++) {
+        enemies.push({
+          x: 520 + (i % 4) * 55 + Math.floor(i / 4) * 28,
+          y: groundY - 42,
+          width: 24,
+          height: 42,
+          hp: 65,
+          alive: true,
+          fireTimer: 25 + i * 18
+        });
+      }
+      updateWarCounters();
+    }
+
+    function updateWarCounters() {
+      const aAlive = allies.filter(a => a.alive).length;
+      const eAlive = enemies.filter(e => e.alive).length;
+      if (allyAliveCountEl) allyAliveCountEl.textContent = aAlive;
+      if (enemyAliveCountEl) enemyAliveCountEl.textContent = eAlive;
+
+      const btnGun = document.getElementById('btnGun');
+      const btnRocket = document.getElementById('btnRocket');
+      const btnLaser = document.getElementById('btnLaser');
+      if (btnGun) btnGun.disabled = cooldowns.gun > 0;
+      if (btnRocket) btnRocket.disabled = cooldowns.rocket > 0;
+      if (btnLaser) btnLaser.disabled = cooldowns.laser > 0;
+    }
+
+    function fireWeapon(type) {
+      if (currentMode !== 'war' || isPaused || isGameOver) return;
+      const leader = allies[0];
+      if (!leader || !leader.alive) return;
+
+      if (type === 'gun' && cooldowns.gun <= 0) {
+        projectiles.push({ fromAlly: true, kind: 'gun', x: leader.x + 26, y: leader.y + 18, vx: 11, vy: 0, dmg: 25, radius: 5 });
+        cooldowns.gun = 14;
+        sfx.gun();
+      } else if (type === 'rocket' && cooldowns.rocket <= 0) {
+        projectiles.push({ fromAlly: true, kind: 'rocket', x: leader.x + 28, y: leader.y + 14, vx: 8.5, vy: 0, dmg: 70, radius: 9 });
+        cooldowns.rocket = 75;
+        sfx.rocket();
+      } else if (type === 'laser' && cooldowns.laser <= 0) {
+        laserBeamTimer = 14;
+        cooldowns.laser = 110;
+        sfx.laser();
+        enemies.forEach(en => {
+          if (en.alive && en.x > leader.x) {
+            en.hp -= 55;
+            if (en.hp <= 0) {
+              en.alive = false;
+              score += 10;
+              coins += 2;
+              saveProgress();
+              const el = document.getElementById('scoreText');
+              if (el) el.textContent = score;
+            }
+          }
+        });
+        updateWarCounters();
+      }
+    }
 
     function saveProgress() {
       localStorage.setItem('gogame_coins', coins);
@@ -406,16 +451,52 @@
     }
     function openModeMenu() { isPaused = true; cancelAnimationFrame(animationId); shopModal.style.display = 'none'; endScreen.style.display = 'none'; modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0; }
     function startGame(mode) { getAudioCtx(); currentMode = mode; modeMenu.style.display = 'none'; restartCurrentMode(); }
+
     function restartCurrentMode() {
       isGameOver = false; isPaused = false; score = 0; gameSpeed = 6; frameCount = 0;
       obstacles = []; coinItems = []; friend.active = false; friend.x = 860;
       player.x = currentMode === 'monster' ? 210 : 120; player.y = groundY - player.height; player.dy = 0; player.grounded = true; monster.x = 45;
-      goalDisplay.innerHTML = currentMode === 'rescue' ? `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}` : `النقاط: <span id="scoreText">0</span>`;
+
+      const isWar = currentMode === 'war';
+      weaponsBar.classList.toggle('active', isWar);
+      warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
+
+      if (isWar) {
+        initWarSquads();
+        goalDisplay.innerHTML = `القتلى: <span id="scoreText">0</span>`;
+      } else if (currentMode === 'rescue') {
+        goalDisplay.innerHTML = `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}`;
+      } else {
+        goalDisplay.innerHTML = `النقاط: <span id="scoreText">0</span>`;
+      }
+
       endScreen.style.display = 'none'; shopModal.style.display = 'none';
       cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
     }
-    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
-    window.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); } });
+
+    function jump() {
+      if (isGameOver || isPaused) return;
+      if (currentMode === 'war') {
+        const leader = allies[0];
+        if (leader && leader.alive && leader.y >= groundY - leader.height - 1) {
+          leader.y -= 36;
+          sfx.jump();
+          setTimeout(() => { if (leader) leader.y = groundY - leader.height; }, 220);
+        }
+        return;
+      }
+      if (player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); }
+    }
+
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
+      if (currentMode === 'war') {
+        if (e.key === '1') fireWeapon('gun');
+        if (e.key === '2') fireWeapon('rocket');
+        if (e.key === '3') fireWeapon('laser');
+      }
+    });
+
     function spawnObstacle() { obstacles.push({ x: canvas.width + 20, y: groundY - (Math.floor(Math.random() * 25) + 30), width: 28, height: Math.floor(Math.random() * 25) + 30 }); }
     function spawnCoinLine() {
       const count = Math.floor(Math.random() * 3) + 3, high = Math.random() > 0.5;
@@ -423,7 +504,7 @@
     }
 
     function drawBackgroundAndGround() {
-      const scroll = frameCount * gameSpeed, sky = ctx.createLinearGradient(0, 0, 0, groundY);
+      const scroll = frameCount * (currentMode === 'war' ? 2 : gameSpeed), sky = ctx.createLinearGradient(0, 0, 0, groundY);
       if (equippedBg === 'desert') { sky.addColorStop(0, '#ea580c'); sky.addColorStop(1, '#fde047'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#d97706'; for (let x = -((scroll * 0.25) % 260); x < canvas.width + 260; x += 260) { ctx.beginPath(); ctx.moveTo(x, groundY); ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY); ctx.fill(); } ctx.fillStyle = '#b45309'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#fbbf24'; }
       else if (equippedBg === 'forest') { sky.addColorStop(0, '#3b0764'); sky.addColorStop(1, '#1e1b4b'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); for (let x = -((scroll * 0.35) % 140); x < canvas.width + 140; x += 140) { ctx.fillStyle = '#14532d'; ctx.beginPath(); ctx.moveTo(x + 25, groundY - 85); ctx.lineTo(x, groundY); ctx.lineTo(x + 50, groundY); ctx.closePath(); ctx.fill(); } ctx.fillStyle = '#166534'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#4ade80'; }
       else if (equippedBg === 'space') { sky.addColorStop(0, '#020617'); sky.addColorStop(1, '#172554'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#f8fafc'; stars.forEach(s => { const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width; ctx.beginPath(); ctx.arc(sx, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#0f172a'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#38bdf8'; }
@@ -439,6 +520,47 @@
       ctx.fillStyle = '#000'; ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
       if (equippedHat === 'cap') { ctx.fillStyle = '#ef4444'; ctx.fillRect(player.x + 8, player.y - 2, 18, 6); ctx.fillRect(player.x + 18, player.y + 2, 13, 3); }
       else if (equippedHat === 'crown') { ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.moveTo(player.x + 8, player.y + 2); ctx.lineTo(player.x + 8, player.y - 8); ctx.lineTo(player.x + 13, player.y - 3); ctx.lineTo(player.x + 17, player.y - 10); ctx.lineTo(player.x + 21, player.y - 3); ctx.lineTo(player.x + 26, player.y - 8); ctx.lineTo(player.x + 26, player.y + 2); ctx.closePath(); ctx.fill(); }
+      ctx.restore();
+    }
+
+    function drawWarScene() {
+      if (currentMode !== 'war') return;
+      ctx.save();
+
+      // رسم 10 مقاتلين من فريقنا
+      allies.forEach(a => {
+        if (!a.alive) return;
+        ctx.fillStyle = a.isPlayer ? equippedShirt : '#38bdf8';
+        ctx.fillRect(a.x, a.y + 12, a.width, 20);
+        ctx.fillStyle = '#fcd34d';
+        ctx.beginPath(); ctx.arc(a.x + 12, a.y + 7, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(a.x + 4, a.y + 32, 6, 10); ctx.fillRect(a.x + 14, a.y + 32, 6, 10);
+      });
+
+      // رسم 10 أعداء
+      enemies.forEach(en => {
+        if (!en.alive) return;
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(en.x, en.y + 12, en.width, 20);
+        ctx.fillStyle = '#fca5a5';
+        ctx.beginPath(); ctx.arc(en.x + 12, en.y + 7, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#450a0a';
+        ctx.fillRect(en.x + 4, en.y + 32, 6, 10); ctx.fillRect(en.x + 14, en.y + 32, 6, 10);
+      });
+
+      // رسم شعاع الطاقة
+      if (laserBeamTimer > 0 && allies[0] && allies[0].alive) {
+        ctx.fillStyle = 'rgba(167, 139, 250, 0.75)';
+        ctx.fillRect(allies[0].x + 24, allies[0].y + 14, canvas.width - allies[0].x, 10);
+      }
+
+      // رسم المقذوفات
+      projectiles.forEach(p => {
+        ctx.fillStyle = p.fromAlly ? (p.kind === 'rocket' ? '#fb923c' : '#60a5fa') : '#f87171';
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+      });
+
       ctx.restore();
     }
 
@@ -478,7 +600,14 @@
       return r1.x + p < r2.x + r2.width - p && r1.x + r1.width - p > r2.x + p && r1.y + p < r2.y + r2.height - p && r1.y + r1.height - p > r2.y + p;
     }
 
-    function draw() { drawBackgroundAndGround(); drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer(); }
+    function draw() {
+      drawBackgroundAndGround();
+      if (currentMode === 'war') {
+        drawWarScene();
+      } else {
+        drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer();
+      }
+    }
 
     function endGame(won, title, message) {
       isGameOver = true; isPaused = true; cancelAnimationFrame(animationId);
@@ -487,9 +616,87 @@
       if (won) sfx.win(); else sfx.lose();
     }
 
+    function updateWar() {
+      if (cooldowns.gun > 0) cooldowns.gun--;
+      if (cooldowns.rocket > 0) cooldowns.rocket--;
+      if (cooldowns.laser > 0) cooldowns.laser--;
+      if (laserBeamTimer > 0) laserBeamTimer--;
+
+      // إطلاق تلقائي خفيف للرفاق والأعداء
+      allies.forEach((a, idx) => {
+        if (!a.alive || idx === 0) return;
+        a.fireTimer--;
+        if (a.fireTimer <= 0) {
+          a.fireTimer = 55 + idx * 7;
+          projectiles.push({ fromAlly: true, kind: 'gun', x: a.x + 24, y: a.y + 18, vx: 8.5, vy: 0, dmg: 12, radius: 4 });
+        }
+      });
+
+      enemies.forEach((en, idx) => {
+        if (!en.alive) return;
+        en.x = Math.max(430, en.x - 0.15);
+        en.fireTimer--;
+        if (en.fireTimer <= 0) {
+          en.fireTimer = 65 + idx * 8;
+          projectiles.push({ fromAlly: false, kind: 'gun', x: en.x - 4, y: en.y + 18, vx: -6.5, vy: 0, dmg: 10, radius: 4 });
+        }
+      });
+
+      for (let i = projectiles.length - 1; i >= 0; i--) {
+        const p = projectiles[i];
+        p.x += p.vx;
+        if (p.x < -20 || p.x > canvas.width + 20) { projectiles.splice(i, 1); continue; }
+
+        if (p.fromAlly) {
+          let hit = false;
+          for (const en of enemies) {
+            if (en.alive && p.x + p.radius > en.x && p.x - p.radius < en.x + en.width && p.y > en.y && p.y < en.y + en.height) {
+              en.hp -= p.dmg;
+              hit = true;
+              if (en.hp <= 0) {
+                en.alive = false;
+                score += 10;
+                coins += 2;
+                saveProgress();
+                const el = document.getElementById('scoreText');
+                if (el) el.textContent = score;
+              }
+              break;
+            }
+          }
+          if (hit) { projectiles.splice(i, 1); continue; }
+        } else {
+          let hit = false;
+          for (const a of allies) {
+            if (a.alive && p.x - p.radius < a.x + a.width && p.x + p.radius > a.x && p.y > a.y && p.y < a.y + a.height) {
+              a.hp -= p.dmg;
+              hit = true;
+              if (a.hp <= 0) a.alive = false;
+              break;
+            }
+          }
+          if (hit) { projectiles.splice(i, 1); continue; }
+        }
+      }
+
+      updateWarCounters();
+      const aAlive = allies.filter(a => a.alive).length;
+      const eAlive = enemies.filter(e => e.alive).length;
+      if (eAlive === 0) { endGame(true, 'انتصر فريقك 10 ضد 10! ⚔️🏆', `نقاط القتال: ${score} | رصيد العملات: ${coins}`); return; }
+      if (aAlive === 0) { endGame(false, 'خسر فريقك المعركة! 💥', `نقاط القتال: ${score} | رصيد العملات: ${coins}`); return; }
+    }
+
     function update() {
       if (isPaused || isGameOver) return;
       frameCount++;
+
+      if (currentMode === 'war') {
+        updateWar();
+        draw();
+        animationId = requestAnimationFrame(update);
+        return;
+      }
+
       if (!player.grounded) { player.y += player.dy; player.dy += player.gravity; if (player.y >= groundY - player.height) { player.y = groundY - player.height; player.dy = 0; player.grounded = true; } }
       if (frameCount % 95 === 0) spawnObstacle();
       if (frameCount % 130 === 0) spawnCoinLine();
