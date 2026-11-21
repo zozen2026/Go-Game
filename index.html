@@ -6,6 +6,7 @@
   <title>NC Go - Live Multiplayer Plaza</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
     html, body {
@@ -340,6 +341,7 @@
       'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
       'Content-Type': 'application/json'
     };
+    const sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     let groundY = 300;
     const RESCUE_TARGET_SCORE = 100;
@@ -348,7 +350,8 @@
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
-    let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0;
+    let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0, lastBroadcastAt = 0;
+    let plazaChannel = null;
 
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
@@ -367,6 +370,7 @@
       player.grounded = true;
       setScoreDisplay(Math.round(player.worldX));
       sfx.jump();
+      broadcastPlazaPresence();
       syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y), in_chat: true });
       draw();
     }
@@ -503,6 +507,7 @@
         localStorage.setItem('ncgo_username', currentUsername);
         input.value = '';
         updateAccountUi('تم تحديث اسمك الفريد بنجاح!');
+        broadcastPlazaPresence();
       } catch (_) {
         updateAccountUi('حدث خطأ أثناء الاتصال بقاعدة البيانات.');
       }
@@ -524,12 +529,89 @@
       }
     }
 
+    function upsertRemotePlayer(data) {
+      if (!data || !data.id || data.id === accountId) return;
+      const idx = remoteAccounts.findIndex(p => p.id === data.id);
+      const entry = {
+        id: data.id,
+        username: data.username || 'Player',
+        shirt: data.shirt || '#3b82f6',
+        hat: data.hat || 'none',
+        world_x: Number.isFinite(Number(data.world_x)) ? Number(data.world_x) : 0,
+        pos_y: Number.isFinite(Number(data.pos_y)) ? Number(data.pos_y) : (groundY - 60),
+        updatedAt: Date.now()
+      };
+      if (idx >= 0) remoteAccounts[idx] = { ...remoteAccounts[idx], ...entry };
+      else remoteAccounts.push(entry);
+      document.getElementById('onlineCount').textContent = Math.max(2, remoteAccounts.length + 1);
+    }
+
+    function broadcastPlazaPresence(extra = {}) {
+      const payload = {
+        id: accountId,
+        username: currentUsername || 'Player',
+        shirt: equippedShirt,
+        hat: equippedHat,
+        world_x: Math.round(player.worldX),
+        pos_y: Math.round(player.y),
+        ...extra
+      };
+      if (plazaChannel) {
+        plazaChannel.send({
+          type: 'broadcast',
+          event: 'player_state',
+          payload
+        }).catch(() => {});
+      }
+    }
+
+    function setupPlazaRealtime() {
+      if (!sbClient || plazaChannel) return;
+      plazaChannel = sbClient.channel('ncgo-live-plaza-room', {
+        config: { broadcast: { self: false } }
+      });
+
+      plazaChannel
+        .on('broadcast', { event: 'player_state' }, ({ payload }) => {
+          if (!payload) return;
+          upsertRemotePlayer(payload);
+          if (payload.message) {
+            const until = Date.now() + 20000;
+            playerBubbles[payload.id] = { text: payload.message, until };
+            if (payload.username) bubblesByName[payload.username] = { text: payload.message, until };
+            appendMiniChatLine(payload.username || 'Player', payload.message);
+          }
+          draw();
+        })
+        .subscribe(status => {
+          if (status === 'SUBSCRIBED') {
+            broadcastPlazaPresence();
+          }
+        });
+    }
+
+    function appendMiniChatLine(sender, text) {
+      const div = document.createElement('div');
+      div.className = 'chat-line';
+      const strong = document.createElement('strong');
+      strong.textContent = `${sender}: `;
+      div.appendChild(strong);
+      div.appendChild(document.createTextNode(text));
+      chatFeedMini.appendChild(div);
+      while (chatFeedMini.children.length > 8) {
+        chatFeedMini.removeChild(chatFeedMini.firstChild);
+      }
+      chatFeedMini.scrollTop = chatFeedMini.scrollHeight;
+    }
+
     async function syncActivePlayers() {
+      setupPlazaRealtime();
+      broadcastPlazaPresence();
       try {
         await syncAccountState();
-        const cutoff = new Date(Date.now() - 120000).toISOString();
+        const cutoff = new Date(Date.now() - 180000).toISOString();
         let res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message,last_msg_at`,
+          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,last_message`,
           { headers: sbHeaders }
         );
         if (!res.ok) {
@@ -541,12 +623,14 @@
         if (!res.ok) return;
         const rows = await res.json();
         if (Array.isArray(rows)) {
-          const el = document.getElementById('onlineCount');
-          if (el) el.textContent = Math.max(1, rows.length);
-          remoteAccounts = rows.filter(r => r && r.id && r.id !== accountId);
+          const others = rows.filter(r => r && r.id && r.id !== accountId);
+          others.forEach(r => upsertRemotePlayer(r));
+          const now = Date.now();
+          remoteAccounts = remoteAccounts.filter(p => now - (p.updatedAt || now) < 180000);
+          document.getElementById('onlineCount').textContent = Math.max(1, remoteAccounts.length + 1);
           rows.forEach(r => {
             if (r.last_message) {
-              const until = Date.now() + 18000;
+              const until = Date.now() + 20000;
               playerBubbles[r.id] = { text: r.last_message, until };
               if (r.username) bubblesByName[r.username] = { text: r.last_message, until };
             }
@@ -589,7 +673,7 @@
           const asc = rows.reverse();
           renderMiniChat(asc);
           asc.forEach(m => {
-            const until = Date.now() + 18000;
+            const until = Date.now() + 20000;
             if (m.sender_id) playerBubbles[m.sender_id] = { text: m.message, until };
             if (m.sender_name) bubblesByName[m.sender_name] = { text: m.message, until };
           });
@@ -605,10 +689,13 @@
       if (!accountReady) await ensureUniqueAccount();
       input.value = '';
       const sender = currentUsername || 'Player';
-      const until = Date.now() + 18000;
+      const until = Date.now() + 20000;
       playerBubbles[accountId] = { text, until };
       bubblesByName[sender] = { text, until };
+      appendMiniChatLine(sender, text);
+      broadcastPlazaPresence({ message: text });
       draw();
+
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
           method: 'POST',
@@ -616,13 +703,12 @@
           body: JSON.stringify({ sender_id: accountId, sender_name: sender, message: text })
         });
         await syncAccountState({ last_message: text, last_msg_at: new Date().toISOString(), in_chat: true });
-        await loadChatFeed();
       } catch (_) {}
     }
 
     setInterval(() => {
       if (currentMode === 'chat') loadChatFeed();
-    }, 1400);
+    }, 1500);
 
     function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
@@ -860,6 +946,7 @@
       localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs)); localStorage.setItem('gogame_eq_bg', equippedBg);
       coinText.textContent = coins; shopCoinText.textContent = coins;
       syncAccountState();
+      broadcastPlazaPresence();
     }
 
     function bindShopGrid(elId, list, ownedArr, setEq, getEq, renderCell) {
@@ -942,14 +1029,14 @@
 
       if (isWar) { goalLabel.textContent = 'القتلى'; setScoreDisplay(0); joinOrCreateOnlineWar(); }
       else if (currentMode === 'rescue') { goalLabel.textContent = 'التقدم'; setScoreDisplay(0); }
-      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(Math.round(player.worldX)); loadChatFeed(); syncActivePlayers(); }
+      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(Math.round(player.worldX)); setupPlazaRealtime(); loadChatFeed(); syncActivePlayers(); }
       else { goalLabel.textContent = 'النقاط'; setScoreDisplay(0); }
 
       endScreen.style.display = 'none'; shopModal.style.display = 'none';
       cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
     }
 
-    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
+    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); broadcastPlazaPresence(); } }
 
     window.addEventListener('keydown', e => {
       if (document.activeElement === document.getElementById('chatInput') || document.activeElement === document.getElementById('newUsernameInput')) return;
@@ -1248,7 +1335,11 @@
         }
       }
       const now = Date.now();
-      if (now - lastPosSyncAt > 650) {
+      if (walkDir !== 0 && now - lastBroadcastAt > 120) {
+        lastBroadcastAt = now;
+        broadcastPlazaPresence();
+      }
+      if (now - lastPosSyncAt > 700) {
         lastPosSyncAt = now;
         syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y), in_chat: true });
       }
