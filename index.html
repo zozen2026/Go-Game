@@ -40,61 +40,70 @@
     .btn-shop { background: #eab308; color: #000; }
     .btn-modes { background: #334155; }
     .btn-account { background: #0284c7; color: #fff; }
-    .btn-chat-top { background: #10b981; color: #fff; display: none; }
-    .btn-chat-top.active { display: inline-block; }
+    .btn-friends { background: #0d9488; color: #fff; }
+    .btn-weather { background: #4f46e5; color: #fff; display: none; }
+    .btn-weather.active { display: inline-block; }
     .btn-respawn-top { background: #8b5cf6; color: #fff; display: none; }
     .btn-respawn-top.active { display: inline-block; }
     .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
     .btn-sound.muted { opacity: 0.65; }
 
+    .top-live-chat-bar {
+      display: none;
+      width: 100%;
+      background: #182235;
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 6px 8px;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .top-live-chat-bar.active { display: flex; }
+    .top-live-chat-input {
+      flex: 1;
+      min-width: 180px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 1px solid #475569;
+      background: #090d16;
+      color: #fff;
+      font-size: 0.9rem;
+      user-select: text;
+    }
+    .top-live-chat-input:focus { outline: none; border-color: #34d399; }
+    .btn-send-top-chat {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 8px 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .emote-group { display: flex; gap: 4px; }
+    .btn-emote {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .btn-emote:hover { border-color: #fbbf24; }
+
     .game-container {
       position: relative;
       width: 100%;
       flex: 1 1 auto;
-      min-height: 58dvh;
-      height: calc(100dvh - 195px);
+      min-height: 56dvh;
+      height: calc(100dvh - 235px);
       background: #0f172a;
       border: 2px solid #334155;
       border-radius: 16px;
       overflow: hidden;
     }
     canvas { display: block; width: 100%; height: 100%; }
-
-    .chat-composer-bar {
-      display: none;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(94%, 640px);
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid #38bdf8;
-      border-radius: 14px;
-      padding: 8px 10px;
-      z-index: 22;
-      gap: 8px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    }
-    .chat-composer-bar.active { display: flex; }
-    .chat-input {
-      flex: 1;
-      padding: 9px 12px;
-      border-radius: 10px;
-      border: 1px solid #475569;
-      background: #020617;
-      color: #fff;
-      font-size: 0.92rem;
-      user-select: text;
-    }
-    .btn-send-chat {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 0 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
 
     .chat-feed-mini {
       display: none;
@@ -117,6 +126,22 @@
     .chat-line { margin-bottom: 3px; word-break: break-word; }
     .chat-line strong { color: #93c5fd; }
 
+    .toast-banner {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 185, 129, 0.94);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      z-index: 24;
+      pointer-events: none;
+    }
+
     .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.96); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
     .overlay-screen h2 { font-size: 1.5rem; margin-bottom: 4px; color: #f8fafc; }
     .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 14px; font-size: 0.9rem; }
@@ -128,7 +153,7 @@
     .mode-card p { font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; }
 
     @media (max-width: 680px) {
-      .game-container { height: calc(100dvh - 245px); min-height: 52dvh; }
+      .game-container { height: calc(100dvh - 280px); min-height: 50dvh; }
       .overlay-screen { justify-content: flex-start; padding: 14px 12px 22px; }
       .mode-cards { flex-direction: column; align-items: stretch; gap: 8px; }
       .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 10px 12px; gap: 10px; }
@@ -138,6 +163,8 @@
 
     .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 35; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
     .account-modal { border-color: #38bdf8; }
+    .friends-modal { border-color: #14b8a6; }
+    .friends-modal h3 { color: #2dd4bf; }
     .modal-box h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
     .account-modal h3 { color: #38bdf8; }
     .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
@@ -155,6 +182,38 @@
     .name-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; margin: 8px 0; text-align: center; user-select: text; }
     .btn-save-name { width: 100%; padding: 10px; border-radius: 10px; border: none; background: #0284c7; color: #fff; font-weight: bold; cursor: pointer; }
     .account-msg { margin-top: 8px; font-size: 0.84rem; min-height: 20px; color: #34d399; }
+
+    .friend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+    .btn-mini-add {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-mini-remove {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
     .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.84); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
     .end-screen h2 { font-size: 1.7rem; margin-bottom: 10px; }
@@ -205,22 +264,29 @@
     </div>
     <div class="actions-group">
       <button type="button" class="btn-top btn-respawn-top" id="topRespawnBtn" onclick="respawnPlayerInPlaza()">🔄 رسبن</button>
-      <button type="button" class="btn-top btn-chat-top" id="topChatBtn" onclick="toggleChatComposer()">💬 دردشة</button>
+      <button type="button" class="btn-top btn-weather" id="weatherBtn" onclick="cyclePlazaWeather()">🌅 نهار</button>
+      <button type="button" class="btn-top btn-friends" onclick="toggleFriendsModal()">👥 الأصدقاء (<span id="friendsCountText">0</span>)</button>
       <button type="button" class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
-      <button type="button" class="btn-top btn-account" onclick="toggleAccountModal()">👤 الحساب</button>
+      <button type="button" class="btn-top btn-account" onclick="toggleAccountModal()">✏️ الاسم</button>
       <button type="button" class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر</button>
       <button type="button" class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
     </div>
   </div>
 
+  <form class="top-live-chat-bar" id="topLiveChatBar" onsubmit="sendChatMessage(event)">
+    <input type="text" id="chatInput" class="top-live-chat-input" maxlength="160" placeholder="اضغط هنا واكتب رسالتك لتظهر فوق رأسك للجميع..." autocomplete="off">
+    <button type="submit" class="btn-send-top-chat">إرسال ➤</button>
+    <div class="emote-group">
+      <button type="button" class="btn-emote" onclick="sendQuickEmote('👋')">👋</button>
+      <button type="button" class="btn-emote" onclick="sendQuickEmote('😂')">😂</button>
+      <button type="button" class="btn-emote" onclick="sendQuickEmote('🔥')">🔥</button>
+    </div>
+  </form>
+
   <div class="game-container" id="gameContainer">
     <canvas id="gameCanvas"></canvas>
 
-    <form class="chat-composer-bar" id="chatComposerBar" onsubmit="sendChatMessage(event)">
-      <input type="text" id="chatInput" class="chat-input" maxlength="160" placeholder="اكتب رسالتك لتظهر فوق رأسك للجميع..." autocomplete="off">
-      <button type="submit" class="btn-send-chat">إرسال ➤</button>
-    </form>
-
+    <div class="toast-banner" id="toastBanner"></div>
     <div class="chat-feed-mini" id="chatFeedMini"></div>
 
     <div class="overlay-screen" id="modeMenu">
@@ -245,19 +311,31 @@
         </div>
         <div class="mode-card" onclick="startGame('chat')">
           <div class="icon">💬</div>
-          <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>الجميع على الأرض في نفس المستوى وتظهر كل رسالة فوق رأس كاتبها!</p></div>
+          <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>الجميع على الأرض، عملات متجددة، إيماءات، دردشة علوية، وأصدقاء!</p></div>
         </div>
       </div>
     </div>
 
     <div class="modal-box account-modal" id="accountModal">
-      <h3>👤 حسابك التلقائي في NC Go</h3>
-      <p class="shop-info">يتم إنشاء حسابك تلقائياً في جدول <strong>accounts</strong> باسم فريد لا يتكرر مع لاعب آخر.</p>
+      <h3>✏️ تعديل اسمك في NC Go</h3>
+      <p class="shop-info">غيّر اسمك التلقائي (مثل <strong>Player_49290</strong>) إلى أي اسم تريده مثل <strong>Mustafa</strong>.</p>
       <div style="font-size:0.85rem;color:#93c5fd;margin-bottom:6px;">الاسم الحالي: <strong id="modalCurrentName">...</strong></div>
-      <input type="text" id="newUsernameInput" class="name-input" maxlength="18" placeholder="اكتب اسماً جديداً فريداً...">
+      <input type="text" id="newUsernameInput" class="name-input" maxlength="18" placeholder="مثال: Mustafa">
       <button type="button" class="btn-save-name" onclick="changeAccountUsername()">حفظ الاسم الجديد</button>
       <div class="account-msg" id="accountMsg"></div>
       <button type="button" class="btn-close" onclick="toggleAccountModal()">إغلاق</button>
+    </div>
+
+    <div class="modal-box friends-modal" id="friendsModal">
+      <h3>👥 قائمة الأصدقاء</h3>
+      <p class="shop-info">أضف لاعباً بالاسم أو من المتواجدين في الساحة ليظهر بعلامة ⭐ فوق رأسه.</p>
+      <input type="text" id="addFriendInput" class="name-input" maxlength="18" placeholder="اكتب اسم صديقك مثل Mustafa...">
+      <button type="button" class="btn-save-name" style="background:#0d9488;" onclick="addFriendFromInput()">➕ إضافة صديق</button>
+      <div class="shop-section-title">🟢 متواجدون في الساحة الآن</div>
+      <div id="plazaCandidatesList"></div>
+      <div class="shop-section-title">⭐ أصدقاؤك المحفوظون</div>
+      <div id="savedFriendsList"></div>
+      <button type="button" class="btn-close" onclick="toggleFriendsModal()">إغلاق</button>
     </div>
 
     <div class="modal-box" id="shopModal">
@@ -313,10 +391,11 @@
     const gameContainer = document.getElementById('gameContainer');
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const topChatBtn = document.getElementById('topChatBtn');
+    const topLiveChatBar = document.getElementById('topLiveChatBar');
+    const weatherBtn = document.getElementById('weatherBtn');
     const topRespawnBtn = document.getElementById('topRespawnBtn');
-    const chatComposerBar = document.getElementById('chatComposerBar');
     const chatFeedMini = document.getElementById('chatFeedMini');
+    const toastBanner = document.getElementById('toastBanner');
     const moveLeftBtn = document.getElementById('moveLeftBtn');
     const moveRightBtn = document.getElementById('moveRightBtn');
     const goalLabel = document.getElementById('goalLabel');
@@ -326,6 +405,7 @@
     const modeMenu = document.getElementById('modeMenu');
     const shopModal = document.getElementById('shopModal');
     const accountModal = document.getElementById('accountModal');
+    const friendsModal = document.getElementById('friendsModal');
     const endScreen = document.getElementById('endScreen');
     const endTitle = document.getElementById('endTitle');
     const endMessage = document.getElementById('endMessage');
@@ -344,6 +424,7 @@
     const sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     let groundY = 300;
+    let toastTimer = null;
     const RESCUE_TARGET_SCORE = 100;
     const stars = Array.from({ length: 45 }, (_, i) => ({ x: (i * 97) % 1200, y: (i * 53) % 420, r: (i % 2) + 1.2 }));
     const player = { x: 210, y: 240, worldX: 0, worldY: 0, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
@@ -352,6 +433,124 @@
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
     let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0, lastBroadcastAt = 0;
     let plazaChannel = null;
+    let plazaCoins = [];
+    const weatherModes = ['day', 'sunset', 'night'];
+    let plazaWeather = 'day';
+
+    let friendsList = JSON.parse(localStorage.getItem('ncgo_friends') || '[]');
+    function saveFriendsList() {
+      localStorage.setItem('ncgo_friends', JSON.stringify(friendsList));
+      document.getElementById('friendsCountText').textContent = friendsList.length;
+      renderFriendsModal();
+    }
+
+    function isFriendName(name) {
+      if (!name) return false;
+      return friendsList.some(f => f.toLowerCase() === String(name).toLowerCase());
+    }
+
+    function addFriendByName(name) {
+      const clean = (name || '').trim();
+      if (!clean) return;
+      if (clean === currentUsername) return showToast('لا يمكنك إضافة نفسك كصديق');
+      if (!friendsList.some(f => f.toLowerCase() === clean.toLowerCase())) {
+        friendsList.push(clean);
+        saveFriendsList();
+        sfx.buy();
+        showToast(`تمت إضافة ${clean} إلى الأصدقاء ⭐`);
+      }
+    }
+
+    function removeFriendByName(name) {
+      friendsList = friendsList.filter(f => f.toLowerCase() !== String(name).toLowerCase());
+      saveFriendsList();
+      showToast(`تمت إزالة ${name}`);
+    }
+
+    function addFriendFromInput() {
+      const inp = document.getElementById('addFriendInput');
+      addFriendByName(inp.value);
+      inp.value = '';
+    }
+
+    function renderFriendsModal() {
+      document.getElementById('friendsCountText').textContent = friendsList.length;
+      const candBox = document.getElementById('plazaCandidatesList');
+      const savedBox = document.getElementById('savedFriendsList');
+      if (!candBox || !savedBox) return;
+
+      if (remoteAccounts.length === 0) {
+        candBox.innerHTML = '<div class="shop-info">لا يوجد لاعبون آخرون في الساحة حالياً.</div>';
+      } else {
+        candBox.innerHTML = remoteAccounts.map(p => {
+          const already = isFriendName(p.username);
+          const safeName = (p.username || 'Player').replace(/'/g, '');
+          return `<div class="friend-row">
+            <span>👤 ${p.username || 'Player'}</span>
+            ${already
+              ? '<span class="item-owned">صديق ⭐</span>'
+              : `<button type="button" class="btn-mini-add" onclick="addFriendByName('${safeName}')">+ إضافة</button>`}
+          </div>`;
+        }).join('');
+      }
+
+      if (friendsList.length === 0) {
+        savedBox.innerHTML = '<div class="shop-info">قائمة أصدقائك فارغة بعد.</div>';
+      } else {
+        savedBox.innerHTML = friendsList.map(name => {
+          const safeName = String(name).replace(/'/g, '');
+          return `<div class="friend-row">
+            <span>⭐ ${name}</span>
+            <button type="button" class="btn-mini-remove" onclick="removeFriendByName('${safeName}')">حذف</button>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    function toggleFriendsModal() {
+      const vis = friendsModal.style.display === 'block';
+      if (!vis) {
+        isPaused = true;
+        renderFriendsModal();
+        friendsModal.style.display = 'block';
+      } else {
+        friendsModal.style.display = 'none';
+        if (currentMode && !isGameOver && shopModal.style.display !== 'block' && accountModal.style.display !== 'block') {
+          isPaused = false;
+          cancelAnimationFrame(animationId);
+          animationId = requestAnimationFrame(update);
+        }
+      }
+    }
+
+    function showToast(msg) {
+      toastBanner.textContent = msg;
+      toastBanner.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toastBanner.style.display = 'none'; }, 2400);
+    }
+
+    function cyclePlazaWeather() {
+      const idx = weatherModes.indexOf(plazaWeather);
+      plazaWeather = weatherModes[(idx + 1) % weatherModes.length];
+      if (plazaWeather === 'day') weatherBtn.textContent = '🌅 نهار';
+      else if (plazaWeather === 'sunset') weatherBtn.textContent = '🌆 غروب';
+      else weatherBtn.textContent = '🌙 ليل';
+      sfx.buy();
+      draw();
+    }
+
+    function initPlazaCoins() {
+      plazaCoins = [];
+      for (let i = -8; i <= 8; i++) {
+        if (i === 0) continue;
+        plazaCoins.push({
+          id: 'pc_' + i + '_' + Math.random().toString(36).slice(2, 6),
+          worldX: i * 130,
+          collected: false
+        });
+      }
+    }
 
     function getGroundCharacterY() {
       return groundY - player.height;
@@ -420,7 +619,7 @@
     let accountReady = false;
 
     function generateUniqueCandidateName() {
-      const rand = Math.floor(1000 + Math.random() * 9000);
+      const rand = Math.floor(10000 + Math.random() * 90000);
       return `Player_${rand}`;
     }
 
@@ -503,7 +702,7 @@
     async function changeAccountUsername() {
       const input = document.getElementById('newUsernameInput');
       const desired = (input.value || '').trim();
-      if (desired.length < 3) return updateAccountUi('الاسم يجب أن يكون 3 أحرف على الأقل.');
+      if (desired.length < 2) return updateAccountUi('الاسم يجب أن يكون حرفين على الأقل.');
       if (desired === currentUsername) return updateAccountUi('هذا هو اسمك الحالي بالفعل.');
       try {
         const checkRes = await fetch(
@@ -521,7 +720,8 @@
         currentUsername = desired;
         localStorage.setItem('ncgo_username', currentUsername);
         input.value = '';
-        updateAccountUi('تم تحديث اسمك الفريد بنجاح!');
+        updateAccountUi('تم حفظ اسمك الجديد بنجاح!');
+        showToast(`أهلاً بك يا ${currentUsername}`);
         broadcastPlazaPresence();
       } catch (_) {
         updateAccountUi('حدث خطأ أثناء الاتصال بقاعدة البيانات.');
@@ -534,9 +734,10 @@
         isPaused = true;
         document.getElementById('accountMsg').textContent = '';
         accountModal.style.display = 'block';
+        setTimeout(() => document.getElementById('newUsernameInput').focus(), 40);
       } else {
         accountModal.style.display = 'none';
-        if (currentMode && !isGameOver && shopModal.style.display !== 'block') {
+        if (currentMode && !isGameOver && shopModal.style.display !== 'block' && friendsModal.style.display !== 'block') {
           isPaused = false;
           cancelAnimationFrame(animationId);
           animationId = requestAnimationFrame(update);
@@ -618,6 +819,10 @@
         .on('broadcast', { event: 'player_state' }, ({ payload }) => {
           if (!payload || currentMode !== 'chat') return;
           upsertRemotePlayer(payload);
+          if (payload.collectedCoinId) {
+            const target = plazaCoins.find(c => c.id === payload.collectedCoinId);
+            if (target) target.collected = true;
+          }
           if (payload.message) {
             const until = Date.now() + 20000;
             playerBubbles[payload.id] = { text: payload.message, until };
@@ -637,7 +842,7 @@
       const div = document.createElement('div');
       div.className = 'chat-line';
       const strong = document.createElement('strong');
-      strong.textContent = `${sender}: `;
+      strong.textContent = `${isFriendName(sender) ? '⭐ ' : ''}${sender}: `;
       div.appendChild(strong);
       div.appendChild(document.createTextNode(text));
       chatFeedMini.appendChild(div);
@@ -690,21 +895,14 @@
     window.addEventListener('pagehide', notifyPlazaLeave);
     window.addEventListener('beforeunload', notifyPlazaLeave);
 
-    function toggleChatComposer() {
-      if (currentMode !== 'chat') return;
-      chatComposerBar.classList.toggle('active');
-      if (chatComposerBar.classList.contains('active')) {
-        setTimeout(() => document.getElementById('chatInput').focus(), 40);
-      }
-    }
-
     function renderMiniChat(rows) {
       if (!Array.isArray(rows)) return;
       chatFeedMini.innerHTML = rows.slice(-6).map(m => {
+        const sender = m.sender_name || 'Player';
         const div = document.createElement('div');
         div.className = 'chat-line';
         const strong = document.createElement('strong');
-        strong.textContent = `${m.sender_name || 'Player'}: `;
+        strong.textContent = `${isFriendName(sender) ? '⭐ ' : ''}${sender}: `;
         div.appendChild(strong);
         div.appendChild(document.createTextNode(m.message || ''));
         return div.outerHTML;
@@ -729,29 +927,41 @@
       } catch (_) {}
     }
 
-    async function sendChatMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = (input.value || '').trim();
-      if (!text) return;
+    async function publishChatText(text) {
+      const clean = (text || '').trim();
+      if (!clean) return;
       if (!accountReady) await ensureUniqueAccount();
-      input.value = '';
       const sender = currentUsername || 'Player';
       const until = Date.now() + 20000;
-      playerBubbles[accountId] = { text, until };
-      bubblesByName[sender] = { text, until };
-      appendMiniChatLine(sender, text);
-      broadcastPlazaPresence({ message: text });
+      playerBubbles[accountId] = { text: clean, until };
+      bubblesByName[sender] = { text: clean, until };
+      appendMiniChatLine(sender, clean);
+      broadcastPlazaPresence({ message: clean });
       draw();
 
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
           method: 'POST',
           headers: sbHeaders,
-          body: JSON.stringify({ sender_id: accountId, sender_name: sender, message: text })
+          body: JSON.stringify({ sender_id: accountId, sender_name: sender, message: clean })
         });
-        await syncAccountState({ last_message: text, last_msg_at: new Date().toISOString(), in_chat: true });
+        await syncAccountState({ last_message: clean, last_msg_at: new Date().toISOString(), in_chat: true });
       } catch (_) {}
+    }
+
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      input.value = '';
+      await publishChatText(text);
+    }
+
+    function sendQuickEmote(emoji) {
+      if (currentMode !== 'chat') return;
+      sfx.buy();
+      publishChatText(emoji);
     }
 
     setInterval(() => {
@@ -925,13 +1135,13 @@
 
     function buyRocket() {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
-      if (coins < 10) return alert('تحتاج إلى 10 عملات لشراء صاروخ!');
+      if (coins < 10) return showToast('تحتاج إلى 10 عملات لشراء صاروخ');
       coins -= 10; rocketsAmmo += 1; sfx.buy(); saveProgress(); updateWarUi();
     }
 
     function buyTank() {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
-      if (coins < 25) return alert('تحتاج إلى 25 عملة لشراء دبابة!');
+      if (coins < 25) return showToast('تحتاج إلى 25 عملة لشراء دبابة');
       coins -= 25;
       tanks.push({ x: 80 + (tanks.length % 3) * 56, y: groundY - 34, width: 48, height: 34, alive: true });
       sfx.buy(); saveProgress(); updateWarUi();
@@ -1007,7 +1217,7 @@
         div.onclick = () => {
           if (owned) { setEq(item.id); sfx.buy(); }
           else if (coins >= item.price) { coins -= item.price; ownedArr.push(item.id); setEq(item.id); sfx.buy(); }
-          else return alert('رصيدك من العملات لا يكفي!');
+          else return showToast('رصيدك من العملات لا يكفي');
           saveProgress(); renderShop(); draw();
         };
         grid.appendChild(div);
@@ -1038,13 +1248,13 @@
       currentMode = null;
       remoteAccounts = [];
       walkDir = 0; walkLeftPressed = false; walkRightPressed = false;
-      topChatBtn.classList.remove('active');
+      topLiveChatBar.classList.remove('active');
+      weatherBtn.classList.remove('active');
       topRespawnBtn.classList.remove('active');
-      chatComposerBar.classList.remove('active');
       chatFeedMini.classList.remove('active');
       moveLeftBtn.classList.remove('active');
       moveRightBtn.classList.remove('active');
-      shopModal.style.display = 'none'; accountModal.style.display = 'none'; endScreen.style.display = 'none';
+      shopModal.style.display = 'none'; accountModal.style.display = 'none'; friendsModal.style.display = 'none'; endScreen.style.display = 'none';
       modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0;
       updateOnlineCounterUi();
       if (wasInChat) notifyPlazaLeave();
@@ -1064,6 +1274,7 @@
       isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
       obstacles = []; coinItems = []; friend.active = false; friend.x = canvas.width + 80;
       remoteAccounts = [];
+      initPlazaCoins();
       player.worldX = currentMode === 'chat' ? Math.floor((Math.random() - 0.5) * 90) : 0;
       player.worldY = 0;
       player.x = currentMode === 'chat' ? Math.floor(canvas.width * 0.5) : (currentMode === 'monster' ? Math.min(240, Math.floor(canvas.width * 0.28)) : Math.min(160, Math.floor(canvas.width * 0.16)));
@@ -1074,10 +1285,10 @@
       const isChat = currentMode === 'chat';
       weaponsBar.classList.toggle('active', isWar);
       warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
-      topChatBtn.classList.toggle('active', isChat);
+      topLiveChatBar.classList.toggle('active', isChat);
+      weatherBtn.classList.toggle('active', isChat);
       topRespawnBtn.classList.toggle('active', isChat);
       chatFeedMini.classList.toggle('active', isChat);
-      chatComposerBar.classList.remove('active');
       moveLeftBtn.classList.toggle('active', isChat);
       moveRightBtn.classList.toggle('active', isChat);
 
@@ -1093,7 +1304,11 @@
     function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); broadcastPlazaPresence(); } }
 
     window.addEventListener('keydown', e => {
-      if (document.activeElement === document.getElementById('chatInput') || document.activeElement === document.getElementById('newUsernameInput')) return;
+      if (
+        document.activeElement === document.getElementById('chatInput') ||
+        document.activeElement === document.getElementById('newUsernameInput') ||
+        document.activeElement === document.getElementById('addFriendInput')
+      ) return;
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); jump(); }
       if (currentMode === 'chat') {
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') setWalk(-1, true);
@@ -1120,14 +1335,24 @@
 
     function drawFixedSocialPlazaBackground() {
       const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-      sky.addColorStop(0, '#0f172a');
-      sky.addColorStop(0.55, '#1e3a5f');
-      sky.addColorStop(1, '#38bdf8');
+      if (plazaWeather === 'sunset') {
+        sky.addColorStop(0, '#4c1d95');
+        sky.addColorStop(0.55, '#ea580c');
+        sky.addColorStop(1, '#fde047');
+      } else if (plazaWeather === 'night') {
+        sky.addColorStop(0, '#020617');
+        sky.addColorStop(0.6, '#0f172a');
+        sky.addColorStop(1, '#1e293b');
+      } else {
+        sky.addColorStop(0, '#0f172a');
+        sky.addColorStop(0.55, '#1e3a5f');
+        sky.addColorStop(1, '#38bdf8');
+      }
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, canvas.width, groundY);
 
       const sunOffset = ((player.worldX * -0.08) % canvas.width + canvas.width) % canvas.width;
-      ctx.fillStyle = 'rgba(254, 240, 138, 0.22)';
+      ctx.fillStyle = plazaWeather === 'night' ? 'rgba(226, 232, 240, 0.25)' : 'rgba(254, 240, 138, 0.25)';
       ctx.beginPath(); ctx.arc(sunOffset, 75, 42, 0, Math.PI * 2); ctx.fill();
 
       const blockSpan = 120;
@@ -1163,6 +1388,20 @@
         ctx.fillRect(sx, groundY + 6, 3, 10);
         ctx.fillText(`${wx}m`, sx, groundY + 28);
       }
+
+      plazaCoins.forEach(c => {
+        if (c.collected) return;
+        const cx = canvas.width * 0.5 + (c.worldX - player.worldX);
+        if (cx < -20 || cx > canvas.width + 20) return;
+        const cy = groundY - 22 + Math.sin(frameCount * 0.1 + c.worldX) * 4;
+        ctx.save();
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#78350f'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('$', cx, cy + 4);
+        ctx.restore();
+      });
     }
 
     function drawBackgroundAndGround() {
@@ -1178,7 +1417,7 @@
       for (let x = -(scroll % 40); x < canvas.width; x += 40) ctx.fillRect(x, groundY + 10, 20, 4);
     }
 
-    function drawCharacterSprite(x, y, shirt, hat, moving, labelName, bubbleText) {
+    function drawCharacterSprite(x, y, shirt, hat, moving, labelName, bubbleText, friendStar = false) {
       ctx.save();
       const swing = (moving && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
       ctx.fillStyle = '#1e293b';
@@ -1204,8 +1443,8 @@
       if (labelName) {
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillText(labelName, x + 17, y - 14);
+        ctx.fillStyle = friendStar ? '#fde047' : '#f8fafc';
+        ctx.fillText(`${friendStar ? '⭐ ' : ''}${labelName}`, x + 17, y - 14);
       }
       if (bubbleText) {
         ctx.font = 'bold 12px sans-serif';
@@ -1236,7 +1475,7 @@
       const bubble = getActiveBubble(accountId, currentUsername);
       const drawX = currentMode === 'chat' ? (canvas.width * 0.5 - player.width * 0.5) : player.x;
       const drawY = currentMode === 'chat' ? Math.min(getGroundCharacterY(), player.y) : player.y;
-      drawCharacterSprite(drawX, drawY, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
+      drawCharacterSprite(drawX, drawY, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble, false);
     }
 
     function drawChatPlazaPlayers() {
@@ -1245,13 +1484,14 @@
       remoteAccounts.forEach((p) => {
         const screenX = canvas.width * 0.5 + (p.world_x - player.worldX) - player.width * 0.5;
         const bubble = getActiveBubble(p.id, p.username);
+        const starred = isFriendName(p.username);
 
         if (screenX < -player.width) {
           ctx.save();
           ctx.font = 'bold 11px sans-serif';
           ctx.fillStyle = '#fde047';
           ctx.textAlign = 'left';
-          ctx.fillText(`⬅️ ${p.username || 'Player'}`, 10, floorY - 12);
+          ctx.fillText(`⬅️ ${starred ? '⭐ ' : ''}${p.username || 'Player'}`, 10, floorY - 12);
           ctx.restore();
           return;
         }
@@ -1261,12 +1501,12 @@
           ctx.font = 'bold 11px sans-serif';
           ctx.fillStyle = '#fde047';
           ctx.textAlign = 'right';
-          ctx.fillText(`${p.username || 'Player'} ➡️`, canvas.width - 10, floorY - 12);
+          ctx.fillText(`${starred ? '⭐ ' : ''}${p.username || 'Player'} ➡️`, canvas.width - 10, floorY - 12);
           ctx.restore();
           return;
         }
 
-        drawCharacterSprite(screenX, floorY, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble);
+        drawCharacterSprite(screenX, floorY, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble, starred);
       });
     }
 
@@ -1399,6 +1639,18 @@
       } else {
         player.y = floorY;
       }
+
+      plazaCoins.forEach(c => {
+        if (!c.collected && Math.abs(player.worldX - c.worldX) < 28) {
+          c.collected = true;
+          coins += 1;
+          sfx.coin();
+          saveProgress();
+          broadcastPlazaPresence({ collectedCoinId: c.id });
+          showToast('+1 عملة 🪙');
+        }
+      });
+
       const now = Date.now();
       if (walkDir !== 0 && now - lastBroadcastAt > 120) {
         lastBroadcastAt = now;
@@ -1445,6 +1697,7 @@
     }
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); }); }
+    document.getElementById('friendsCountText').textContent = friendsList.length;
     updateSoundButton(); saveProgress(); resizeCanvasToScreen(); draw();
   </script>
 </body>
