@@ -657,26 +657,30 @@
       broadcastPlazaPresence();
       try {
         await syncAccountState({ in_chat: true, pos_y: Math.round(getGroundCharacterY()) });
-        const cutoff = new Date(Date.now() - 10000).toISOString();
+        const cutoff = new Date(Date.now() - 35000).toISOString();
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?in_chat=eq.true&last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message`,
+          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message`,
           { headers: sbHeaders }
         );
         if (!res.ok) return;
         const rows = await res.json();
         if (Array.isArray(rows) && currentMode === 'chat') {
-          const activeIds = new Set(rows.filter(r => r && r.id && r.id !== accountId).map(r => r.id));
           const now = Date.now();
-          remoteAccounts = remoteAccounts.filter(p => activeIds.has(p.id) && (now - (p.updatedAt || now) < 10000));
-          rows.filter(r => r && r.id && r.id !== accountId).forEach(r => upsertRemotePlayer(r));
-          updateOnlineCounterUi();
           rows.forEach(r => {
+            if (!r || !r.id || r.id === accountId) return;
+            if (r.in_chat === false) {
+              removeRemotePlayer(r.id);
+              return;
+            }
+            upsertRemotePlayer(r);
             if (r.last_message) {
-              const until = Date.now() + 20000;
+              const until = now + 20000;
               playerBubbles[r.id] = { text: r.last_message, until };
               if (r.username) bubblesByName[r.username] = { text: r.last_message, until };
             }
           });
+          remoteAccounts = remoteAccounts.filter(p => now - (p.updatedAt || now) < 25000);
+          updateOnlineCounterUi();
         }
       } catch (_) {}
     }
