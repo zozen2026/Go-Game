@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - 4 Modes, 10v10 War, Tanks & Rockets</title>
+  <title>NC Go - Online War & Auto Accounts</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -21,15 +21,18 @@
     }
     .top-bar { width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
     .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .score-board { font-size: 0.92rem; font-weight: bold; background: #1e1e26; padding: 8px 11px; border-radius: 10px; border: 1px solid #333; }
+    .score-board { font-size: 0.9rem; font-weight: bold; background: #1e1e26; padding: 8px 11px; border-radius: 10px; border: 1px solid #333; }
     .coin-board { color: #fbbf24; border-color: #78350f; }
     .online-board { color: #34d399; border-color: #065f46; }
+    .acc-board { color: #93c5fd; border-color: #1e3a8a; }
     .war-board { color: #f87171; border-color: #7f1d1d; }
-    .btn-top { background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
+    .btn-top { background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.88rem; font-weight: bold; cursor: pointer; }
     .btn-shop { background: #eab308; color: #000; }
     .btn-modes { background: #334155; }
+    .btn-account { background: #0284c7; color: #fff; }
     .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
     .btn-sound.muted { opacity: 0.65; }
+
     .game-container { position: relative; width: 95%; max-width: 800px; height: 360px; background: #0f172a; border: 2px solid #334155; border-radius: 16px; overflow: hidden; }
     canvas { display: block; width: 100%; height: 100%; }
     .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
@@ -49,9 +52,12 @@
       .mode-card .icon { font-size: 1.7rem; margin-bottom: 0; flex-shrink: 0; }
       .mode-card-text { display: flex; flex-direction: column; }
     }
-    .shop-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 30; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
-    .shop-modal h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
-    .shop-modal .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
+
+    .modal-box { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 35; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
+    .account-modal { border-color: #38bdf8; }
+    .modal-box h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
+    .account-modal h3 { color: #38bdf8; }
+    .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
     .shop-section-title { text-align: right; font-size: 0.9rem; color: #cbd5e1; margin: 12px 0 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
     .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
     .bg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
@@ -61,7 +67,12 @@
     .bg-preview { width: 100%; height: 34px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); }
     .item-price { color: #fbbf24; font-weight: bold; font-size: 0.78rem; }
     .item-owned { color: #10b981; font-weight: bold; font-size: 0.78rem; }
-    .btn-close { background: #10b981; color: #fff; border: none; padding: 9px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 6px; }
+    .btn-close { background: #10b981; color: #fff; border: none; padding: 9px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 8px; }
+
+    .name-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; margin: 8px 0; text-align: center; user-select: text; }
+    .btn-save-name { width: 100%; padding: 10px; border-radius: 10px; border: none; background: #0284c7; color: #fff; font-weight: bold; cursor: pointer; }
+    .account-msg { margin-top: 8px; font-size: 0.84rem; min-height: 20px; color: #34d399; }
+
     .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.84); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
     .end-screen h2 { font-size: 1.7rem; margin-bottom: 10px; }
     .end-screen p { font-size: 1.05rem; margin-bottom: 18px; color: #e2e8f0; }
@@ -70,30 +81,9 @@
     .btn-restart { background: #10b981; }
     .btn-menu { background: #475569; }
 
-    .weapons-bar {
-      display: none;
-      margin-top: 10px;
-      width: 95%;
-      max-width: 800px;
-      background: #1e1e26;
-      border: 1px solid #475569;
-      border-radius: 14px;
-      padding: 10px 12px;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .weapons-bar { display: none; margin-top: 10px; width: 95%; max-width: 800px; background: #1e1e26; border: 1px solid #475569; border-radius: 14px; padding: 10px 12px; justify-content: center; gap: 8px; flex-wrap: wrap; }
     .weapons-bar.active { display: flex; }
-    .btn-weapon {
-      border: none;
-      border-radius: 11px;
-      padding: 9px 12px;
-      font-size: 0.88rem;
-      font-weight: bold;
-      cursor: pointer;
-      color: #fff;
-      transition: transform 0.1s, opacity 0.2s;
-    }
+    .btn-weapon { border: none; border-radius: 11px; padding: 9px 12px; font-size: 0.88rem; font-weight: bold; cursor: pointer; color: #fff; transition: transform 0.1s, opacity 0.2s; }
     .btn-weapon:active { transform: scale(0.96); }
     .btn-weapon:disabled { opacity: 0.45; cursor: not-allowed; }
     .w-gun { background: #2563eb; box-shadow: 0 4px 0 #1e40af; }
@@ -104,9 +94,7 @@
 
     .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
     .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
-    .btn-jump:active { transform: translateY(4px); box-shadow: 0 1px 0 #b45309; }
     .btn-stop-run { flex: 1; max-width: 170px; padding: 14px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
-    .btn-stop-run:active { transform: translateY(4px); box-shadow: 0 1px 0 #1d4ed8; }
 
     .share-box { margin-top: 14px; width: 95%; max-width: 800px; background: #1e1e26; border: 1px solid #334155; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
     .share-label { font-size: 0.9rem; font-weight: bold; color: #e2e8f0; }
@@ -125,13 +113,15 @@
       <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
       <div class="score-board online-board">🟢 نشط الآن: <span id="onlineCount">1</span></div>
+      <div class="score-board acc-board">👤 <span id="accountNameDisplay">...</span></div>
       <div class="score-board war-board" id="warTeamStatus" style="display:none;">
-        ⚔️ فريقنا: <span id="allyAliveCount">10</span> | الأعداء: <span id="enemyAliveCount">10</span> | 🚀 <span id="rocketAmmoText">2</span> | 🛡️ دبابات: <span id="tankCountText">0</span>
+        ⚔️ <span id="warMatchState">بحث عن خصم...</span> | ❤️ <span id="myWarHp">150</span> vs ❤️ <span id="oppWarHp">150</span> | 🚀 <span id="rocketAmmoText">2</span> | 🛡️ <span id="tankCountText">0</span>
       </div>
     </div>
     <div class="actions-group">
       <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
-      <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر والملابس</button>
+      <button class="btn-top btn-account" onclick="toggleAccountModal()">👤 الحساب</button>
+      <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر</button>
       <button class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
     </div>
   </div>
@@ -140,7 +130,7 @@
     <canvas id="gameCanvas" width="800" height="360"></canvas>
     <div class="overlay-screen" id="modeMenu">
       <h2>اختر طور اللعب</h2>
-      <p class="subtitle">اسحب لتصفح الأطوار واختر التحدي المناسب</p>
+      <p class="subtitle">حسابك التلقائي جاهز — اختر الطور المناسب</p>
       <div class="mode-cards">
         <div class="mode-card" onclick="startGame('monster')">
           <div class="icon">👾</div>
@@ -156,12 +146,22 @@
         </div>
         <div class="mode-card" onclick="startGame('war')">
           <div class="icon">⚔️</div>
-          <div class="mode-card-text"><h3>4. حرب 10 ضد 10</h3><p>الجميع يطلق عند ضغط الزر مع شراء الصواريخ والدبابات!</p></div>
+          <div class="mode-card-text"><h3>4. حرب أونلاين</h3><p>مواجهة أونلاين عبر Supabase مع إطلاق جماعي وشراء الصواريخ والدبابات!</p></div>
         </div>
       </div>
     </div>
 
-    <div class="shop-modal" id="shopModal">
+    <div class="modal-box account-modal" id="accountModal">
+      <h3>👤 حسابك التلقائي في NC Go</h3>
+      <p class="shop-info">يتم إنشاء حسابك تلقائياً في جدول <strong>accounts</strong> باسم فريد لا يتكرر مع لاعب آخر.</p>
+      <div style="font-size:0.85rem;color:#93c5fd;margin-bottom:6px;">الاسم الحالي: <strong id="modalCurrentName">...</strong></div>
+      <input type="text" id="newUsernameInput" class="name-input" maxlength="18" placeholder="اكتب اسماً جديداً فريداً...">
+      <button type="button" class="btn-save-name" onclick="changeAccountUsername()">حفظ الاسم الجديد</button>
+      <div class="account-msg" id="accountMsg"></div>
+      <button type="button" class="btn-close" onclick="toggleAccountModal()">إغلاق</button>
+    </div>
+
+    <div class="modal-box" id="shopModal">
       <h3>🛒 متجر Go Game</h3>
       <p class="shop-info">اللعبة متوقفة مؤقتاً — رصيدك: <span id="shopCoinText" style="color:#fbbf24;font-weight:bold;">0</span> 🪙</p>
       <div class="shop-section-title">👕 ألوان الملابس</div>
@@ -183,11 +183,10 @@
     </div>
   </div>
 
-  <!-- أزرار الإطلاق الجماعي وشراء الصواريخ والدبابات في طور الحرب -->
   <div class="weapons-bar" id="weaponsBar">
-    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireWeapon('gun')">🔫 إطلاق جماعي (مسدس)</button>
-    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireWeapon('rocket')">🚀 إطلاق صواريخ (<span id="btnRocketCount">2</span>)</button>
-    <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireWeapon('laser')">⚡ شعاع طاقة جماعي</button>
+    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireOnlineWeapon('gun')">🔫 إطلاق جماعي (مسدس)</button>
+    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireOnlineWeapon('rocket')">🚀 إطلاق صواريخ (<span id="btnRocketCount">2</span>)</button>
+    <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireOnlineWeapon('laser')">⚡ شعاع طاقة جماعي</button>
     <button type="button" class="btn-weapon w-buy-rocket" onclick="buyRocket()">➕ شراء صاروخ (10 🪙)</button>
     <button type="button" class="btn-weapon w-buy-tank" onclick="buyTank()">🛡️ شراء دبابة (25 🪙)</button>
   </div>
@@ -213,19 +212,148 @@
     const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
     const goalDisplay = document.getElementById('goalDisplay'), coinText = document.getElementById('coinText');
     const shopCoinText = document.getElementById('shopCoinText'), modeMenu = document.getElementById('modeMenu');
-    const shopModal = document.getElementById('shopModal'), endScreen = document.getElementById('endScreen');
-    const endTitle = document.getElementById('endTitle'), endMessage = document.getElementById('endMessage');
-    const soundBtn = document.getElementById('soundBtn'), weaponsBar = document.getElementById('weaponsBar');
-    const warTeamStatus = document.getElementById('warTeamStatus');
-    const allyAliveCountEl = document.getElementById('allyAliveCount'), enemyAliveCountEl = document.getElementById('enemyAliveCount');
-    const rocketAmmoText = document.getElementById('rocketAmmoText'), btnRocketCount = document.getElementById('btnRocketCount');
-    const tankCountText = document.getElementById('tankCountText');
+    const shopModal = document.getElementById('shopModal'), accountModal = document.getElementById('accountModal');
+    const endScreen = document.getElementById('endScreen'), endTitle = document.getElementById('endTitle');
+    const endMessage = document.getElementById('endMessage'), soundBtn = document.getElementById('soundBtn');
+    const weaponsBar = document.getElementById('weaponsBar'), warTeamStatus = document.getElementById('warTeamStatus');
     const SHARE_URL = 'https://zozen2026.github.io/Go-Game/';
 
-    function showShareStatus(msg) {
-      const el = document.getElementById('shareStatus');
-      if (el) el.textContent = msg;
+    const SUPABASE_URL = 'https://lzvtnfdgynwczrkwlwhf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6dnRuZmRneW53Y3pya3dsd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDIxMTEsImV4cCI6MjEwNDcxODExMX0.w2hNlJ4SszyMBkUVjr1qiWNTTPxHMHkM9YOFtVP-pVI';
+    const sbHeaders = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    };
+
+    // إدارة الحساب التلقائي والاسم الفريد في جدول accounts
+    const accountId = localStorage.getItem('ncgo_acc_id') || ('acc_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36));
+    localStorage.setItem('ncgo_acc_id', accountId);
+    let currentUsername = localStorage.getItem('ncgo_username') || '';
+
+    function generateUniqueCandidateName() {
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      return `Player_${rand}`;
     }
+
+    function updateAccountUi(msg = '') {
+      document.getElementById('accountNameDisplay').textContent = currentUsername || 'جاري الإنشاء...';
+      document.getElementById('modalCurrentName').textContent = currentUsername || 'جاري الإنشاء...';
+      if (msg) document.getElementById('accountMsg').textContent = msg;
+    }
+
+    async function ensureUniqueAccount() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=id,username,coins`, { headers: sbHeaders });
+        const existing = await res.json();
+        if (Array.isArray(existing) && existing.length > 0) {
+          currentUsername = existing[0].username;
+          localStorage.setItem('ncgo_username', currentUsername);
+          updateAccountUi();
+          await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
+            method: 'PATCH',
+            headers: sbHeaders,
+            body: JSON.stringify({ last_seen: new Date().toISOString() })
+          });
+          return;
+        }
+
+        // إنشاء حساب جديد تلقائياً مع ضمان عدم تشابه الاسم
+        for (let attempt = 0; attempt < 8; attempt++) {
+          const candidate = currentUsername || generateUniqueCandidateName();
+          const createRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts`, {
+            method: 'POST',
+            headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+            body: JSON.stringify({ id: accountId, username: candidate, coins: 30, last_seen: new Date().toISOString() })
+          });
+          if (createRes.ok) {
+            const created = await createRes.json();
+            currentUsername = (Array.isArray(created) && created[0]?.username) || candidate;
+            localStorage.setItem('ncgo_username', currentUsername);
+            updateAccountUi('تم إنشاء حسابك التلقائي باسم فريد.');
+            return;
+          }
+          currentUsername = generateUniqueCandidateName();
+        }
+      } catch (_) {}
+    }
+
+    async function changeAccountUsername() {
+      const input = document.getElementById('newUsernameInput');
+      const desired = (input.value || '').trim();
+      if (desired.length < 3) {
+        updateAccountUi('الاسم يجب أن يكون 3 أحرف على الأقل.');
+        return;
+      }
+      if (desired === currentUsername) {
+        updateAccountUi('هذا هو اسمك الحالي بالفعل.');
+        return;
+      }
+
+      try {
+        const checkRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/accounts?username=eq.${encodeURIComponent(desired)}&id=neq.${encodeURIComponent(accountId)}&select=id`,
+          { headers: sbHeaders }
+        );
+        const dupes = await checkRes.json();
+        if (Array.isArray(dupes) && dupes.length > 0) {
+          updateAccountUi('هذا الاسم مستخدم مسبقاً من لاعب آخر، اختر اسماً مختلفاً.');
+          return;
+        }
+
+        const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
+          method: 'PATCH',
+          headers: sbHeaders,
+          body: JSON.stringify({ username: desired, last_seen: new Date().toISOString() })
+        });
+        if (!patchRes.ok) {
+          updateAccountUi('تعذر حفظ الاسم (قد يكون مكرراً أو غير مسموح).');
+          return;
+        }
+
+        currentUsername = desired;
+        localStorage.setItem('ncgo_username', currentUsername);
+        input.value = '';
+        updateAccountUi('تم تحديث اسمك الفريد بنجاح!');
+      } catch (_) {
+        updateAccountUi('حدث خطأ أثناء الاتصال بقاعدة البيانات.');
+      }
+    }
+
+    function toggleAccountModal() {
+      const vis = accountModal.style.display === 'block';
+      if (!vis) {
+        isPaused = true;
+        document.getElementById('accountMsg').textContent = '';
+        accountModal.style.display = 'block';
+      } else {
+        accountModal.style.display = 'none';
+        if (currentMode && !isGameOver && shopModal.style.display !== 'block') {
+          isPaused = false;
+          animationId = requestAnimationFrame(update);
+        }
+      }
+    }
+
+    // عداد النشطين الآن عبر accounts (آخر 45 ثانية)
+    async function syncActivePlayers() {
+      try {
+        await ensureUniqueAccount();
+        const cutoff = new Date(Date.now() - 45000).toISOString();
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id`,
+          { headers: sbHeaders }
+        );
+        const rows = await res.json();
+        const el = document.getElementById('onlineCount');
+        if (el && Array.isArray(rows)) el.textContent = Math.max(1, rows.length);
+      } catch (_) {}
+    }
+
+    ensureUniqueAccount().then(syncActivePlayers);
+    setInterval(syncActivePlayers, 15000);
+
+    function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
       const input = document.getElementById('shareUrlInput');
       if (input) { input.focus(); input.select(); }
@@ -233,9 +361,7 @@
         if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(SHARE_URL);
         else document.execCommand('copy');
         showShareStatus('تم نسخ الرابط بنجاح! يمكنك لصقه في واتساب أو تيليجرام أو سناب.');
-      } catch (_) {
-        showShareStatus('حدد الرابط واضغط نسخ يدوياً.');
-      }
+      } catch (_) { showShareStatus('حدد الرابط واضغط نسخ يدوياً.'); }
     }
     async function shareGameLink() {
       if (navigator.share) {
@@ -244,28 +370,6 @@
       }
       await copyShareLink();
     }
-
-    // إعدادات Supabase لعداد اللاعبين النشطين الآن
-    const SUPABASE_URL = 'https://lzvtnfdgynwczrkwlwhf.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6dnRuZmRneW53Y3pya3dsd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDIxMTEsImV4cCI6MjEwNDcxODExMX0.w2hNlJ4SszyMBkUVjr1qiWNTTPxHMHkM9YOFtVP-pVI';
-    const sessionId = sessionStorage.getItem('ncgo_sid') || ('sid_' + Math.random().toString(36).slice(2) + '_' + Date.now());
-    sessionStorage.setItem('ncgo_sid', sessionId);
-
-    async function syncActivePlayers() {
-      const headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' };
-      try {
-        const postRes = await fetch(`${SUPABASE_URL}/rest/v1/active_players`, { method: 'POST', headers, body: JSON.stringify({ session_id: sessionId, last_seen: new Date().toISOString() }) });
-        if (!postRes.ok) return;
-        const cutoff = new Date(Date.now() - 45000).toISOString();
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/active_players?last_seen=gte.${encodeURIComponent(cutoff)}&select=session_id`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY } });
-        if (!res.ok) return;
-        const rows = await res.json();
-        const el = document.getElementById('onlineCount');
-        if (el && Array.isArray(rows)) el.textContent = rows.length;
-      } catch (_) {}
-    }
-    syncActivePlayers();
-    setInterval(syncActivePlayers, 15000);
 
     let soundEnabled = localStorage.getItem('gogame_sfx') !== 'false', audioCtx = null;
     function getAudioCtx() {
@@ -326,169 +430,132 @@
     const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
     let obstacles = [], coinItems = [];
 
-    // حالة طور الحرب 10 ضد 10 (إطلاق جماعي عند الضغط + شراء صواريخ ودبابات)
-    let allies = [], enemies = [], tanks = [], projectiles = [], laserBeamTimer = 0;
-    let rocketsAmmo = 2;
-    let cooldowns = { gun: 0, rocket: 0, laser: 0 };
+    // حالة حرب الأونلاين عبر Supabase
+    let warMatchId = null, isHost = false, opponentName = 'خصم أونلاين', myWarHp = 150, oppWarHp = 150, lastSeenActionSeq = 0;
+    let tanks = [], projectiles = [], laserBeamTimer = 0, rocketsAmmo = 2, cooldowns = { gun: 0, rocket: 0, laser: 0 };
 
-    function initWarSquads() {
-      allies = [];
-      enemies = [];
-      tanks = [];
-      projectiles = [];
-      laserBeamTimer = 0;
-      rocketsAmmo = 2;
-      cooldowns = { gun: 0, rocket: 0, laser: 0 };
-
-      for (let i = 0; i < 10; i++) {
-        allies.push({
-          isPlayer: i === 0,
-          x: i === 0 ? 190 : 30 + (i % 3) * 42,
-          y: groundY - 42,
-          width: 24,
-          height: 42,
-          hp: i === 0 ? 140 : 65,
-          alive: true
-        });
-      }
-
-      for (let i = 0; i < 10; i++) {
-        enemies.push({
-          x: 520 + (i % 4) * 55 + Math.floor(i / 4) * 28,
-          y: groundY - 42,
-          width: 24,
-          height: 42,
-          hp: 65,
-          alive: true,
-          fireTimer: 35 + i * 20
-        });
-      }
-      updateWarCounters();
+    function updateWarUi() {
+      document.getElementById('warMatchState').textContent = warMatchId ? `ضد ${opponentName}` : 'بحث عن خصم...';
+      document.getElementById('myWarHp').textContent = Math.max(0, myWarHp);
+      document.getElementById('oppWarHp').textContent = Math.max(0, oppWarHp);
+      document.getElementById('rocketAmmoText').textContent = rocketsAmmo;
+      document.getElementById('btnRocketCount').textContent = rocketsAmmo;
+      document.getElementById('tankCountText').textContent = tanks.filter(t => t.alive).length;
+      document.getElementById('btnGun').disabled = cooldowns.gun > 0;
+      document.getElementById('btnRocket').disabled = cooldowns.rocket > 0 || rocketsAmmo <= 0;
+      document.getElementById('btnLaser').disabled = cooldowns.laser > 0;
     }
 
-    function updateWarCounters() {
-      const aAlive = allies.filter(a => a.alive).length;
-      const eAlive = enemies.filter(e => e.alive).length;
-      const activeTanks = tanks.filter(t => t.alive).length;
-      if (allyAliveCountEl) allyAliveCountEl.textContent = aAlive;
-      if (enemyAliveCountEl) enemyAliveCountEl.textContent = eAlive;
-      if (rocketAmmoText) rocketAmmoText.textContent = rocketsAmmo;
-      if (btnRocketCount) btnRocketCount.textContent = rocketsAmmo;
-      if (tankCountText) tankCountText.textContent = activeTanks;
-
-      const btnGun = document.getElementById('btnGun');
-      const btnRocket = document.getElementById('btnRocket');
-      const btnLaser = document.getElementById('btnLaser');
-      if (btnGun) btnGun.disabled = cooldowns.gun > 0 || aAlive === 0;
-      if (btnRocket) btnRocket.disabled = cooldowns.rocket > 0 || rocketsAmmo <= 0 || aAlive === 0;
-      if (btnLaser) btnLaser.disabled = cooldowns.laser > 0 || aAlive === 0;
+    async function joinOrCreateOnlineWar() {
+      warMatchId = null; isHost = false; opponentName = 'في الانتظار...';
+      myWarHp = 150; oppWarHp = 150; lastSeenActionSeq = 0; tanks = []; projectiles = []; rocketsAmmo = 2;
+      updateWarUi();
+      try {
+        const openRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?status=eq.waiting&player1_id=neq.${encodeURIComponent(accountId)}&select=*&limit=1`, { headers: sbHeaders });
+        const openRooms = await openRes.json();
+        if (Array.isArray(openRooms) && openRooms.length > 0) {
+          const room = openRooms[0];
+          const joinRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(room.id)}`, {
+            method: 'PATCH',
+            headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+            body: JSON.stringify({ player2_id: accountId, player2_name: currentUsername || 'Player', status: 'active', updated_at: new Date().toISOString() })
+          });
+          const joined = await joinRes.json();
+          if (Array.isArray(joined) && joined[0]) {
+            warMatchId = joined[0].id; isHost = false; opponentName = joined[0].player1_name || 'خصم أونلاين';
+            updateWarUi();
+            return;
+          }
+        }
+        const newId = 'room_' + accountId + '_' + Date.now().toString(36);
+        const createRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches`, {
+          method: 'POST',
+          headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+          body: JSON.stringify({ id: newId, player1_id: accountId, player1_name: currentUsername || 'Player', player1_hp: 150, player2_hp: 150, status: 'waiting', updated_at: new Date().toISOString() })
+        });
+        const created = await createRes.json();
+        if (Array.isArray(created) && created[0]) {
+          warMatchId = created[0].id; isHost = true;
+          updateWarUi();
+        }
+      } catch (_) {}
     }
+
+    async function pollOnlineWarRoom() {
+      if (currentMode !== 'war' || !warMatchId || isPaused || isGameOver) return;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}&select=*`, { headers: sbHeaders });
+        const rows = await res.json();
+        if (!Array.isArray(rows) || !rows[0]) return;
+        const r = rows[0];
+        if (!isHost && r.player1_name) opponentName = r.player1_name;
+        if (isHost && r.player2_name) opponentName = r.player2_name;
+
+        const remoteHp = isHost ? r.player2_hp : r.player1_hp;
+        if (typeof remoteHp === 'number') oppWarHp = remoteHp;
+
+        if (r.action_seq > lastSeenActionSeq && r.last_action) {
+          lastSeenActionSeq = r.action_seq;
+          const [actorId, weaponType] = String(r.last_action).split(':');
+          if (actorId && actorId !== accountId) {
+            const dmg = weaponType === 'laser' ? 28 : weaponType === 'rocket' ? 24 : 10;
+            myWarHp = Math.max(0, myWarHp - dmg);
+            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: 640, y: groundY - 24, vx: -9, dmg: 0, radius: weaponType === 'rocket' ? 8 : 5 });
+            const hpPatch = isHost ? { player1_hp: myWarHp, updated_at: new Date().toISOString() } : { player2_hp: myWarHp, updated_at: new Date().toISOString() };
+            await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(hpPatch) });
+          }
+        }
+        updateWarUi();
+        if (oppWarHp <= 0) endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`);
+        else if (myWarHp <= 0) endGame(false, 'خسرت في الحرب الأونلاين! 💥', `تغلب عليك ${opponentName} | نقاطك: ${score}`);
+      } catch (_) {}
+    }
+    setInterval(pollOnlineWarRoom, 1800);
 
     function buyRocket() {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
       if (coins < 10) return alert('تحتاج إلى 10 عملات لشراء صاروخ!');
-      coins -= 10;
-      rocketsAmmo += 1;
-      sfx.buy();
-      saveProgress();
-      updateWarCounters();
+      coins -= 10; rocketsAmmo += 1; sfx.buy(); saveProgress(); updateWarUi();
     }
 
     function buyTank() {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
       if (coins < 25) return alert('تحتاج إلى 25 عملة لشراء دبابة!');
       coins -= 25;
-      tanks.push({
-        x: 75 + (tanks.length % 3) * 58,
-        y: groundY - 34,
-        width: 48,
-        height: 34,
-        hp: 220,
-        alive: true
-      });
-      sfx.buy();
-      saveProgress();
-      updateWarCounters();
+      tanks.push({ x: 80 + (tanks.length % 3) * 56, y: groundY - 34, width: 48, height: 34, alive: true });
+      sfx.buy(); saveProgress(); updateWarUi();
     }
 
-    function registerEnemyKill() {
-      score += 10;
-      coins += 2;
-      saveProgress();
-      const el = document.getElementById('scoreText');
-      if (el) el.textContent = score;
-    }
-
-    function fireWeapon(type) {
+    async function fireOnlineWeapon(type) {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
-      const aliveAllies = allies.filter(a => a.alive);
-      const aliveTanks = tanks.filter(t => t.alive);
-      if (aliveAllies.length === 0) return;
-
       if (type === 'gun' && cooldowns.gun <= 0) {
-        // جميع المقاتلين الأحياء في الفريق يطلقون المسدس معاً
-        aliveAllies.forEach(a => {
-          projectiles.push({
-            fromAlly: true,
-            kind: 'gun',
-            x: a.x + a.width + 2,
-            y: a.y + 18,
-            vx: 11.5,
-            vy: 0,
-            dmg: a.isPlayer ? 25 : 18,
-            radius: 5
-          });
-        });
-        // الدبابات تطلق أيضاً مع الفريق
-        aliveTanks.forEach(t => {
-          projectiles.push({
-            fromAlly: true,
-            kind: 'gun',
-            x: t.x + t.width + 2,
-            y: t.y + 12,
-            vx: 11,
-            vy: 0,
-            dmg: 30,
-            radius: 6
-          });
-        });
-        cooldowns.gun = 14;
-        sfx.gun();
+        projectiles.push({ fromAlly: true, kind: 'gun', x: 180, y: groundY - 24, vx: 11.5, dmg: 12, radius: 5 });
+        tanks.forEach(t => { if (t.alive) projectiles.push({ fromAlly: true, kind: 'gun', x: t.x + t.width, y: t.y + 12, vx: 11, dmg: 12, radius: 6 }); });
+        cooldowns.gun = 14; sfx.gun();
       } else if (type === 'rocket' && cooldowns.rocket <= 0 && rocketsAmmo > 0) {
         rocketsAmmo -= 1;
-        // إطلاق صاروخ رئيسي + صواريخ مساندة من الدبابات والمقاتلين
-        const shooters = [...aliveAllies.slice(0, 4), ...aliveTanks];
-        shooters.forEach((s, idx) => {
-          projectiles.push({
-            fromAlly: true,
-            kind: 'rocket',
-            x: s.x + s.width + 4,
-            y: s.y + 12 + (idx % 2) * 4,
-            vx: 9,
-            vy: 0,
-            dmg: idx === 0 ? 85 : 45,
-            radius: idx === 0 ? 9 : 7
-          });
-        });
-        cooldowns.rocket = 35;
-        sfx.rocket();
+        projectiles.push({ fromAlly: true, kind: 'rocket', x: 185, y: groundY - 26, vx: 9.5, dmg: 26, radius: 9 });
+        cooldowns.rocket = 35; sfx.rocket();
       } else if (type === 'laser' && cooldowns.laser <= 0) {
-        // جميع المقاتلين الأحياء يطلقون شعاع الطاقة معاً
-        laserBeamTimer = 14;
-        cooldowns.laser = 95;
-        sfx.laser();
-        const totalLaserDmg = 25 + aliveAllies.length * 8 + aliveTanks.length * 15;
-        enemies.forEach(en => {
-          if (en.alive) {
-            en.hp -= totalLaserDmg;
-            if (en.hp <= 0) {
-              en.alive = false;
-              registerEnemyKill();
-            }
-          }
-        });
+        laserBeamTimer = 14; cooldowns.laser = 95; sfx.laser();
+        oppWarHp = Math.max(0, oppWarHp - (24 + tanks.filter(t => t.alive).length * 6));
+        score += 10; coins += 2; saveProgress();
+        const el = document.getElementById('scoreText'); if (el) el.textContent = score;
+      } else return;
+
+      updateWarUi();
+      if (warMatchId) {
+        const nextSeq = lastSeenActionSeq + 1;
+        lastSeenActionSeq = nextSeq;
+        const hpField = isHost ? { player2_hp: oppWarHp } : { player1_hp: oppWarHp };
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, {
+            method: 'PATCH',
+            headers: sbHeaders,
+            body: JSON.stringify({ ...hpField, last_action: `${accountId}:${type}`, action_seq: nextSeq, updated_at: new Date().toISOString() })
+          });
+        } catch (_) {}
       }
-      updateWarCounters();
     }
 
     function saveProgress() {
@@ -533,7 +600,7 @@
       if (!vis) { isPaused = true; renderShop(); shopModal.style.display = 'block'; }
       else { shopModal.style.display = 'none'; isPaused = false; animationId = requestAnimationFrame(update); }
     }
-    function openModeMenu() { isPaused = true; cancelAnimationFrame(animationId); shopModal.style.display = 'none'; endScreen.style.display = 'none'; modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0; }
+    function openModeMenu() { isPaused = true; cancelAnimationFrame(animationId); shopModal.style.display = 'none'; accountModal.style.display = 'none'; endScreen.style.display = 'none'; modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0; }
     function startGame(mode) { getAudioCtx(); currentMode = mode; modeMenu.style.display = 'none'; restartCurrentMode(); }
 
     function restartCurrentMode() {
@@ -546,8 +613,8 @@
       warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
 
       if (isWar) {
-        initWarSquads();
         goalDisplay.innerHTML = `القتلى: <span id="scoreText">0</span>`;
+        joinOrCreateOnlineWar();
       } else if (currentMode === 'rescue') {
         goalDisplay.innerHTML = `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}`;
       } else {
@@ -558,27 +625,13 @@
       cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
     }
 
-    function jump() {
-      if (isGameOver || isPaused) return;
-      if (currentMode === 'war') {
-        allies.forEach(a => {
-          if (a.alive && a.y >= groundY - a.height - 1) {
-            a.y -= 34;
-            setTimeout(() => { if (a) a.y = groundY - a.height; }, 220);
-          }
-        });
-        sfx.jump();
-        return;
-      }
-      if (player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); }
-    }
-
+    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
     window.addEventListener('keydown', e => {
       if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
       if (currentMode === 'war') {
-        if (e.key === '1') fireWeapon('gun');
-        if (e.key === '2') fireWeapon('rocket');
-        if (e.key === '3') fireWeapon('laser');
+        if (e.key === '1') fireOnlineWeapon('gun');
+        if (e.key === '2') fireOnlineWeapon('rocket');
+        if (e.key === '3') fireOnlineWeapon('laser');
       }
     });
 
@@ -608,55 +661,35 @@
       ctx.restore();
     }
 
-    function drawWarScene() {
-      if (currentMode !== 'war') return;
+    function drawOnlineWarScene() {
       ctx.save();
+      // لاعبك في اليسار مع اسمه
+      ctx.fillStyle = equippedShirt; ctx.fillRect(140, groundY - 34, 28, 24);
+      ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(154, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(currentUsername || 'أنت', 125, groundY - 58);
 
-      allies.forEach(a => {
-        if (!a.alive) return;
-        ctx.fillStyle = a.isPlayer ? equippedShirt : '#38bdf8';
-        ctx.fillRect(a.x, a.y + 12, a.width, 20);
-        ctx.fillStyle = '#fcd34d';
-        ctx.beginPath(); ctx.arc(a.x + 12, a.y + 7, 7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(a.x + 4, a.y + 32, 6, 10); ctx.fillRect(a.x + 14, a.y + 32, 6, 10);
-      });
-
+      // الدبابات المشتراة
       tanks.forEach(t => {
         if (!t.alive) return;
-        ctx.fillStyle = '#15803d';
-        ctx.fillRect(t.x, t.y + 12, t.width, 16);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(t.x + 10, t.y + 4, 22, 9);
-        ctx.fillStyle = '#14532d';
-        ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(t.x, t.y + 26, t.width, 8);
+        ctx.fillStyle = '#15803d'; ctx.fillRect(t.x, t.y + 12, t.width, 16);
+        ctx.fillStyle = '#22c55e'; ctx.fillRect(t.x + 10, t.y + 4, 22, 9);
+        ctx.fillStyle = '#14532d'; ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
       });
 
-      enemies.forEach(en => {
-        if (!en.alive) return;
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect(en.x, en.y + 12, en.width, 20);
-        ctx.fillStyle = '#fca5a5';
-        ctx.beginPath(); ctx.arc(en.x + 12, en.y + 7, 7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#450a0a';
-        ctx.fillRect(en.x + 4, en.y + 32, 6, 10); ctx.fillRect(en.x + 14, en.y + 32, 6, 10);
-      });
+      // الخصم الأونلاين في اليمين
+      ctx.fillStyle = '#ef4444'; ctx.fillRect(630, groundY - 34, 28, 24);
+      ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(644, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(opponentName, 608, groundY - 58);
 
       if (laserBeamTimer > 0) {
-        allies.forEach(a => {
-          if (!a.alive) return;
-          ctx.fillStyle = a.isPlayer ? 'rgba(167, 139, 250, 0.8)' : 'rgba(125, 211, 252, 0.45)';
-          ctx.fillRect(a.x + a.width, a.y + 14, canvas.width - a.x, a.isPlayer ? 10 : 5);
-        });
+        ctx.fillStyle = 'rgba(167, 139, 250, 0.8)';
+        ctx.fillRect(170, groundY - 26, 465, 10);
       }
 
       projectiles.forEach(p => {
         ctx.fillStyle = p.fromAlly ? (p.kind === 'rocket' ? '#fb923c' : '#60a5fa') : '#f87171';
         ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
       });
-
       ctx.restore();
     }
 
@@ -698,7 +731,7 @@
 
     function draw() {
       drawBackgroundAndGround();
-      if (currentMode === 'war') drawWarScene();
+      if (currentMode === 'war') drawOnlineWarScene();
       else { drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer(); }
     }
 
@@ -709,70 +742,26 @@
       if (won) sfx.win(); else sfx.lose();
     }
 
-    function updateWar() {
+    function updateOnlineWar() {
       if (cooldowns.gun > 0) cooldowns.gun--;
       if (cooldowns.rocket > 0) cooldowns.rocket--;
       if (cooldowns.laser > 0) cooldowns.laser--;
       if (laserBeamTimer > 0) laserBeamTimer--;
 
-      enemies.forEach((en, idx) => {
-        if (!en.alive) return;
-        en.x = Math.max(430, en.x - 0.14);
-        en.fireTimer--;
-        if (en.fireTimer <= 0) {
-          en.fireTimer = 70 + idx * 9;
-          projectiles.push({ fromAlly: false, kind: 'gun', x: en.x - 4, y: en.y + 18, vx: -6.2, vy: 0, dmg: 10, radius: 4 });
-        }
-      });
-
       for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
         p.x += p.vx;
         if (p.x < -20 || p.x > canvas.width + 20) { projectiles.splice(i, 1); continue; }
-
-        if (p.fromAlly) {
-          let hit = false;
-          for (const en of enemies) {
-            if (en.alive && p.x + p.radius > en.x && p.x - p.radius < en.x + en.width && p.y > en.y && p.y < en.y + en.height) {
-              en.hp -= p.dmg;
-              hit = true;
-              if (en.hp <= 0) {
-                en.alive = false;
-                registerEnemyKill();
-              }
-              break;
-            }
-          }
-          if (hit) { projectiles.splice(i, 1); continue; }
-        } else {
-          let hit = false;
-          for (const t of tanks) {
-            if (t.alive && p.x - p.radius < t.x + t.width && p.x + p.radius > t.x && p.y > t.y && p.y < t.y + t.height) {
-              t.hp -= p.dmg;
-              hit = true;
-              if (t.hp <= 0) t.alive = false;
-              break;
-            }
-          }
-          if (!hit) {
-            for (const a of allies) {
-              if (a.alive && p.x - p.radius < a.x + a.width && p.x + p.radius > a.x && p.y > a.y && p.y < a.y + a.height) {
-                a.hp -= p.dmg;
-                hit = true;
-                if (a.hp <= 0) a.alive = false;
-                break;
-              }
-            }
-          }
-          if (hit) { projectiles.splice(i, 1); continue; }
+        if (p.fromAlly && p.x >= 630) {
+          oppWarHp = Math.max(0, oppWarHp - p.dmg);
+          score += 5; coins += 1; saveProgress();
+          const el = document.getElementById('scoreText'); if (el) el.textContent = score;
+          projectiles.splice(i, 1);
+          updateWarUi();
+          if (oppWarHp <= 0) { endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`); return; }
         }
       }
-
-      updateWarCounters();
-      const aAlive = allies.filter(a => a.alive).length;
-      const eAlive = enemies.filter(e => e.alive).length;
-      if (eAlive === 0) { endGame(true, 'انتصر فريقك 10 ضد 10! ⚔️🏆', `نقاط القتال: ${score} | رصيد العملات: ${coins}`); return; }
-      if (aAlive === 0) { endGame(false, 'خسر فريقك المعركة! 💥', `نقاط القتال: ${score} | رصيد العملات: ${coins}`); return; }
+      updateWarUi();
     }
 
     function update() {
@@ -780,7 +769,7 @@
       frameCount++;
 
       if (currentMode === 'war') {
-        updateWar();
+        updateOnlineWar();
         draw();
         animationId = requestAnimationFrame(update);
         return;
