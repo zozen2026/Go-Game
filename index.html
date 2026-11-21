@@ -187,12 +187,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 6px;
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 10px;
       padding: 8px 10px;
       margin-bottom: 6px;
       font-size: 0.88rem;
+    }
+    .friend-actions { display: flex; gap: 5px; align-items: center; }
+    .btn-mini-chat {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
     }
     .btn-mini-add {
       background: #10b981;
@@ -213,6 +225,57 @@
       font-size: 0.78rem;
       font-weight: bold;
       cursor: pointer;
+    }
+    .dm-panel {
+      display: none;
+      margin-top: 10px;
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: right;
+    }
+    .dm-panel.active { display: block; }
+    .dm-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      color: #7dd3fc;
+      font-weight: bold;
+    }
+    .dm-messages {
+      max-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 8px;
+      padding: 6px;
+      background: #020617;
+      border-radius: 8px;
+      user-select: text;
+    }
+    .dm-bubble {
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      max-width: 85%;
+      word-break: break-word;
+    }
+    .dm-bubble.mine { background: #1d4ed8; color: #fff; align-self: flex-start; }
+    .dm-bubble.theirs { background: #1e293b; color: #e2e8f0; align-self: flex-end; }
+    .dm-form { display: flex; gap: 6px; }
+    .dm-input {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #020617;
+      color: #fff;
+      font-size: 0.86rem;
+      user-select: text;
     }
 
     .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.84); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
@@ -327,14 +390,27 @@
     </div>
 
     <div class="modal-box friends-modal" id="friendsModal">
-      <h3>👥 قائمة الأصدقاء</h3>
-      <p class="shop-info">أضف لاعباً بالاسم أو من المتواجدين في الساحة ليظهر بعلامة ⭐ فوق رأسه.</p>
+      <h3>👥 الأصدقاء والدردشة الخاصة</h3>
+      <p class="shop-info">أضف صديقك ثم اضغط <strong>💬 دردشة</strong> للتراسل الخاص معه مباشرة.</p>
       <input type="text" id="addFriendInput" class="name-input" maxlength="18" placeholder="اكتب اسم صديقك مثل Mustafa...">
       <button type="button" class="btn-save-name" style="background:#0d9488;" onclick="addFriendFromInput()">➕ إضافة صديق</button>
       <div class="shop-section-title">🟢 متواجدون في الساحة الآن</div>
       <div id="plazaCandidatesList"></div>
       <div class="shop-section-title">⭐ أصدقاؤك المحفوظون</div>
       <div id="savedFriendsList"></div>
+
+      <div class="dm-panel" id="friendDmPanel">
+        <div class="dm-header">
+          <span>💬 دردشة خاصة مع: <span id="dmTargetName">...</span></span>
+          <button type="button" class="btn-mini-remove" onclick="closeFriendChat()">✕</button>
+        </div>
+        <div class="dm-messages" id="dmMessagesBox"></div>
+        <form class="dm-form" onsubmit="sendPrivateFriendMessage(event)">
+          <input type="text" id="dmInput" class="dm-input" maxlength="180" placeholder="اكتب رسالة خاصة لصديقك..." autocomplete="off">
+          <button type="submit" class="btn-mini-add">إرسال</button>
+        </form>
+      </div>
+
       <button type="button" class="btn-close" onclick="toggleFriendsModal()">إغلاق</button>
     </div>
 
@@ -406,6 +482,7 @@
     const shopModal = document.getElementById('shopModal');
     const accountModal = document.getElementById('accountModal');
     const friendsModal = document.getElementById('friendsModal');
+    const friendDmPanel = document.getElementById('friendDmPanel');
     const endScreen = document.getElementById('endScreen');
     const endTitle = document.getElementById('endTitle');
     const endMessage = document.getElementById('endMessage');
@@ -438,10 +515,17 @@
     let plazaWeather = 'day';
 
     let friendsList = JSON.parse(localStorage.getItem('ncgo_friends') || '[]');
+    let privateChats = JSON.parse(localStorage.getItem('ncgo_private_chats') || '{}');
+    let activeFriendChatName = '';
+
     function saveFriendsList() {
       localStorage.setItem('ncgo_friends', JSON.stringify(friendsList));
       document.getElementById('friendsCountText').textContent = friendsList.length;
       renderFriendsModal();
+    }
+
+    function savePrivateChats() {
+      localStorage.setItem('ncgo_private_chats', JSON.stringify(privateChats));
     }
 
     function isFriendName(name) {
@@ -463,6 +547,9 @@
 
     function removeFriendByName(name) {
       friendsList = friendsList.filter(f => f.toLowerCase() !== String(name).toLowerCase());
+      if (activeFriendChatName && activeFriendChatName.toLowerCase() === String(name).toLowerCase()) {
+        closeFriendChat();
+      }
       saveFriendsList();
       showToast(`تمت إزالة ${name}`);
     }
@@ -471,6 +558,98 @@
       const inp = document.getElementById('addFriendInput');
       addFriendByName(inp.value);
       inp.value = '';
+    }
+
+    function getFriendThread(friendName) {
+      const key = String(friendName || '').toLowerCase();
+      if (!privateChats[key]) privateChats[key] = [];
+      return privateChats[key];
+    }
+
+    function renderFriendMessages() {
+      const box = document.getElementById('dmMessagesBox');
+      if (!box || !activeFriendChatName) return;
+      const thread = getFriendThread(activeFriendChatName);
+      if (thread.length === 0) {
+        box.innerHTML = '<div class="shop-info">ابدأ محادثة خاصة مع صديقك الآن.</div>';
+        return;
+      }
+      box.innerHTML = thread.map(m => {
+        const cls = m.mine ? 'mine' : 'theirs';
+        const div = document.createElement('div');
+        div.className = `dm-bubble ${cls}`;
+        div.textContent = m.text;
+        return div.outerHTML;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function openFriendChat(friendName) {
+      if (!friendName) return;
+      activeFriendChatName = friendName;
+      document.getElementById('dmTargetName').textContent = friendName;
+      friendDmPanel.classList.add('active');
+      renderFriendMessages();
+      setTimeout(() => document.getElementById('dmInput').focus(), 40);
+    }
+
+    function closeFriendChat() {
+      activeFriendChatName = '';
+      friendDmPanel.classList.remove('active');
+    }
+
+    async function sendPrivateFriendMessage(e) {
+      e.preventDefault();
+      if (!activeFriendChatName) return;
+      const inp = document.getElementById('dmInput');
+      const text = (inp.value || '').trim();
+      if (!text) return;
+      if (!accountReady) await ensureUniqueAccount();
+      inp.value = '';
+
+      const sender = currentUsername || 'Player';
+      const key = activeFriendChatName.toLowerCase();
+      if (!privateChats[key]) privateChats[key] = [];
+      privateChats[key].push({ mine: true, text, at: Date.now() });
+      savePrivateChats();
+      renderFriendMessages();
+      sfx.buy();
+
+      const dmPayload = {
+        private_dm: {
+          from_username: sender,
+          to_username: activeFriendChatName,
+          text,
+          sent_at: Date.now()
+        }
+      };
+      if (plazaChannel) {
+        plazaChannel.send({ type: 'broadcast', event: 'friend_dm', payload: dmPayload }).catch(() => {});
+      }
+    }
+
+    function handleIncomingFriendDm(data) {
+      const dm = data && data.private_dm;
+      if (!dm || !dm.from_username || !dm.to_username || !dm.text) return;
+      const myName = (currentUsername || '').toLowerCase();
+      if (!myName || dm.to_username.toLowerCase() !== myName) return;
+
+      const senderName = dm.from_username;
+      if (!friendsList.some(f => f.toLowerCase() === senderName.toLowerCase())) {
+        friendsList.push(senderName);
+        saveFriendsList();
+      }
+      const key = senderName.toLowerCase();
+      if (!privateChats[key]) privateChats[key] = [];
+      privateChats[key].push({ mine: false, text: dm.text, at: Date.now() });
+      savePrivateChats();
+
+      if (friendsModal.style.display === 'block' && activeFriendChatName.toLowerCase() === key) {
+        renderFriendMessages();
+      } else {
+        showToast(`رسالة خاصة من ${senderName}: ${dm.text.slice(0, 28)}`);
+      }
+      sfx.coin();
     }
 
     function renderFriendsModal() {
@@ -487,9 +666,12 @@
           const safeName = (p.username || 'Player').replace(/'/g, '');
           return `<div class="friend-row">
             <span>👤 ${p.username || 'Player'}</span>
-            ${already
-              ? '<span class="item-owned">صديق ⭐</span>'
-              : `<button type="button" class="btn-mini-add" onclick="addFriendByName('${safeName}')">+ إضافة</button>`}
+            <div class="friend-actions">
+              <button type="button" class="btn-mini-chat" onclick="openFriendChat('${safeName}')">💬 دردشة</button>
+              ${already
+                ? '<span class="item-owned">صديق ⭐</span>'
+                : `<button type="button" class="btn-mini-add" onclick="addFriendByName('${safeName}')">+ إضافة</button>`}
+            </div>
           </div>`;
         }).join('');
       }
@@ -501,7 +683,10 @@
           const safeName = String(name).replace(/'/g, '');
           return `<div class="friend-row">
             <span>⭐ ${name}</span>
-            <button type="button" class="btn-mini-remove" onclick="removeFriendByName('${safeName}')">حذف</button>
+            <div class="friend-actions">
+              <button type="button" class="btn-mini-chat" onclick="openFriendChat('${safeName}')">💬 دردشة</button>
+              <button type="button" class="btn-mini-remove" onclick="removeFriendByName('${safeName}')">حذف</button>
+            </div>
           </div>`;
         }).join('');
       }
@@ -527,7 +712,7 @@
       toastBanner.textContent = msg;
       toastBanner.style.display = 'block';
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { toastBanner.style.display = 'none'; }, 2400);
+      toastTimer = setTimeout(() => { toastBanner.style.display = 'none'; }, 2600);
     }
 
     function cyclePlazaWeather() {
@@ -830,6 +1015,9 @@
             appendMiniChatLine(payload.username || 'Player', payload.message);
           }
           draw();
+        })
+        .on('broadcast', { event: 'friend_dm' }, ({ payload }) => {
+          handleIncomingFriendDm(payload);
         })
         .subscribe(status => {
           if (status === 'SUBSCRIBED' && currentMode === 'chat') {
@@ -1307,7 +1495,8 @@
       if (
         document.activeElement === document.getElementById('chatInput') ||
         document.activeElement === document.getElementById('newUsernameInput') ||
-        document.activeElement === document.getElementById('addFriendInput')
+        document.activeElement === document.getElementById('addFriendInput') ||
+        document.activeElement === document.getElementById('dmInput')
       ) return;
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); jump(); }
       if (currentMode === 'chat') {
