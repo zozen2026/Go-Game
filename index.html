@@ -147,13 +147,12 @@
     const soundBtn = document.getElementById('soundBtn');
 
     // إعدادات Supabase لعداد اللاعبين النشطين الآن
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://lzvtnfdgynwczrkwlwhf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6dnRuZmRneW53Y3pya3dsd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDIxMTEsImV4cCI6MjEwNDcxODExMX0.w2hNlJ4SszyMBkUVjr1qiWNTTPxHMHkM9YOFtVP-pVI';
     const sessionId = sessionStorage.getItem('ncgo_sid') || ('sid_' + Math.random().toString(36).slice(2) + '_' + Date.now());
     sessionStorage.setItem('ncgo_sid', sessionId);
 
     async function syncActivePlayers() {
-      if (!SUPABASE_URL.startsWith('http')) return;
       const headers = {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
@@ -161,20 +160,32 @@
         'Prefer': 'resolution=merge-duplicates'
       };
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/active_players`, {
+        const postRes = await fetch(`${SUPABASE_URL}/rest/v1/active_players`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ session_id: sessionId, last_seen: new Date().toISOString() })
         });
+        if (!postRes.ok) {
+          console.error('Supabase POST failed:', postRes.status, await postRes.text());
+          return;
+        }
+
         const cutoff = new Date(Date.now() - 45000).toISOString();
         const res = await fetch(
           `${SUPABASE_URL}/rest/v1/active_players?last_seen=gte.${encodeURIComponent(cutoff)}&select=session_id`,
           { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY } }
         );
+        if (!res.ok) {
+          console.error('Supabase GET failed:', res.status, await res.text());
+          return;
+        }
+
         const rows = await res.json();
         const el = document.getElementById('onlineCount');
         if (el && Array.isArray(rows)) el.textContent = rows.length;
-      } catch (_) {}
+      } catch (err) {
+        console.error('Supabase error:', err);
+      }
     }
 
     syncActivePlayers();
