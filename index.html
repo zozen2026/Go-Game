@@ -348,7 +348,7 @@
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
-    let plazaPlayers = [], playerBubbles = {}, lastPosSyncAt = 0;
+    let plazaPlayers = [], playerBubbles = {}, chatSendersSeen = {}, lastPosSyncAt = 0;
 
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
@@ -360,13 +360,14 @@
 
     function respawnPlayerInPlaza() {
       if (currentMode !== 'chat') return;
-      player.worldX = Math.floor((Math.random() - 0.5) * 300);
+      player.worldX = Math.floor((Math.random() - 0.5) * 240);
       player.worldY = 0;
       player.y = groundY - player.height;
       player.dy = 0;
       player.grounded = true;
+      setScoreDisplay(Math.round(player.worldX));
       sfx.jump();
-      syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y) });
+      syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y), in_chat: true });
       draw();
     }
 
@@ -454,7 +455,7 @@
       if (!accountReady) await ensureUniqueAccount();
       if (!accountReady) return;
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
+        const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
           method: 'PATCH',
           headers: sbHeaders,
           body: JSON.stringify({
@@ -470,6 +471,13 @@
             ...extra
           })
         });
+        if (!patchRes.ok) {
+          await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
+            method: 'PATCH',
+            headers: sbHeaders,
+            body: JSON.stringify({ coins, last_seen: new Date().toISOString() })
+          });
+        }
       } catch (_) {}
     }
 
@@ -516,28 +524,66 @@
       }
     }
 
+    function rebuildPlazaPlayers() {
+      const map = new Map();
+      Object.values(chatSendersSeen).forEach(s => {
+        if (s.id && s.id !== accountId && Date.now() - s.seenAt < 60000) {
+          map.set(s.id, {
+            id: s.id,
+            username: s.username || 'Player',
+            shirt: '#10b981',
+            hat: 'cap',
+            world_x: s.worldX || 120,
+            pos_y: groundY - 60
+          });
+        }
+      });
+      plazaPlayers.forEach(r => {
+        if (r.id && r.id !== accountId) {
+          const prev = map.get(r.id) || {};
+          map.set(r.id, {
+            ...prev,
+            id: r.id,
+            username: r.username || prev.username || 'Player',
+            shirt: r.shirt || prev.shirt || '#3b82f6',
+            hat: r.hat || prev.hat || 'none',
+            world_x: typeof r.world_x === 'number' ? r.world_x : (prev.world_x || 120),
+            pos_y: typeof r.pos_y === 'number' ? r.pos_y : (groundY - 60)
+          });
+        }
+      });
+      plazaPlayers = Array.from(map.values());
+    }
+
     async function syncActivePlayers() {
       try {
         await syncAccountState();
-        const cutoff = new Date(Date.now() - 45000).toISOString();
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,world_y,pos_x,pos_y,in_chat,last_message,last_msg_at`,
+        const cutoff = new Date(Date.now() - 60000).toISOString();
+        let res = await fetch(
+          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message,last_msg_at`,
           { headers: sbHeaders }
         );
+        if (!res.ok) {
+          res = await fetch(
+            `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,last_seen`,
+            { headers: sbHeaders }
+          );
+        }
         if (!res.ok) return;
         const rows = await res.json();
         if (Array.isArray(rows)) {
           const el = document.getElementById('onlineCount');
           if (el) el.textContent = Math.max(1, rows.length);
-          plazaPlayers = rows.filter(r => r.in_chat && r.id !== accountId);
+          plazaPlayers = rows.filter(r => r.id !== accountId);
           rows.forEach(r => {
             if (r.last_message && r.last_msg_at) {
               const ageMs = Date.now() - new Date(r.last_msg_at).getTime();
-              if (ageMs >= 0 && ageMs < 9000) {
-                playerBubbles[r.id] = { text: r.last_message, until: Date.now() + (9000 - ageMs) };
+              if (ageMs >= 0 && ageMs < 12000) {
+                playerBubbles[r.id] = { text: r.last_message, until: Date.now() + (12000 - ageMs) };
               }
             }
           });
+          rebuildPlazaPlayers();
         }
       } catch (_) {}
     }
@@ -569,20 +615,29 @@
 
     async function loadChatFeed() {
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=12`, { headers: sbHeaders });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=15`, { headers: sbHeaders });
         if (!res.ok) return;
         const rows = await res.json();
         if (Array.isArray(rows)) {
           const asc = rows.reverse();
           renderMiniChat(asc);
-          asc.forEach(m => {
+          asc.forEach((m, idx) => {
+            if (m.sender_id && m.sender_id !== accountId) {
+              chatSendersSeen[m.sender_id] = {
+                id: m.sender_id,
+                username: m.sender_name || 'Player',
+                worldX: ((idx % 5) - 2) * 90,
+                seenAt: Date.now()
+              };
+            }
             if (m.created_at) {
               const age = Date.now() - new Date(m.created_at).getTime();
-              if (age >= 0 && age < 8000) {
-                playerBubbles[m.sender_id] = { text: m.message, until: Date.now() + (8000 - age) };
+              if (age >= 0 && age < 12000) {
+                playerBubbles[m.sender_id] = { text: m.message, until: Date.now() + (12000 - age) };
               }
             }
           });
+          rebuildPlazaPlayers();
         }
       } catch (_) {}
     }
@@ -595,21 +650,21 @@
       if (!accountReady) await ensureUniqueAccount();
       input.value = '';
       const sender = currentUsername || 'Player';
-      playerBubbles[accountId] = { text, until: Date.now() + 8000 };
+      playerBubbles[accountId] = { text, until: Date.now() + 12000 };
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
           method: 'POST',
           headers: sbHeaders,
           body: JSON.stringify({ sender_id: accountId, sender_name: sender, message: text })
         });
-        await syncAccountState({ last_message: text, last_msg_at: new Date().toISOString() });
+        await syncAccountState({ last_message: text, last_msg_at: new Date().toISOString(), in_chat: true });
         await loadChatFeed();
       } catch (_) {}
     }
 
     setInterval(() => {
       if (currentMode === 'chat') loadChatFeed();
-    }, 2000);
+    }, 1800);
 
     function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
@@ -963,7 +1018,6 @@
       for (let i = 0; i < count; i++) coinItems.push({ x: canvas.width + 20 + i * 34, y: high ? groundY - 95 : groundY - 35, radius: 10 });
     }
 
-    // خلفية لا حدود لها تتحرك مع worldX ولا تتغير باختيار خلفية المتجر
     function drawFixedSocialPlazaBackground() {
       const sky = ctx.createLinearGradient(0, 0, 0, groundY);
       sky.addColorStop(0, '#0f172a');
@@ -1059,7 +1113,7 @@
         const tw = Math.min(220, ctx.measureText(bubbleText).width + padX * 2);
         const bx = Math.min(Math.max(8, x + 17 - tw / 2), canvas.width - tw - 8);
         const by = y - 46;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
         ctx.beginPath();
         ctx.roundRect(bx, by, tw, 24, 8);
         ctx.fill();
@@ -1079,13 +1133,25 @@
 
     function drawChatPlazaPlayers() {
       const now = Date.now();
+      let offscreenIndex = 0;
       plazaPlayers.forEach(p => {
         const wx = Number(p.world_x);
-        const remoteWorldX = Number.isFinite(wx) ? wx : ((Number(p.pos_x) || 200) - 200);
-        const screenX = canvas.width * 0.5 + (remoteWorldX - player.worldX) - player.width * 0.5;
+        const remoteWorldX = Number.isFinite(wx) ? wx : 0;
+        let screenX = canvas.width * 0.5 + (remoteWorldX - player.worldX) - player.width * 0.5;
         const py = Math.min(groundY - 60, Math.max(40, Number(p.pos_y) || (groundY - 60)));
-        if (screenX < -120 || screenX > canvas.width + 120) return;
         const bubble = playerBubbles[p.id] && playerBubbles[p.id].until > now ? playerBubbles[p.id].text : '';
+
+        if (screenX < 20 || screenX > canvas.width - 54) {
+          const side = screenX < 20 ? -1 : 1;
+          screenX = side < 0 ? 24 + (offscreenIndex % 2) * 44 : canvas.width - 62 - (offscreenIndex % 2) * 44;
+          offscreenIndex++;
+          ctx.save();
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillStyle = '#fde047';
+          ctx.textAlign = 'center';
+          ctx.fillText(side < 0 ? '⬅️ يسار' : 'يمين ➡️', screenX + 17, py - 58);
+          ctx.restore();
+        }
         drawCharacterSprite(screenX, py, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble);
       });
     }
@@ -1219,7 +1285,7 @@
       const now = Date.now();
       if (now - lastPosSyncAt > 650) {
         lastPosSyncAt = now;
-        syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y) });
+        syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y), in_chat: true });
       }
     }
 
