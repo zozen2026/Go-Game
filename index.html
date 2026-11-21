@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Go Game - 3 Modes, Backgrounds & SFX</title>
+  <title>NC Go - 3 Modes, Backgrounds & SFX</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
     body {
@@ -17,368 +19,70 @@
       padding: 10px 0 24px;
       overflow-x: hidden;
     }
-
-    .top-bar {
-      width: 95%;
-      max-width: 800px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .stats-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .score-board {
-      font-size: 1rem;
-      font-weight: bold;
-      background: #1e1e26;
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid #333;
-    }
-
-    .coin-board {
-      color: #fbbf24;
-      border-color: #78350f;
-    }
-
-    .actions-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .btn-top {
-      background: #6366f1;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .btn-top:hover { background: #4f46e5; }
-    .btn-top:active { transform: scale(0.96); }
+    .top-bar { width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
+    .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .score-board { font-size: 1rem; font-weight: bold; background: #1e1e26; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; }
+    .coin-board { color: #fbbf24; border-color: #78350f; }
+    .online-board { color: #34d399; border-color: #065f46; }
+    .btn-top { background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
     .btn-shop { background: #eab308; color: #000; }
-    .btn-shop:hover { background: #ca8a04; }
     .btn-modes { background: #334155; }
-    .btn-modes:hover { background: #475569; }
     .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
     .btn-sound.muted { opacity: 0.65; }
-
-    .game-container {
-      position: relative;
-      width: 95%;
-      max-width: 800px;
-      height: 360px;
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* شاشة اختيار الطور */
-    .overlay-screen {
-      display: flex;
-      position: absolute;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.95);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 25;
-      padding: 16px;
-      text-align: center;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .overlay-screen h2 {
-      font-size: 1.5rem;
-      margin-bottom: 4px;
-      color: #f8fafc;
-    }
-
-    .overlay-screen p.subtitle {
-      color: #94a3b8;
-      margin-bottom: 14px;
-      font-size: 0.9rem;
-    }
-
-    .mode-cards {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      max-width: 680px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .mode-card {
-      background: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 14px;
-      padding: 16px 14px;
-      width: 200px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .mode-card:hover {
-      border-color: #6366f1;
-      transform: translateY(-4px);
-      background: #263349;
-    }
-
+    .game-container { position: relative; width: 95%; max-width: 800px; height: 360px; background: #0f172a; border: 2px solid #334155; border-radius: 16px; overflow: hidden; }
+    canvas { display: block; width: 100%; height: 100%; }
+    .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
+    .overlay-screen h2 { font-size: 1.5rem; margin-bottom: 4px; color: #f8fafc; }
+    .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 14px; font-size: 0.9rem; }
+    .mode-cards { display: flex; gap: 12px; width: 100%; max-width: 680px; justify-content: center; flex-wrap: wrap; }
+    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 16px 14px; width: 200px; cursor: pointer; }
+    .mode-card:hover { border-color: #6366f1; background: #263349; }
     .mode-card .icon { font-size: 2rem; margin-bottom: 8px; }
     .mode-card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #fff; }
     .mode-card p { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
-
-    /* تحسين عرض خيارات اللعب في شاشات الموبايل لتكون واضحة وقابلة للتصفح */
     @media (max-width: 680px) {
-      .game-container {
-        height: 320px;
-      }
-      .overlay-screen {
-        justify-content: flex-start;
-        padding: 14px 12px 22px;
-      }
-      .overlay-screen h2 {
-        font-size: 1.3rem;
-      }
-      .overlay-screen p.subtitle {
-        margin-bottom: 10px;
-        font-size: 0.85rem;
-      }
-      .mode-cards {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .mode-card {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        text-align: right;
-        padding: 12px 14px;
-        gap: 12px;
-      }
-      .mode-card:hover {
-        transform: none;
-      }
-      .mode-card .icon {
-        font-size: 1.9rem;
-        margin-bottom: 0;
-        flex-shrink: 0;
-      }
-      .mode-card-text {
-        display: flex;
-        flex-direction: column;
-      }
-      .mode-card h3 {
-        font-size: 1rem;
-        margin-bottom: 3px;
-      }
-      .mode-card p {
-        font-size: 0.8rem;
-      }
+      .game-container { height: 320px; }
+      .overlay-screen { justify-content: flex-start; padding: 14px 12px 22px; }
+      .mode-cards { flex-direction: column; align-items: stretch; gap: 10px; }
+      .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 12px 14px; gap: 12px; }
+      .mode-card .icon { font-size: 1.9rem; margin-bottom: 0; flex-shrink: 0; }
+      .mode-card-text { display: flex; flex-direction: column; }
     }
-
-    /* نافذة المتجر والملابس والخلفيات */
-    .shop-modal {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #1e1e26;
-      border: 2px solid #eab308;
-      padding: 16px;
-      border-radius: 14px;
-      z-index: 30;
-      text-align: center;
-      width: 92%;
-      max-width: 450px;
-      max-height: 90%;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-    }
+    .shop-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 30; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
     .shop-modal h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
     .shop-modal .shop-info { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
-    
-    .shop-section-title {
-      text-align: right;
-      font-size: 0.9rem;
-      color: #cbd5e1;
-      margin: 12px 0 8px;
-      border-bottom: 1px solid #334155;
-      padding-bottom: 4px;
-    }
-
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .bg-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .shop-item {
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 10px;
-      padding: 8px 6px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.82rem;
-    }
+    .shop-section-title { text-align: right; font-size: 0.9rem; color: #cbd5e1; margin: 12px 0 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+    .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .bg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .shop-item { background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 8px 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.82rem; }
     .shop-item.equipped { border-color: #10b981; background: #064e3b44; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
-    .bg-preview {
-      width: 100%;
-      height: 34px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
+    .bg-preview { width: 100%; height: 34px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); }
     .item-price { color: #fbbf24; font-weight: bold; font-size: 0.78rem; }
     .item-owned { color: #10b981; font-weight: bold; font-size: 0.78rem; }
-
-    .btn-close {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      padding: 9px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 6px;
-    }
-
-    /* شاشة النهاية */
-    .end-screen {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.84);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      text-align: center;
-      padding: 20px;
-    }
+    .btn-close { background: #10b981; color: #fff; border: none; padding: 9px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 6px; }
+    .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.84); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
     .end-screen h2 { font-size: 1.7rem; margin-bottom: 10px; }
     .end-screen p { font-size: 1.05rem; margin-bottom: 18px; color: #e2e8f0; }
     .end-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    .btn-restart {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      padding: 11px 22px;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .btn-menu {
-      background: #475569;
-      color: #fff;
-      border: none;
-      padding: 11px 22px;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* أزرار التحكم السفلية */
-    .controls {
-      margin-top: 12px;
-      width: 95%;
-      max-width: 800px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .btn-jump {
-      flex: 2;
-      max-width: 320px;
-      padding: 14px;
-      background: #f59e0b;
-      color: #000;
-      font-size: 1.2rem;
-      font-weight: 900;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: 0 5px 0 #b45309;
-    }
-    .btn-jump:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #b45309;
-    }
-
-    .btn-stop-run {
-      flex: 1;
-      max-width: 170px;
-      padding: 14px;
-      background: #3b82f6;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: 0 5px 0 #1d4ed8;
-    }
-    .btn-stop-run:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #1d4ed8;
-    }
-
-    .watermark {
-      position: fixed;
-      bottom: 4px;
-      right: 12px;
-      font-size: 11px;
-      color: #64748b;
-    }
+    .btn-restart, .btn-menu { color: #fff; border: none; padding: 11px 22px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    .btn-restart { background: #10b981; }
+    .btn-menu { background: #475569; }
+    .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
+    .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
+    .btn-stop-run { flex: 1; max-width: 170px; padding: 14px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
+    .watermark { position: fixed; bottom: 4px; right: 12px; font-size: 11px; color: #64748b; }
   </style>
 </head>
 <body>
-
   <div class="top-bar">
     <div class="stats-group">
       <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
+      <div class="score-board online-board">🟢 نشط الآن: <span id="onlineCount">1</span></div>
     </div>
     <div class="actions-group">
-      <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()" title="تشغيل أو كتم الأصوات">🔊</button>
+      <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
       <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر والملابس</button>
       <button class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
     </div>
@@ -386,54 +90,37 @@
 
   <div class="game-container">
     <canvas id="gameCanvas" width="800" height="360"></canvas>
-
-    <!-- قائمة اختيار الأطوار الثلاثة -->
     <div class="overlay-screen" id="modeMenu">
       <h2>اختر طور اللعب</h2>
       <p class="subtitle">اسحب لتصفح الأطوار واختر التحدي المناسب</p>
       <div class="mode-cards">
         <div class="mode-card" onclick="startGame('monster')">
           <div class="icon">👾</div>
-          <div class="mode-card-text">
-            <h3>1. الهروب من الوحش</h3>
-            <p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p>
-          </div>
+          <div class="mode-card-text"><h3>1. الهروب من الوحش</h3><p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p></div>
         </div>
         <div class="mode-card" onclick="startGame('rescue')">
           <div class="icon">🦸‍♂️</div>
-          <div class="mode-card-text">
-            <h3>2. إنقاذ الصديق</h3>
-            <p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p>
-          </div>
+          <div class="mode-card-text"><h3>2. إنقاذ الصديق</h3><p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p></div>
         </div>
         <div class="mode-card" onclick="startGame('coins')">
           <div class="icon">🪙</div>
-          <div class="mode-card-text">
-            <h3>3. جمع الأموال والمتجر</h3>
-            <p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p>
-          </div>
+          <div class="mode-card-text"><h3>3. جمع الأموال والمتجر</h3><p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p></div>
         </div>
       </div>
     </div>
 
-    <!-- نافذة المتجر وتبديل الملابس والخلفيات -->
     <div class="shop-modal" id="shopModal">
       <h3>🛒 متجر Go Game</h3>
       <p class="shop-info">اللعبة متوقفة مؤقتاً — رصيدك: <span id="shopCoinText" style="color:#fbbf24;font-weight:bold;">0</span> 🪙</p>
-      
       <div class="shop-section-title">👕 ألوان الملابس</div>
       <div class="shop-grid" id="shirtsGrid"></div>
-
       <div class="shop-section-title">🎩 القبعات والإضافات</div>
       <div class="shop-grid" id="hatsGrid"></div>
-
       <div class="shop-section-title">🖼️ الخلفيات</div>
       <div class="bg-grid" id="backgroundsGrid"></div>
-
       <button class="btn-close" onclick="toggleShopModal()">متابعة الركض ▶️</button>
     </div>
 
-    <!-- شاشة النهاية -->
     <div class="end-screen" id="endScreen">
       <h2 id="endTitle">لقد خسرت!</h2>
       <p id="endMessage">مجموع نقاطك: 0</p>
@@ -452,121 +139,86 @@
   <div class="watermark">NC Studio © 2026</div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreText = document.getElementById('scoreText');
-    const goalDisplay = document.getElementById('goalDisplay');
-    const coinText = document.getElementById('coinText');
-    const shopCoinText = document.getElementById('shopCoinText');
-    const modeMenu = document.getElementById('modeMenu');
-    const shopModal = document.getElementById('shopModal');
-    const endScreen = document.getElementById('endScreen');
-    const endTitle = document.getElementById('endTitle');
-    const endMessage = document.getElementById('endMessage');
+    const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
+    const goalDisplay = document.getElementById('goalDisplay'), coinText = document.getElementById('coinText');
+    const shopCoinText = document.getElementById('shopCoinText'), modeMenu = document.getElementById('modeMenu');
+    const shopModal = document.getElementById('shopModal'), endScreen = document.getElementById('endScreen');
+    const endTitle = document.getElementById('endTitle'), endMessage = document.getElementById('endMessage');
     const soundBtn = document.getElementById('soundBtn');
 
-    // نظام المؤثرات الصوتية فقط (بدون موسيقى)
-    let soundEnabled = localStorage.getItem('gogame_sfx') !== 'false';
-    let audioCtx = null;
+    // إعدادات Supabase لعداد اللاعبين النشطين الآن
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const sessionId = sessionStorage.getItem('ncgo_sid') || ('sid_' + Math.random().toString(36).slice(2) + '_' + Date.now());
+    sessionStorage.setItem('ncgo_sid', sessionId);
 
+    async function syncActivePlayers() {
+      if (!SUPABASE_URL.startsWith('http')) return;
+      const headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      };
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/active_players`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ session_id: sessionId, last_seen: new Date().toISOString() })
+        });
+        const cutoff = new Date(Date.now() - 45000).toISOString();
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/active_players?last_seen=gte.${encodeURIComponent(cutoff)}&select=session_id`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY } }
+        );
+        const rows = await res.json();
+        const el = document.getElementById('onlineCount');
+        if (el && Array.isArray(rows)) el.textContent = rows.length;
+      } catch (_) {}
+    }
+
+    syncActivePlayers();
+    setInterval(syncActivePlayers, 15000);
+
+    let soundEnabled = localStorage.getItem('gogame_sfx') !== 'false', audioCtx = null;
     function getAudioCtx() {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) audioCtx = new AudioContextClass();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
       return audioCtx;
     }
-
     function playTone(freq, endFreq, duration, type = 'sine', delay = 0, volume = 0.12) {
       if (!soundEnabled) return;
-      const ctxAudio = getAudioCtx();
-      if (!ctxAudio) return;
-
-      const startTime = ctxAudio.currentTime + delay;
-      const osc = ctxAudio.createOscillator();
-      const gain = ctxAudio.createGain();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, startTime);
-      if (endFreq !== null) {
-        osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), startTime + duration);
-      }
-
-      gain.gain.setValueAtTime(volume, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctxAudio.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + duration);
+      const c = getAudioCtx(); if (!c) return;
+      const t = c.currentTime + delay, osc = c.createOscillator(), gain = c.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, t);
+      if (endFreq !== null) osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), t + duration);
+      gain.gain.setValueAtTime(volume, t); gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      osc.connect(gain); gain.connect(c.destination); osc.start(t); osc.stop(t + duration);
     }
-
     const sfx = {
       jump: () => playTone(260, 520, 0.13, 'triangle', 0, 0.12),
-      coin: () => {
-        playTone(780, 980, 0.07, 'sine', 0, 0.11);
-        playTone(1040, 1250, 0.09, 'sine', 0.06, 0.11);
-      },
-      buy: () => {
-        playTone(520, 680, 0.08, 'triangle', 0, 0.11);
-        playTone(780, 920, 0.1, 'triangle', 0.07, 0.11);
-      },
-      win: () => {
-        playTone(523, 523, 0.1, 'triangle', 0, 0.12);
-        playTone(659, 659, 0.1, 'triangle', 0.1, 0.12);
-        playTone(784, 1046, 0.22, 'triangle', 0.2, 0.13);
-      },
-      lose: () => {
-        playTone(280, 110, 0.25, 'sawtooth', 0, 0.11);
-      }
+      coin: () => { playTone(780, 980, 0.07, 'sine', 0, 0.11); playTone(1040, 1250, 0.09, 'sine', 0.06, 0.11); },
+      buy: () => { playTone(520, 680, 0.08, 'triangle', 0, 0.11); playTone(780, 920, 0.1, 'triangle', 0.07, 0.11); },
+      win: () => { playTone(523, 523, 0.1, 'triangle', 0, 0.12); playTone(659, 659, 0.1, 'triangle', 0.1, 0.12); playTone(784, 1046, 0.22, 'triangle', 0.2, 0.13); },
+      lose: () => playTone(280, 110, 0.25, 'sawtooth', 0, 0.11)
     };
+    function updateSoundButton() { soundBtn.textContent = soundEnabled ? '🔊' : '🔇'; soundBtn.classList.toggle('muted', !soundEnabled); }
+    function toggleSound() { soundEnabled = !soundEnabled; localStorage.setItem('gogame_sfx', soundEnabled); updateSoundButton(); if (soundEnabled) sfx.buy(); }
 
-    function updateSoundButton() {
-      soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
-      soundBtn.classList.toggle('muted', !soundEnabled);
-    }
-
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      localStorage.setItem('gogame_sfx', soundEnabled);
-      updateSoundButton();
-      if (soundEnabled) sfx.buy();
-    }
-
-    let currentMode = null;
-    let isPaused = true;
-    let isGameOver = false;
-    let score = 0;
-    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30;
-    let gameSpeed = 6;
-    let frameCount = 0;
-    let animationId = null;
-
-    let ownedShirts = JSON.parse(localStorage.getItem('gogame_shirts')) || ['#3b82f6'];
-    let equippedShirt = localStorage.getItem('gogame_eq_shirt') || '#3b82f6';
-
-    let ownedHats = JSON.parse(localStorage.getItem('gogame_hats')) || ['none'];
-    let equippedHat = localStorage.getItem('gogame_eq_hat') || 'none';
-
-    let ownedBgs = JSON.parse(localStorage.getItem('gogame_bgs')) || ['night'];
-    let equippedBg = localStorage.getItem('gogame_eq_bg') || 'night';
+    let currentMode = null, isPaused = true, isGameOver = false, score = 0;
+    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30, gameSpeed = 6, frameCount = 0, animationId = null;
+    let ownedShirts = JSON.parse(localStorage.getItem('gogame_shirts')) || ['#3b82f6'], equippedShirt = localStorage.getItem('gogame_eq_shirt') || '#3b82f6';
+    let ownedHats = JSON.parse(localStorage.getItem('gogame_hats')) || ['none'], equippedHat = localStorage.getItem('gogame_eq_hat') || 'none';
+    let ownedBgs = JSON.parse(localStorage.getItem('gogame_bgs')) || ['night'], equippedBg = localStorage.getItem('gogame_eq_bg') || 'night';
 
     const shopCatalog = {
       shirts: [
-        { id: '#3b82f6', name: 'أزرق كلاسيك', price: 0 },
-        { id: '#ef4444', name: 'أحمر ناري', price: 20 },
-        { id: '#10b981', name: 'أخضر زمردي', price: 30 },
-        { id: '#eab308', name: 'ذهبي ملكي', price: 50 },
-        { id: '#a855f7', name: 'بنفسجي', price: 70 },
-        { id: '#f97316', name: 'برتقالي', price: 90 }
+        { id: '#3b82f6', name: 'أزرق كلاسيك', price: 0 }, { id: '#ef4444', name: 'أحمر ناري', price: 20 },
+        { id: '#10b981', name: 'أخضر زمردي', price: 30 }, { id: '#eab308', name: 'ذهبي ملكي', price: 50 },
+        { id: '#a855f7', name: 'بنفسجي', price: 70 }, { id: '#f97316', name: 'برتقالي', price: 90 }
       ],
       hats: [
-        { id: 'none', name: 'بدون قبعة', icon: '🚫', price: 0 },
-        { id: 'cap', name: 'كاب رياضي', icon: '🧢', price: 40 },
+        { id: 'none', name: 'بدون قبعة', icon: '🚫', price: 0 }, { id: 'cap', name: 'كاب رياضي', icon: '🧢', price: 40 },
         { id: 'crown', name: 'تاج البطل', icon: '👑', price: 100 }
       ],
       backgrounds: [
@@ -577,619 +229,159 @@
       ]
     };
 
-    const groundY = 300;
-    const RESCUE_TARGET_SCORE = 100;
-
-    const stars = Array.from({ length: 35 }, (_, i) => ({
-      x: (i * 97) % 800,
-      y: (i * 53) % 260,
-      r: (i % 2) + 1.2
-    }));
-
-    const player = {
-      x: 210,
-      y: groundY - 60,
-      width: 34,
-      height: 60,
-      dy: 0,
-      jumpPower: -13.5,
-      gravity: 0.65,
-      grounded: true
-    };
-
-    const monster = {
-      x: 45,
-      y: groundY - 85,
-      width: 65,
-      height: 85
-    };
-
-    const friend = {
-      active: false,
-      x: 850,
-      y: groundY - 65,
-      width: 48,
-      height: 65
-    };
-
-    let obstacles = [];
-    let coinItems = [];
+    const groundY = 300, RESCUE_TARGET_SCORE = 100;
+    const stars = Array.from({ length: 35 }, (_, i) => ({ x: (i * 97) % 800, y: (i * 53) % 260, r: (i % 2) + 1.2 }));
+    const player = { x: 210, y: groundY - 60, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
+    const monster = { x: 45, y: groundY - 85, width: 65, height: 85 };
+    const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
+    let obstacles = [], coinItems = [];
 
     function saveProgress() {
       localStorage.setItem('gogame_coins', coins);
-      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts));
-      localStorage.setItem('gogame_eq_shirt', equippedShirt);
-      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats));
-      localStorage.setItem('gogame_eq_hat', equippedHat);
-      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs));
-      localStorage.setItem('gogame_eq_bg', equippedBg);
-      coinText.textContent = coins;
-      shopCoinText.textContent = coins;
+      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts)); localStorage.setItem('gogame_eq_shirt', equippedShirt);
+      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats)); localStorage.setItem('gogame_eq_hat', equippedHat);
+      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs)); localStorage.setItem('gogame_eq_bg', equippedBg);
+      coinText.textContent = coins; shopCoinText.textContent = coins;
+    }
+
+    function bindShopGrid(elId, list, ownedArr, setEq, getEq, renderCell) {
+      const grid = document.getElementById(elId); grid.innerHTML = '';
+      list.forEach(item => {
+        const owned = ownedArr.includes(item.id), eq = getEq() === item.id;
+        const div = document.createElement('div');
+        div.className = 'shop-item' + (eq ? ' equipped' : '');
+        div.innerHTML = renderCell(item, owned, eq);
+        div.onclick = () => {
+          if (owned) { setEq(item.id); sfx.buy(); }
+          else if (coins >= item.price) { coins -= item.price; ownedArr.push(item.id); setEq(item.id); sfx.buy(); }
+          else return alert('رصيدك من العملات لا يكفي!');
+          saveProgress(); renderShop(); draw();
+        };
+        grid.appendChild(div);
+      });
     }
 
     function renderShop() {
       shopCoinText.textContent = coins;
-      const shirtsGrid = document.getElementById('shirtsGrid');
-      const hatsGrid = document.getElementById('hatsGrid');
-      const bgsGrid = document.getElementById('backgroundsGrid');
-      shirtsGrid.innerHTML = '';
-      hatsGrid.innerHTML = '';
-      bgsGrid.innerHTML = '';
-
-      shopCatalog.shirts.forEach(item => {
-        const owned = ownedShirts.includes(item.id);
-        const equipped = equippedShirt === item.id;
-        const div = document.createElement('div');
-        div.className = 'shop-item' + (equipped ? ' equipped' : '');
-        div.innerHTML = `
-          <div class="color-dot" style="background:${item.id}"></div>
-          <span>${item.name}</span>
-          ${equipped ? '<span class="item-owned">مُرتدى ✓</span>' :
-            owned ? '<span class="item-owned">مملوك</span>' :
-            `<span class="item-price">🪙 ${item.price}</span>`}
-        `;
-        div.onclick = () => buyOrEquipShirt(item);
-        shirtsGrid.appendChild(div);
-      });
-
-      shopCatalog.hats.forEach(item => {
-        const owned = ownedHats.includes(item.id);
-        const equipped = equippedHat === item.id;
-        const div = document.createElement('div');
-        div.className = 'shop-item' + (equipped ? ' equipped' : '');
-        div.innerHTML = `
-          <div style="font-size:1.3rem">${item.icon}</div>
-          <span>${item.name}</span>
-          ${equipped ? '<span class="item-owned">مُرتدى ✓</span>' :
-            owned ? '<span class="item-owned">مملوك</span>' :
-            `<span class="item-price">🪙 ${item.price}</span>`}
-        `;
-        div.onclick = () => buyOrEquipHat(item);
-        hatsGrid.appendChild(div);
-      });
-
-      shopCatalog.backgrounds.forEach(item => {
-        const owned = ownedBgs.includes(item.id);
-        const equipped = equippedBg === item.id;
-        const div = document.createElement('div');
-        div.className = 'shop-item' + (equipped ? ' equipped' : '');
-        div.innerHTML = `
-          <div class="bg-preview" style="background:${item.preview}"></div>
-          <span>${item.name}</span>
-          ${equipped ? '<span class="item-owned">مُفعّل ✓</span>' :
-            owned ? '<span class="item-owned">مملوك</span>' :
-            `<span class="item-price">🪙 ${item.price}</span>`}
-        `;
-        div.onclick = () => buyOrEquipBg(item);
-        bgsGrid.appendChild(div);
-      });
-    }
-
-    function buyOrEquipShirt(item) {
-      if (ownedShirts.includes(item.id)) {
-        equippedShirt = item.id;
-        sfx.buy();
-      } else if (coins >= item.price) {
-        coins -= item.price;
-        ownedShirts.push(item.id);
-        equippedShirt = item.id;
-        sfx.buy();
-      } else {
-        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
-        return;
-      }
-      saveProgress();
-      renderShop();
-      draw();
-    }
-
-    function buyOrEquipHat(item) {
-      if (ownedHats.includes(item.id)) {
-        equippedHat = item.id;
-        sfx.buy();
-      } else if (coins >= item.price) {
-        coins -= item.price;
-        ownedHats.push(item.id);
-        equippedHat = item.id;
-        sfx.buy();
-      } else {
-        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
-        return;
-      }
-      saveProgress();
-      renderShop();
-      draw();
-    }
-
-    function buyOrEquipBg(item) {
-      if (ownedBgs.includes(item.id)) {
-        equippedBg = item.id;
-        sfx.buy();
-      } else if (coins >= item.price) {
-        coins -= item.price;
-        ownedBgs.push(item.id);
-        equippedBg = item.id;
-        sfx.buy();
-      } else {
-        alert('رصيدك من العملات لا يكفي! اجمع المزيد في طور الأموال.');
-        return;
-      }
-      saveProgress();
-      renderShop();
-      draw();
+      const badge = (o, e) => e ? '<span class="item-owned">مُرتدى ✓</span>' : o ? '<span class="item-owned">مملوك</span>' : '';
+      bindShopGrid('shirtsGrid', shopCatalog.shirts, ownedShirts, v => equippedShirt = v, () => equippedShirt,
+        (i, o, e) => `<div class="color-dot" style="background:${i.id}"></div><span>${i.name}</span>${badge(o, e) || `<span class="item-price">🪙 ${i.price}</span>`}`);
+      bindShopGrid('hatsGrid', shopCatalog.hats, ownedHats, v => equippedHat = v, () => equippedHat,
+        (i, o, e) => `<div style="font-size:1.3rem">${i.icon}</div><span>${i.name}</span>${badge(o, e) || `<span class="item-price">🪙 ${i.price}</span>`}`);
+      bindShopGrid('backgroundsGrid', shopCatalog.backgrounds, ownedBgs, v => equippedBg = v, () => equippedBg,
+        (i, o, e) => `<div class="bg-preview" style="background:${i.preview}"></div><span>${i.name}</span>${e ? '<span class="item-owned">مُفعّل ✓</span>' : o ? '<span class="item-owned">مملوك</span>' : `<span class="item-price">🪙 ${i.price}</span>`}`);
     }
 
     function toggleShopModal() {
       if (!currentMode || isGameOver) return;
-      const isVisible = shopModal.style.display === 'block';
-      if (!isVisible) {
-        isPaused = true;
-        renderShop();
-        shopModal.style.display = 'block';
-      } else {
-        shopModal.style.display = 'none';
-        isPaused = false;
-        animationId = requestAnimationFrame(update);
-      }
+      const vis = shopModal.style.display === 'block';
+      if (!vis) { isPaused = true; renderShop(); shopModal.style.display = 'block'; }
+      else { shopModal.style.display = 'none'; isPaused = false; animationId = requestAnimationFrame(update); }
     }
-
-    function openModeMenu() {
-      isPaused = true;
-      cancelAnimationFrame(animationId);
-      shopModal.style.display = 'none';
-      endScreen.style.display = 'none';
-      modeMenu.style.display = 'flex';
-      modeMenu.scrollTop = 0;
-    }
-
-    function startGame(mode) {
-      getAudioCtx();
-      currentMode = mode;
-      modeMenu.style.display = 'none';
-      restartCurrentMode();
-    }
-
+    function openModeMenu() { isPaused = true; cancelAnimationFrame(animationId); shopModal.style.display = 'none'; endScreen.style.display = 'none'; modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0; }
+    function startGame(mode) { getAudioCtx(); currentMode = mode; modeMenu.style.display = 'none'; restartCurrentMode(); }
     function restartCurrentMode() {
-      isGameOver = false;
-      isPaused = false;
-      score = 0;
-      gameSpeed = 6;
-      frameCount = 0;
-      obstacles = [];
-      coinItems = [];
-      friend.active = false;
-      friend.x = 860;
-
-      player.x = currentMode === 'monster' ? 210 : 120;
-      player.y = groundY - player.height;
-      player.dy = 0;
-      player.grounded = true;
-      monster.x = 45;
-
-      if (currentMode === 'rescue') {
-        goalDisplay.innerHTML = `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}`;
-      } else {
-        goalDisplay.innerHTML = `النقاط: <span id="scoreText">0</span>`;
-      }
-
-      endScreen.style.display = 'none';
-      shopModal.style.display = 'none';
-      cancelAnimationFrame(animationId);
-      animationId = requestAnimationFrame(update);
+      isGameOver = false; isPaused = false; score = 0; gameSpeed = 6; frameCount = 0;
+      obstacles = []; coinItems = []; friend.active = false; friend.x = 860;
+      player.x = currentMode === 'monster' ? 210 : 120; player.y = groundY - player.height; player.dy = 0; player.grounded = true; monster.x = 45;
+      goalDisplay.innerHTML = currentMode === 'rescue' ? `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}` : `النقاط: <span id="scoreText">0</span>`;
+      endScreen.style.display = 'none'; shopModal.style.display = 'none';
+      cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
     }
-
-    function jump() {
-      if (isGameOver || isPaused) return;
-      if (player.grounded) {
-        player.dy = player.jumpPower;
-        player.grounded = false;
-        sfx.jump();
-      }
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' || e.code === 'ArrowUp') {
-        e.preventDefault();
-        jump();
-      }
-    });
-
-    function spawnObstacle() {
-      const height = Math.floor(Math.random() * 25) + 30;
-      obstacles.push({
-        x: canvas.width + 20,
-        y: groundY - height,
-        width: 28,
-        height: height
-      });
-    }
-
+    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
+    window.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); } });
+    function spawnObstacle() { obstacles.push({ x: canvas.width + 20, y: groundY - (Math.floor(Math.random() * 25) + 30), width: 28, height: Math.floor(Math.random() * 25) + 30 }); }
     function spawnCoinLine() {
-      const count = Math.floor(Math.random() * 3) + 3;
-      const highArc = Math.random() > 0.5;
-      for (let i = 0; i < count; i++) {
-        coinItems.push({
-          x: canvas.width + 20 + (i * 34),
-          y: highArc ? groundY - 95 : groundY - 35,
-          radius: 10
-        });
-      }
+      const count = Math.floor(Math.random() * 3) + 3, high = Math.random() > 0.5;
+      for (let i = 0; i < count; i++) coinItems.push({ x: canvas.width + 20 + i * 34, y: high ? groundY - 95 : groundY - 35, radius: 10 });
     }
 
     function drawBackgroundAndGround() {
-      const scroll = frameCount * gameSpeed;
-
-      if (equippedBg === 'desert') {
-        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-        sky.addColorStop(0, '#ea580c');
-        sky.addColorStop(1, '#fde047');
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, canvas.width, groundY);
-
-        ctx.fillStyle = '#d97706';
-        const duneOffset = (scroll * 0.25) % 260;
-        for (let x = -duneOffset; x < canvas.width + 260; x += 260) {
-          ctx.beginPath();
-          ctx.moveTo(x, groundY);
-          ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY);
-          ctx.fill();
-        }
-
-        ctx.fillStyle = '#b45309';
-        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-        ctx.fillStyle = '#fbbf24';
-        const lineOffset = scroll % 40;
-        for (let x = -lineOffset; x < canvas.width; x += 40) {
-          ctx.fillRect(x, groundY + 10, 20, 4);
-        }
-      } else if (equippedBg === 'forest') {
-        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-        sky.addColorStop(0, '#3b0764');
-        sky.addColorStop(1, '#1e1b4b');
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, canvas.width, groundY);
-
-        const treeOffset = (scroll * 0.35) % 140;
-        for (let x = -treeOffset; x < canvas.width + 140; x += 140) {
-          ctx.fillStyle = '#14532d';
-          ctx.beginPath();
-          ctx.moveTo(x + 25, groundY - 85);
-          ctx.lineTo(x, groundY);
-          ctx.lineTo(x + 50, groundY);
-          ctx.closePath();
-          ctx.fill();
-        }
-
-        ctx.fillStyle = '#166534';
-        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-        ctx.fillStyle = '#4ade80';
-        const lineOffset = scroll % 40;
-        for (let x = -lineOffset; x < canvas.width; x += 40) {
-          ctx.fillRect(x, groundY + 10, 20, 4);
-        }
-      } else if (equippedBg === 'space') {
-        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-        sky.addColorStop(0, '#020617');
-        sky.addColorStop(1, '#172554');
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, canvas.width, groundY);
-
-        ctx.fillStyle = '#f8fafc';
-        stars.forEach(s => {
-          const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width;
-          ctx.beginPath();
-          ctx.arc(sx, s.y, s.r, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-        ctx.fillStyle = '#38bdf8';
-        const lineOffset = scroll % 40;
-        for (let x = -lineOffset; x < canvas.width; x += 40) {
-          ctx.fillRect(x, groundY + 10, 22, 4);
-        }
-      } else {
-        const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-        sky.addColorStop(0, '#1e293b');
-        sky.addColorStop(1, '#0f172a');
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, canvas.width, groundY);
-
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-        ctx.fillStyle = '#475569';
-        const lineOffset = scroll % 40;
-        for (let x = -lineOffset; x < canvas.width; x += 40) {
-          ctx.fillRect(x, groundY + 10, 20, 4);
-        }
-      }
+      const scroll = frameCount * gameSpeed, sky = ctx.createLinearGradient(0, 0, 0, groundY);
+      if (equippedBg === 'desert') { sky.addColorStop(0, '#ea580c'); sky.addColorStop(1, '#fde047'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#d97706'; for (let x = -((scroll * 0.25) % 260); x < canvas.width + 260; x += 260) { ctx.beginPath(); ctx.moveTo(x, groundY); ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY); ctx.fill(); } ctx.fillStyle = '#b45309'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#fbbf24'; }
+      else if (equippedBg === 'forest') { sky.addColorStop(0, '#3b0764'); sky.addColorStop(1, '#1e1b4b'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); for (let x = -((scroll * 0.35) % 140); x < canvas.width + 140; x += 140) { ctx.fillStyle = '#14532d'; ctx.beginPath(); ctx.moveTo(x + 25, groundY - 85); ctx.lineTo(x, groundY); ctx.lineTo(x + 50, groundY); ctx.closePath(); ctx.fill(); } ctx.fillStyle = '#166534'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#4ade80'; }
+      else if (equippedBg === 'space') { sky.addColorStop(0, '#020617'); sky.addColorStop(1, '#172554'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#f8fafc'; stars.forEach(s => { const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width; ctx.beginPath(); ctx.arc(sx, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#0f172a'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#38bdf8'; }
+      else { sky.addColorStop(0, '#1e293b'); sky.addColorStop(1, '#0f172a'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#334155'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#475569'; }
+      for (let x = -(scroll % 40); x < canvas.width; x += 40) ctx.fillRect(x, groundY + 10, 20, 4);
     }
 
     function drawPlayer() {
-      ctx.save();
-      const swing = (player.grounded && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
-
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(player.x + 6 + swing, player.y + 40, 8, 20);
-      ctx.fillRect(player.x + 20 - swing, player.y + 40, 8, 20);
-
-      ctx.fillStyle = equippedShirt;
-      ctx.fillRect(player.x + 4, player.y + 18, 26, 24);
-
-      ctx.fillStyle = '#fcd34d';
-      ctx.beginPath();
-      ctx.arc(player.x + 17, player.y + 10, 10, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#000';
-      ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
-
-      if (equippedHat === 'cap') {
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect(player.x + 8, player.y - 2, 18, 6);
-        ctx.fillRect(player.x + 18, player.y + 2, 13, 3);
-      } else if (equippedHat === 'crown') {
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.moveTo(player.x + 8, player.y + 2);
-        ctx.lineTo(player.x + 8, player.y - 8);
-        ctx.lineTo(player.x + 13, player.y - 3);
-        ctx.lineTo(player.x + 17, player.y - 10);
-        ctx.lineTo(player.x + 21, player.y - 3);
-        ctx.lineTo(player.x + 26, player.y - 8);
-        ctx.lineTo(player.x + 26, player.y + 2);
-        ctx.closePath();
-        ctx.fill();
-      }
+      ctx.save(); const swing = (player.grounded && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(player.x + 6 + swing, player.y + 40, 8, 20); ctx.fillRect(player.x + 20 - swing, player.y + 40, 8, 20);
+      ctx.fillStyle = equippedShirt; ctx.fillRect(player.x + 4, player.y + 18, 26, 24);
+      ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(player.x + 17, player.y + 10, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.fillRect(player.x + 21, player.y + 7, 3, 3);
+      if (equippedHat === 'cap') { ctx.fillStyle = '#ef4444'; ctx.fillRect(player.x + 8, player.y - 2, 18, 6); ctx.fillRect(player.x + 18, player.y + 2, 13, 3); }
+      else if (equippedHat === 'crown') { ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.moveTo(player.x + 8, player.y + 2); ctx.lineTo(player.x + 8, player.y - 8); ctx.lineTo(player.x + 13, player.y - 3); ctx.lineTo(player.x + 17, player.y - 10); ctx.lineTo(player.x + 21, player.y - 3); ctx.lineTo(player.x + 26, player.y - 8); ctx.lineTo(player.x + 26, player.y + 2); ctx.closePath(); ctx.fill(); }
       ctx.restore();
     }
 
     function drawMonster() {
       if (currentMode !== 'monster') return;
-      ctx.save();
-      const bounceY = Math.abs(Math.sin(frameCount * 0.2)) * 8;
-      const mx = monster.x;
-      const my = monster.y - bounceY;
-
-      ctx.fillStyle = '#dc2626';
-      ctx.beginPath();
-      ctx.roundRect(mx, my, monster.width, monster.height, [25, 25, 5, 5]);
-      ctx.fill();
-
+      ctx.save(); const my = monster.y - Math.abs(Math.sin(frameCount * 0.2)) * 8, mx = monster.x;
+      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.roundRect(mx, my, monster.width, monster.height, [25, 25, 5, 5]); ctx.fill();
       ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.moveTo(mx + 10, my + 5);
-      ctx.lineTo(mx + 2, my - 15);
-      ctx.lineTo(mx + 22, my + 2);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(mx + 45, my + 5);
-      ctx.lineTo(mx + 58, my - 15);
-      ctx.lineTo(mx + 55, my + 5);
-      ctx.fill();
-
-      ctx.fillStyle = '#fef08a';
-      ctx.fillRect(mx + 35, my + 20, 16, 10);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(mx + 44, my + 22, 6, 6);
-
-      ctx.fillStyle = '#450a0a';
-      ctx.fillRect(mx + 25, my + 42, 35, 18);
-      ctx.fillStyle = '#fff';
-      for (let i = 0; i < 4; i++) {
-        ctx.fillRect(mx + 28 + (i * 8), my + 42, 4, 6);
-      }
+      ctx.beginPath(); ctx.moveTo(mx + 10, my + 5); ctx.lineTo(mx + 2, my - 15); ctx.lineTo(mx + 22, my + 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(mx + 45, my + 5); ctx.lineTo(mx + 58, my - 15); ctx.lineTo(mx + 55, my + 5); ctx.fill();
+      ctx.fillStyle = '#fef08a'; ctx.fillRect(mx + 35, my + 20, 16, 10); ctx.fillStyle = '#000'; ctx.fillRect(mx + 44, my + 22, 6, 6);
+      ctx.fillStyle = '#450a0a'; ctx.fillRect(mx + 25, my + 42, 35, 18); ctx.fillStyle = '#fff';
+      for (let i = 0; i < 4; i++) ctx.fillRect(mx + 28 + i * 8, my + 42, 4, 6);
       ctx.restore();
     }
 
     function drawFriendCage() {
       if (currentMode !== 'rescue' || !friend.active) return;
-      ctx.save();
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(friend.x + 12, friend.y + 22, 24, 24);
-      ctx.fillStyle = '#fcd34d';
-      ctx.beginPath();
-      ctx.arc(friend.x + 24, friend.y + 14, 9, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(friend.x, friend.y, friend.width, friend.height);
-      for (let i = 10; i < friend.width; i += 10) {
-        ctx.beginPath();
-        ctx.moveTo(friend.x + i, friend.y);
-        ctx.lineTo(friend.x + i, friend.y + friend.height);
-        ctx.stroke();
-      }
+      ctx.save(); ctx.fillStyle = '#10b981'; ctx.fillRect(friend.x + 12, friend.y + 22, 24, 24);
+      ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(friend.x + 24, friend.y + 14, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.strokeRect(friend.x, friend.y, friend.width, friend.height);
+      for (let i = 10; i < friend.width; i += 10) { ctx.beginPath(); ctx.moveTo(friend.x + i, friend.y); ctx.lineTo(friend.x + i, friend.y + friend.height); ctx.stroke(); }
       ctx.restore();
     }
 
     function drawCoins() {
-      coinItems.forEach(c => {
-        ctx.save();
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#b45309';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.fillStyle = '#78350f';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillText('$', c.x - 3.5, c.y + 4);
-        ctx.restore();
-      });
+      coinItems.forEach(c => { ctx.save(); ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = '#78350f'; ctx.font = 'bold 11px sans-serif'; ctx.fillText('$', c.x - 3.5, c.y + 4); ctx.restore(); });
     }
 
     function drawObstacles() {
       ctx.fillStyle = '#f43f5e';
-      obstacles.forEach(obs => {
-        ctx.beginPath();
-        ctx.moveTo(obs.x, obs.y + obs.height);
-        ctx.lineTo(obs.x + obs.width / 2, obs.y);
-        ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
-        ctx.closePath();
-        ctx.fill();
-      });
+      obstacles.forEach(o => { ctx.beginPath(); ctx.moveTo(o.x, o.y + o.height); ctx.lineTo(o.x + o.width / 2, o.y); ctx.lineTo(o.x + o.width, o.y + o.height); ctx.closePath(); ctx.fill(); });
     }
 
-    function checkCollision(rect1, rect2) {
-      const pad = 6;
-      return (
-        rect1.x + pad < rect2.x + rect2.width - pad &&
-        rect1.x + rect1.width - pad > rect2.x + pad &&
-        rect1.y + pad < rect2.y + rect2.height - pad &&
-        rect1.y + rect1.height - pad > rect2.y + pad
-      );
+    function checkCollision(r1, r2) {
+      const p = 6;
+      return r1.x + p < r2.x + r2.width - p && r1.x + r1.width - p > r2.x + p && r1.y + p < r2.y + r2.height - p && r1.y + r1.height - p > r2.y + p;
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawBackgroundAndGround();
-      drawMonster();
-      drawFriendCage();
-      drawCoins();
-      drawPlayer();
-      drawObstacles();
+    function draw() { drawBackgroundAndGround(); drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer(); }
+
+    function endGame(won, title, message) {
+      isGameOver = true; isPaused = true; cancelAnimationFrame(animationId);
+      endTitle.textContent = title; endTitle.style.color = won ? '#10b981' : '#f43f5e';
+      endMessage.textContent = message; endScreen.style.display = 'flex';
+      if (won) sfx.win(); else sfx.lose();
     }
 
     function update() {
       if (isPaused || isGameOver) return;
       frameCount++;
-
-      player.dy += player.gravity;
-      player.y += player.dy;
-      if (player.y + player.height >= groundY) {
-        player.y = groundY - player.height;
-        player.dy = 0;
-        player.grounded = true;
-      }
-
+      if (!player.grounded) { player.y += player.dy; player.dy += player.gravity; if (player.y >= groundY - player.height) { player.y = groundY - player.height; player.dy = 0; player.grounded = true; } }
+      if (frameCount % 95 === 0) spawnObstacle();
+      if (frameCount % 130 === 0) spawnCoinLine();
+      if (frameCount % 450 === 0 && gameSpeed < 12) gameSpeed += 0.4;
+      if (frameCount % 12 === 0) { score++; const el = document.getElementById('scoreText'); if (el) el.textContent = score; if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true; }
       if (currentMode === 'monster') {
-        if (frameCount % Math.floor(Math.random() * 35 + 85) === 0) spawnObstacle();
-      } else if (currentMode === 'rescue') {
-        if (!friend.active && frameCount % Math.floor(Math.random() * 35 + 90) === 0) {
-          spawnObstacle();
-        }
-        if (score >= RESCUE_TARGET_SCORE && !friend.active) {
-          friend.active = true;
-          friend.x = canvas.width + 40;
-        }
-      } else if (currentMode === 'coins') {
-        if (frameCount % 95 === 0) {
-          if (Math.random() > 0.35) spawnCoinLine();
-          else spawnObstacle();
-        }
+        const hit = obstacles.some(o => o.x < player.x && o.x + o.width > monster.x);
+        monster.x = hit ? monster.x + 1.4 : Math.max(45, monster.x - 0.35);
+        if (monster.x + monster.width >= player.x + 8) { endGame(false, 'أمسك بك الوحش! 👾', `مجموع نقاطك: ${score}`); return; }
       }
-
-      for (let i = obstacles.length - 1; i >= 0; i--) {
-        obstacles[i].x -= gameSpeed;
-
-        if (checkCollision(player, obstacles[i])) {
-          triggerEnd(false);
-          return;
-        }
-
-        if (obstacles[i].x + obstacles[i].width < 0) {
-          obstacles.splice(i, 1);
-          score += 10;
-          document.getElementById('scoreText').textContent = score;
-          if (score % 100 === 0 && currentMode === 'monster') gameSpeed += 0.4;
-        }
-      }
-
-      for (let i = coinItems.length - 1; i >= 0; i--) {
-        coinItems[i].x -= gameSpeed;
-        const cBox = {
-          x: coinItems[i].x - coinItems[i].radius,
-          y: coinItems[i].y - coinItems[i].radius,
-          width: coinItems[i].radius * 2,
-          height: coinItems[i].radius * 2
-        };
-
-        if (checkCollision(player, cBox)) {
-          coinItems.splice(i, 1);
-          coins += 5;
-          score += 5;
-          document.getElementById('scoreText').textContent = score;
-          sfx.coin();
-          saveProgress();
-          continue;
-        }
-
-        if (coinItems[i].x + coinItems[i].radius < 0) {
-          coinItems.splice(i, 1);
-        }
-      }
-
-      if (friend.active) {
-        friend.x -= gameSpeed;
-        if (checkCollision(player, friend)) {
-          coins += 30;
-          saveProgress();
-          triggerEnd(true);
-          return;
-        }
-      }
-
-      draw();
-      animationId = requestAnimationFrame(update);
+      if (currentMode === 'rescue' && friend.active) { friend.x -= gameSpeed; if (checkCollision(player, friend)) { endGame(true, 'تم إنقاذ الصديق! 🦸‍♂️🎉', `وصلت إلى ${score} نقطة بنجاح!`); return; } }
+      for (let i = obstacles.length - 1; i >= 0; i--) { obstacles[i].x -= gameSpeed; if (checkCollision(player, obstacles[i])) { endGame(false, 'لقد خسرت! 💥', `مجموع نقاطك: ${score} | رصيد العملات: ${coins}`); return; } if (obstacles[i].x + obstacles[i].width < -30) obstacles.splice(i, 1); }
+      for (let i = coinItems.length - 1; i >= 0; i--) { coinItems[i].x -= gameSpeed; const dx = player.x + player.width / 2 - coinItems[i].x, dy = player.y + player.height / 2 - coinItems[i].y; if (Math.hypot(dx, dy) < player.width / 2 + coinItems[i].radius + 4) { coins += 1; saveProgress(); sfx.coin(); coinItems.splice(i, 1); continue; } if (coinItems[i].x < -30) coinItems.splice(i, 1); }
+      draw(); animationId = requestAnimationFrame(update);
     }
 
-    function triggerEnd(isWin) {
-      isGameOver = true;
-      cancelAnimationFrame(animationId);
-
-      if (isWin) {
-        sfx.win();
-        endTitle.style.color = '#10b981';
-        endTitle.textContent = 'أحسنت! أنقذت صديقك بنجاح 🦸‍♂️🎉';
-        endMessage.textContent = 'حصلت على مكافأة +30 عملة ذهبية!';
-      } else {
-        sfx.lose();
-        endTitle.style.color = '#ef4444';
-        if (currentMode === 'monster') {
-          monster.x = player.x - 45;
-          draw();
-          endTitle.textContent = 'لقد خسرت! أمسك بك الوحش 👾';
-        } else if (currentMode === 'rescue') {
-          endTitle.textContent = 'اصطدمت بعائق قبل الوصول لصديقك! 💥';
-        } else {
-          endTitle.textContent = 'انتهت الجولة! 💥';
-        }
-        endMessage.textContent = `نقاطك: ${score} | رصيد عملاتك الحالي: ${coins} 🪙`;
-      }
-
-      endScreen.style.display = 'flex';
-    }
-
-    updateSoundButton();
-    coinText.textContent = coins;
-    drawBackgroundAndGround();
-    drawPlayer();
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); }); }
+    updateSoundButton(); saveProgress(); draw();
   </script>
-  <link rel="manifest" href="./manifest.json">
 </body>
 </html>
