@@ -353,6 +353,11 @@
     let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0, lastBroadcastAt = 0;
     let plazaChannel = null;
 
+    function getSkyElevationOffset(shirt) {
+      if (currentMode !== 'chat') return 0;
+      return shirt === '#3b82f6' ? -115 : 0;
+    }
+
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
       if (dir === 1) walkRightPressed = pressed;
@@ -1181,7 +1186,8 @@
       const moving = currentMode === 'chat' ? (walkDir !== 0) : player.grounded;
       const bubble = getActiveBubble(accountId, currentUsername);
       const drawX = currentMode === 'chat' ? (canvas.width * 0.5 - player.width * 0.5) : player.x;
-      drawCharacterSprite(drawX, player.y, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
+      const drawY = player.y + getSkyElevationOffset(equippedShirt);
+      drawCharacterSprite(drawX, drawY, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
     }
 
     function drawChatPlazaPlayers() {
@@ -1190,7 +1196,7 @@
         const wx = Number(p.world_x);
         const remoteWorldX = Number.isFinite(wx) ? wx : ((idx + 1) * 65);
         let screenX = canvas.width * 0.5 + (remoteWorldX - player.worldX) - player.width * 0.5;
-        const py = Math.min(groundY - 60, Math.max(40, Number(p.pos_y) || (groundY - 60)));
+        const py = Math.min(groundY - 60, Math.max(40, Number(p.pos_y) || (groundY - 60))) + getSkyElevationOffset(p.shirt);
         const bubble = getActiveBubble(p.id, p.username);
 
         if (screenX < 20 || screenX > canvas.width - 54) {
