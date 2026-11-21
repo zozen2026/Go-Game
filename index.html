@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - 4 Modes, 10v10 War, Backgrounds & SFX</title>
+  <title>NC Go - 4 Modes, 10v10 War, Tanks & Rockets</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -21,7 +21,7 @@
     }
     .top-bar { width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
     .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .score-board { font-size: 0.95rem; font-weight: bold; background: #1e1e26; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; }
+    .score-board { font-size: 0.92rem; font-weight: bold; background: #1e1e26; padding: 8px 11px; border-radius: 10px; border: 1px solid #333; }
     .coin-board { color: #fbbf24; border-color: #78350f; }
     .online-board { color: #34d399; border-color: #065f46; }
     .war-board { color: #f87171; border-color: #7f1d1d; }
@@ -70,7 +70,6 @@
     .btn-restart { background: #10b981; }
     .btn-menu { background: #475569; }
 
-    /* شريط أزرار الأسلحة في طور الحرب */
     .weapons-bar {
       display: none;
       margin-top: 10px;
@@ -81,15 +80,15 @@
       border-radius: 14px;
       padding: 10px 12px;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .weapons-bar.active { display: flex; }
     .btn-weapon {
       border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.95rem;
+      border-radius: 11px;
+      padding: 9px 12px;
+      font-size: 0.88rem;
       font-weight: bold;
       cursor: pointer;
       color: #fff;
@@ -100,6 +99,8 @@
     .w-gun { background: #2563eb; box-shadow: 0 4px 0 #1e40af; }
     .w-rocket { background: #dc2626; box-shadow: 0 4px 0 #991b1b; }
     .w-laser { background: #7c3aed; box-shadow: 0 4px 0 #5b21b6; }
+    .w-buy-rocket { background: #d97706; color: #000; box-shadow: 0 4px 0 #92400e; }
+    .w-buy-tank { background: #059669; box-shadow: 0 4px 0 #065f46; }
 
     .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
     .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
@@ -124,7 +125,9 @@
       <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
       <div class="score-board online-board">🟢 نشط الآن: <span id="onlineCount">1</span></div>
-      <div class="score-board war-board" id="warTeamStatus" style="display:none;">⚔️ فريقنا: <span id="allyAliveCount">10</span> | الأعداء: <span id="enemyAliveCount">10</span></div>
+      <div class="score-board war-board" id="warTeamStatus" style="display:none;">
+        ⚔️ فريقنا: <span id="allyAliveCount">10</span> | الأعداء: <span id="enemyAliveCount">10</span> | 🚀 <span id="rocketAmmoText">2</span> | 🛡️ دبابات: <span id="tankCountText">0</span>
+      </div>
     </div>
     <div class="actions-group">
       <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
@@ -153,7 +156,7 @@
         </div>
         <div class="mode-card" onclick="startGame('war')">
           <div class="icon">⚔️</div>
-          <div class="mode-card-text"><h3>4. حرب 10 ضد 10</h3><p>قُد فريقك المكون من 10 مقاتلين ضد 10 أعداء واستخدم أزرار الأسلحة!</p></div>
+          <div class="mode-card-text"><h3>4. حرب 10 ضد 10</h3><p>إطلاق يدوي بالأزرار مع شراء الصواريخ والدبابات لدعم فريقك!</p></div>
         </div>
       </div>
     </div>
@@ -180,11 +183,13 @@
     </div>
   </div>
 
-  <!-- أزرار الأسلحة الخاصة بطور الحرب 10 ضد 10 -->
+  <!-- أزرار الإطلاق اليدوي وشراء الصواريخ والدبابات في طور الحرب -->
   <div class="weapons-bar" id="weaponsBar">
-    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireWeapon('gun')">🔫 مسدس سريع</button>
-    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireWeapon('rocket')">💥 صاروخ جماعي</button>
+    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireWeapon('gun')">🔫 مسدس</button>
+    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireWeapon('rocket')">🚀 إطلاق صاروخ (<span id="btnRocketCount">2</span>)</button>
     <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireWeapon('laser')">⚡ شعاع طاقة</button>
+    <button type="button" class="btn-weapon w-buy-rocket" onclick="buyRocket()">➕ شراء صاروخ (10 🪙)</button>
+    <button type="button" class="btn-weapon w-buy-tank" onclick="buyTank()">🛡️ شراء دبابة (25 🪙)</button>
   </div>
 
   <div class="controls">
@@ -213,6 +218,8 @@
     const soundBtn = document.getElementById('soundBtn'), weaponsBar = document.getElementById('weaponsBar');
     const warTeamStatus = document.getElementById('warTeamStatus');
     const allyAliveCountEl = document.getElementById('allyAliveCount'), enemyAliveCountEl = document.getElementById('enemyAliveCount');
+    const rocketAmmoText = document.getElementById('rocketAmmoText'), btnRocketCount = document.getElementById('btnRocketCount');
+    const tankCountText = document.getElementById('tankCountText');
     const SHARE_URL = 'https://zozen2026.github.io/Go-Game/';
 
     function showShareStatus(msg) {
@@ -319,18 +326,20 @@
     const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
     let obstacles = [], coinItems = [];
 
-    // حالة طور الحرب 10 ضد 10
-    let allies = [], enemies = [], projectiles = [], laserBeamTimer = 0;
+    // حالة طور الحرب 10 ضد 10 (إطلاق يدوي + شراء صواريخ ودبابات)
+    let allies = [], enemies = [], tanks = [], projectiles = [], laserBeamTimer = 0;
+    let rocketsAmmo = 2;
     let cooldowns = { gun: 0, rocket: 0, laser: 0 };
 
     function initWarSquads() {
       allies = [];
       enemies = [];
+      tanks = [];
       projectiles = [];
       laserBeamTimer = 0;
+      rocketsAmmo = 2;
       cooldowns = { gun: 0, rocket: 0, laser: 0 };
 
-      // 10 مقاتلين في فريقك (اللاعب رقم 0 في المقدمة + 9 رفاق)
       for (let i = 0; i < 10; i++) {
         allies.push({
           isPlayer: i === 0,
@@ -338,13 +347,11 @@
           y: groundY - 42,
           width: 24,
           height: 42,
-          hp: i === 0 ? 120 : 60,
-          alive: true,
-          fireTimer: i * 14
+          hp: i === 0 ? 140 : 65,
+          alive: true
         });
       }
 
-      // 10 أعداء في الفريق المقابل
       for (let i = 0; i < 10; i++) {
         enemies.push({
           x: 520 + (i % 4) * 55 + Math.floor(i / 4) * 28,
@@ -353,7 +360,7 @@
           height: 42,
           hp: 65,
           alive: true,
-          fireTimer: 25 + i * 18
+          fireTimer: 35 + i * 20
         });
       }
       updateWarCounters();
@@ -362,15 +369,46 @@
     function updateWarCounters() {
       const aAlive = allies.filter(a => a.alive).length;
       const eAlive = enemies.filter(e => e.alive).length;
+      const activeTanks = tanks.filter(t => t.alive).length;
       if (allyAliveCountEl) allyAliveCountEl.textContent = aAlive;
       if (enemyAliveCountEl) enemyAliveCountEl.textContent = eAlive;
+      if (rocketAmmoText) rocketAmmoText.textContent = rocketsAmmo;
+      if (btnRocketCount) btnRocketCount.textContent = rocketsAmmo;
+      if (tankCountText) tankCountText.textContent = activeTanks;
 
       const btnGun = document.getElementById('btnGun');
       const btnRocket = document.getElementById('btnRocket');
       const btnLaser = document.getElementById('btnLaser');
       if (btnGun) btnGun.disabled = cooldowns.gun > 0;
-      if (btnRocket) btnRocket.disabled = cooldowns.rocket > 0;
+      if (btnRocket) btnRocket.disabled = cooldowns.rocket > 0 || rocketsAmmo <= 0;
       if (btnLaser) btnLaser.disabled = cooldowns.laser > 0;
+    }
+
+    function buyRocket() {
+      if (currentMode !== 'war' || isPaused || isGameOver) return;
+      if (coins < 10) return alert('تحتاج إلى 10 عملات لشراء صاروخ!');
+      coins -= 10;
+      rocketsAmmo += 1;
+      sfx.buy();
+      saveProgress();
+      updateWarCounters();
+    }
+
+    function buyTank() {
+      if (currentMode !== 'war' || isPaused || isGameOver) return;
+      if (coins < 25) return alert('تحتاج إلى 25 عملة لشراء دبابة!');
+      coins -= 25;
+      tanks.push({
+        x: 75 + (tanks.length % 3) * 58,
+        y: groundY - 34,
+        width: 48,
+        height: 34,
+        hp: 220,
+        alive: true
+      });
+      sfx.buy();
+      saveProgress();
+      updateWarCounters();
     }
 
     function fireWeapon(type) {
@@ -379,20 +417,24 @@
       if (!leader || !leader.alive) return;
 
       if (type === 'gun' && cooldowns.gun <= 0) {
-        projectiles.push({ fromAlly: true, kind: 'gun', x: leader.x + 26, y: leader.y + 18, vx: 11, vy: 0, dmg: 25, radius: 5 });
-        cooldowns.gun = 14;
+        projectiles.push({ fromAlly: true, kind: 'gun', x: leader.x + 26, y: leader.y + 18, vx: 11.5, vy: 0, dmg: 25, radius: 5 });
+        tanks.forEach(t => {
+          if (t.alive) projectiles.push({ fromAlly: true, kind: 'gun', x: t.x + t.width, y: t.y + 12, vx: 11, vy: 0, dmg: 30, radius: 6 });
+        });
+        cooldowns.gun = 12;
         sfx.gun();
-      } else if (type === 'rocket' && cooldowns.rocket <= 0) {
-        projectiles.push({ fromAlly: true, kind: 'rocket', x: leader.x + 28, y: leader.y + 14, vx: 8.5, vy: 0, dmg: 70, radius: 9 });
-        cooldowns.rocket = 75;
+      } else if (type === 'rocket' && cooldowns.rocket <= 0 && rocketsAmmo > 0) {
+        rocketsAmmo -= 1;
+        projectiles.push({ fromAlly: true, kind: 'rocket', x: leader.x + 28, y: leader.y + 14, vx: 9, vy: 0, dmg: 85, radius: 9 });
+        cooldowns.rocket = 35;
         sfx.rocket();
       } else if (type === 'laser' && cooldowns.laser <= 0) {
         laserBeamTimer = 14;
-        cooldowns.laser = 110;
+        cooldowns.laser = 95;
         sfx.laser();
         enemies.forEach(en => {
           if (en.alive && en.x > leader.x) {
-            en.hp -= 55;
+            en.hp -= 65;
             if (en.hp <= 0) {
               en.alive = false;
               score += 10;
@@ -403,8 +445,8 @@
             }
           }
         });
-        updateWarCounters();
       }
+      updateWarCounters();
     }
 
     function saveProgress() {
@@ -527,7 +569,6 @@
       if (currentMode !== 'war') return;
       ctx.save();
 
-      // رسم 10 مقاتلين من فريقنا
       allies.forEach(a => {
         if (!a.alive) return;
         ctx.fillStyle = a.isPlayer ? equippedShirt : '#38bdf8';
@@ -538,7 +579,18 @@
         ctx.fillRect(a.x + 4, a.y + 32, 6, 10); ctx.fillRect(a.x + 14, a.y + 32, 6, 10);
       });
 
-      // رسم 10 أعداء
+      tanks.forEach(t => {
+        if (!t.alive) return;
+        ctx.fillStyle = '#15803d';
+        ctx.fillRect(t.x, t.y + 12, t.width, 16);
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(t.x + 10, t.y + 4, 22, 9);
+        ctx.fillStyle = '#14532d';
+        ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(t.x, t.y + 26, t.width, 8);
+      });
+
       enemies.forEach(en => {
         if (!en.alive) return;
         ctx.fillStyle = '#ef4444';
@@ -549,13 +601,11 @@
         ctx.fillRect(en.x + 4, en.y + 32, 6, 10); ctx.fillRect(en.x + 14, en.y + 32, 6, 10);
       });
 
-      // رسم شعاع الطاقة
       if (laserBeamTimer > 0 && allies[0] && allies[0].alive) {
-        ctx.fillStyle = 'rgba(167, 139, 250, 0.75)';
+        ctx.fillStyle = 'rgba(167, 139, 250, 0.78)';
         ctx.fillRect(allies[0].x + 24, allies[0].y + 14, canvas.width - allies[0].x, 10);
       }
 
-      // رسم المقذوفات
       projectiles.forEach(p => {
         ctx.fillStyle = p.fromAlly ? (p.kind === 'rocket' ? '#fb923c' : '#60a5fa') : '#f87171';
         ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
@@ -602,11 +652,8 @@
 
     function draw() {
       drawBackgroundAndGround();
-      if (currentMode === 'war') {
-        drawWarScene();
-      } else {
-        drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer();
-      }
+      if (currentMode === 'war') drawWarScene();
+      else { drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer(); }
     }
 
     function endGame(won, title, message) {
@@ -622,23 +669,13 @@
       if (cooldowns.laser > 0) cooldowns.laser--;
       if (laserBeamTimer > 0) laserBeamTimer--;
 
-      // إطلاق تلقائي خفيف للرفاق والأعداء
-      allies.forEach((a, idx) => {
-        if (!a.alive || idx === 0) return;
-        a.fireTimer--;
-        if (a.fireTimer <= 0) {
-          a.fireTimer = 55 + idx * 7;
-          projectiles.push({ fromAlly: true, kind: 'gun', x: a.x + 24, y: a.y + 18, vx: 8.5, vy: 0, dmg: 12, radius: 4 });
-        }
-      });
-
       enemies.forEach((en, idx) => {
         if (!en.alive) return;
-        en.x = Math.max(430, en.x - 0.15);
+        en.x = Math.max(430, en.x - 0.14);
         en.fireTimer--;
         if (en.fireTimer <= 0) {
-          en.fireTimer = 65 + idx * 8;
-          projectiles.push({ fromAlly: false, kind: 'gun', x: en.x - 4, y: en.y + 18, vx: -6.5, vy: 0, dmg: 10, radius: 4 });
+          en.fireTimer = 70 + idx * 9;
+          projectiles.push({ fromAlly: false, kind: 'gun', x: en.x - 4, y: en.y + 18, vx: -6.2, vy: 0, dmg: 10, radius: 4 });
         }
       });
 
@@ -667,12 +704,22 @@
           if (hit) { projectiles.splice(i, 1); continue; }
         } else {
           let hit = false;
-          for (const a of allies) {
-            if (a.alive && p.x - p.radius < a.x + a.width && p.x + p.radius > a.x && p.y > a.y && p.y < a.y + a.height) {
-              a.hp -= p.dmg;
+          for (const t of tanks) {
+            if (t.alive && p.x - p.radius < t.x + t.width && p.x + p.radius > t.x && p.y > t.y && p.y < t.y + t.height) {
+              t.hp -= p.dmg;
               hit = true;
-              if (a.hp <= 0) a.alive = false;
+              if (t.hp <= 0) t.alive = false;
               break;
+            }
+          }
+          if (!hit) {
+            for (const a of allies) {
+              if (a.alive && p.x - p.radius < a.x + a.width && p.x + p.radius > a.x && p.y > a.y && p.y < a.y + a.height) {
+                a.hp -= p.dmg;
+                hit = true;
+                if (a.hp <= 0) a.alive = false;
+                break;
+              }
             }
           }
           if (hit) { projectiles.splice(i, 1); continue; }
