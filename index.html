@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - Social Plaza & Live Chat</title>
+  <title>NC Go - Infinite Social Plaza</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -41,6 +41,8 @@
     .btn-account { background: #0284c7; color: #fff; }
     .btn-chat-top { background: #10b981; color: #fff; display: none; }
     .btn-chat-top.active { display: inline-block; }
+    .btn-respawn-top { background: #8b5cf6; color: #fff; display: none; }
+    .btn-respawn-top.active { display: inline-block; }
     .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
     .btn-sound.muted { opacity: 0.65; }
 
@@ -57,7 +59,6 @@
     }
     canvas { display: block; width: 100%; height: 100%; }
 
-    /* شريط الدردشة العلوي فوق الساحة عند الضغط على زر دردشة */
     .chat-composer-bar {
       display: none;
       position: absolute;
@@ -94,7 +95,6 @@
       cursor: pointer;
     }
 
-    /* سجل خفيف شفاف أسفل الساحة في طور الدردشة */
     .chat-feed-mini {
       display: none;
       position: absolute;
@@ -203,6 +203,7 @@
       </div>
     </div>
     <div class="actions-group">
+      <button type="button" class="btn-top btn-respawn-top" id="topRespawnBtn" onclick="respawnPlayerInPlaza()">🔄 رسبن</button>
       <button type="button" class="btn-top btn-chat-top" id="topChatBtn" onclick="toggleChatComposer()">💬 دردشة</button>
       <button type="button" class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
       <button type="button" class="btn-top btn-account" onclick="toggleAccountModal()">👤 الحساب</button>
@@ -243,7 +244,7 @@
         </div>
         <div class="mode-card" onclick="startGame('chat')">
           <div class="icon">💬</div>
-          <div class="mode-card-text"><h3>5. ساحة الدردشة الحية</h3><p>امشِ بحرية بشخصيتك واسمك وملابسك وتحدث مع اللاعبين بخلفية خاصة ثابتة!</p></div>
+          <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>امشِ بلا حدود مع رسبن فوري وتحدث مع اللاعبين بخلفية خاصة ثابتة!</p></div>
         </div>
       </div>
     </div>
@@ -312,6 +313,7 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const topChatBtn = document.getElementById('topChatBtn');
+    const topRespawnBtn = document.getElementById('topRespawnBtn');
     const chatComposerBar = document.getElementById('chatComposerBar');
     const chatFeedMini = document.getElementById('chatFeedMini');
     const moveLeftBtn = document.getElementById('moveLeftBtn');
@@ -342,11 +344,11 @@
     let groundY = 300;
     const RESCUE_TARGET_SCORE = 100;
     const stars = Array.from({ length: 45 }, (_, i) => ({ x: (i * 97) % 1200, y: (i * 53) % 420, r: (i % 2) + 1.2 }));
-    const player = { x: 210, y: 240, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
+    const player = { x: 210, y: 240, worldX: 0, worldY: 0, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
-    let plazaPlayers = [], playerBubbles = {};
+    let plazaPlayers = [], playerBubbles = {}, lastPosSyncAt = 0;
 
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
@@ -354,6 +356,18 @@
       if (walkLeftPressed && !walkRightPressed) walkDir = -1;
       else if (walkRightPressed && !walkLeftPressed) walkDir = 1;
       else walkDir = 0;
+    }
+
+    function respawnPlayerInPlaza() {
+      if (currentMode !== 'chat') return;
+      player.worldX = Math.floor((Math.random() - 0.5) * 300);
+      player.worldY = 0;
+      player.y = groundY - player.height;
+      player.dy = 0;
+      player.grounded = true;
+      sfx.jump();
+      syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y) });
+      draw();
     }
 
     function resizeCanvasToScreen() {
@@ -367,7 +381,9 @@
         groundY = Math.max(180, canvas.height - 56);
         const deltaGround = groundY - prevGround;
         player.y = Math.min(groundY - player.height, player.y + deltaGround);
-        player.x = Math.min(Math.max(20, player.x), Math.max(20, canvas.width - player.width - 20));
+        if (currentMode !== 'chat') {
+          player.x = Math.min(Math.max(20, player.x), Math.max(20, canvas.width - player.width - 20));
+        }
         monster.y = groundY - monster.height;
         friend.y = groundY - friend.height;
         if (currentMode === 'war') {
@@ -415,7 +431,9 @@
             headers: { ...sbHeaders, 'Prefer': 'return=representation' },
             body: JSON.stringify({
               id: accountId, username: candidate, coins,
-              shirt: equippedShirt, hat: equippedHat, pos_x: player.x, pos_y: player.y,
+              shirt: equippedShirt, hat: equippedHat,
+              world_x: Math.round(player.worldX), world_y: Math.round(player.worldY),
+              pos_x: Math.round(player.x), pos_y: Math.round(player.y),
               in_chat: currentMode === 'chat', last_seen: new Date().toISOString()
             })
           });
@@ -443,6 +461,8 @@
             coins,
             shirt: equippedShirt,
             hat: equippedHat,
+            world_x: Math.round(player.worldX),
+            world_y: Math.round(player.worldY),
             pos_x: Math.round(player.x),
             pos_y: Math.round(player.y),
             in_chat: currentMode === 'chat',
@@ -501,7 +521,7 @@
         await syncAccountState();
         const cutoff = new Date(Date.now() - 45000).toISOString();
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,pos_x,pos_y,in_chat,last_message,last_msg_at`,
+          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,world_y,pos_x,pos_y,in_chat,last_message,last_msg_at`,
           { headers: sbHeaders }
         );
         if (!res.ok) return;
@@ -523,7 +543,7 @@
     }
 
     ensureUniqueAccount().then(syncActivePlayers);
-    setInterval(syncActivePlayers, 2500);
+    setInterval(syncActivePlayers, 1500);
 
     function toggleChatComposer() {
       if (currentMode !== 'chat') return;
@@ -589,7 +609,7 @@
 
     setInterval(() => {
       if (currentMode === 'chat') loadChatFeed();
-    }, 2200);
+    }, 2000);
 
     function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
@@ -869,6 +889,7 @@
       currentMode = null;
       walkDir = 0; walkLeftPressed = false; walkRightPressed = false;
       topChatBtn.classList.remove('active');
+      topRespawnBtn.classList.remove('active');
       chatComposerBar.classList.remove('active');
       chatFeedMini.classList.remove('active');
       moveLeftBtn.classList.remove('active');
@@ -889,6 +910,7 @@
     function restartCurrentMode() {
       isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
       obstacles = []; coinItems = []; friend.active = false; friend.x = canvas.width + 80;
+      player.worldX = 0; player.worldY = 0;
       player.x = currentMode === 'chat' ? Math.floor(canvas.width * 0.5) : (currentMode === 'monster' ? Math.min(240, Math.floor(canvas.width * 0.28)) : Math.min(160, Math.floor(canvas.width * 0.16)));
       player.y = groundY - player.height; player.dy = 0; player.grounded = true;
       monster.x = 45; monster.y = groundY - monster.height;
@@ -898,6 +920,7 @@
       weaponsBar.classList.toggle('active', isWar);
       warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
       topChatBtn.classList.toggle('active', isChat);
+      topRespawnBtn.classList.toggle('active', isChat);
       chatFeedMini.classList.toggle('active', isChat);
       chatComposerBar.classList.remove('active');
       moveLeftBtn.classList.toggle('active', isChat);
@@ -905,7 +928,7 @@
 
       if (isWar) { goalLabel.textContent = 'القتلى'; setScoreDisplay(0); joinOrCreateOnlineWar(); }
       else if (currentMode === 'rescue') { goalLabel.textContent = 'التقدم'; setScoreDisplay(0); }
-      else if (isChat) { goalLabel.textContent = 'الساحة'; setScoreDisplay('💬'); loadChatFeed(); syncAccountState({ in_chat: true }); }
+      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(0); loadChatFeed(); syncActivePlayers(); }
       else { goalLabel.textContent = 'النقاط'; setScoreDisplay(0); }
 
       endScreen.style.display = 'none'; shopModal.style.display = 'none';
@@ -920,6 +943,7 @@
       if (currentMode === 'chat') {
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') setWalk(-1, true);
         if (e.code === 'ArrowRight' || e.code === 'KeyD') setWalk(1, true);
+        if (e.code === 'KeyR') respawnPlayerInPlaza();
       }
       if (currentMode === 'war') {
         if (e.key === '1') fireOnlineWeapon('gun');
@@ -939,7 +963,7 @@
       for (let i = 0; i < count; i++) coinItems.push({ x: canvas.width + 20 + i * 34, y: high ? groundY - 95 : groundY - 35, radius: 10 });
     }
 
-    // خلفية خاصة ثابتة لطور الدردشة لا تتغير باختيار خلفية المتجر
+    // خلفية لا حدود لها تتحرك مع worldX ولا تتغير باختيار خلفية المتجر
     function drawFixedSocialPlazaBackground() {
       const sky = ctx.createLinearGradient(0, 0, 0, groundY);
       sky.addColorStop(0, '#0f172a');
@@ -948,19 +972,23 @@
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, canvas.width, groundY);
 
+      const sunOffset = ((player.worldX * -0.08) % canvas.width + canvas.width) % canvas.width;
       ctx.fillStyle = 'rgba(254, 240, 138, 0.22)';
-      ctx.beginPath();
-      ctx.arc(Math.min(160, canvas.width * 0.2), 75, 42, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(sunOffset, 75, 42, 0, Math.PI * 2); ctx.fill();
 
-      for (let bx = 20; bx < canvas.width; bx += 95) {
-        const bh = 55 + ((bx * 19) % 55);
+      const blockSpan = 120;
+      const startIndex = Math.floor((player.worldX - canvas.width) / blockSpan);
+      const endIndex = Math.ceil((player.worldX + canvas.width) / blockSpan);
+      for (let idx = startIndex; idx <= endIndex; idx++) {
+        const worldBx = idx * blockSpan;
+        const screenBx = canvas.width * 0.5 + (worldBx - player.worldX);
+        const bh = 55 + (Math.abs(idx * 23) % 60);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
-        ctx.fillRect(bx, groundY - bh, 64, bh);
+        ctx.fillRect(screenBx, groundY - bh, 72, bh);
         ctx.fillStyle = 'rgba(253, 224, 71, 0.45)';
         for (let wy = groundY - bh + 10; wy < groundY - 12; wy += 16) {
-          ctx.fillRect(bx + 12, wy, 8, 8);
-          ctx.fillRect(bx + 36, wy, 8, 8);
+          ctx.fillRect(screenBx + 14, wy, 9, 8);
+          ctx.fillRect(screenBx + 42, wy, 9, 8);
         }
       }
 
@@ -968,6 +996,19 @@
       ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
       ctx.fillStyle = '#10b981';
       ctx.fillRect(0, groundY, canvas.width, 5);
+
+      const markerSpan = 160;
+      const mStart = Math.floor((player.worldX - canvas.width) / markerSpan);
+      const mEnd = Math.ceil((player.worldX + canvas.width) / markerSpan);
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      for (let m = mStart; m <= mEnd; m++) {
+        const wx = m * markerSpan;
+        const sx = canvas.width * 0.5 + (wx - player.worldX);
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(sx, groundY + 6, 3, 10);
+        ctx.fillText(`${wx}m`, sx, groundY + 28);
+      }
     }
 
     function drawBackgroundAndGround() {
@@ -1032,16 +1073,20 @@
     function drawPlayer() {
       const moving = currentMode === 'chat' ? (walkDir !== 0) : player.grounded;
       const bubble = playerBubbles[accountId] && playerBubbles[accountId].until > Date.now() ? playerBubbles[accountId].text : '';
-      drawCharacterSprite(player.x, player.y, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
+      const drawX = currentMode === 'chat' ? (canvas.width * 0.5 - player.width * 0.5) : player.x;
+      drawCharacterSprite(drawX, player.y, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
     }
 
     function drawChatPlazaPlayers() {
       const now = Date.now();
       plazaPlayers.forEach(p => {
-        const px = Math.min(Math.max(20, Number(p.pos_x) || 120), Math.max(20, canvas.width - 54));
+        const wx = Number(p.world_x);
+        const remoteWorldX = Number.isFinite(wx) ? wx : ((Number(p.pos_x) || 200) - 200);
+        const screenX = canvas.width * 0.5 + (remoteWorldX - player.worldX) - player.width * 0.5;
         const py = Math.min(groundY - 60, Math.max(40, Number(p.pos_y) || (groundY - 60)));
+        if (screenX < -120 || screenX > canvas.width + 120) return;
         const bubble = playerBubbles[p.id] && playerBubbles[p.id].until > now ? playerBubbles[p.id].text : '';
-        drawCharacterSprite(px, py, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble);
+        drawCharacterSprite(screenX, py, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble);
       });
     }
 
@@ -1159,7 +1204,8 @@
 
     function updateChatPlaza() {
       if (walkDir !== 0) {
-        player.x = Math.min(Math.max(16, player.x + walkDir * 4.5), Math.max(16, canvas.width - player.width - 16));
+        player.worldX += walkDir * 5;
+        setScoreDisplay(Math.round(player.worldX));
       }
       if (!player.grounded) {
         player.y += player.dy;
@@ -1169,6 +1215,11 @@
           player.dy = 0;
           player.grounded = true;
         }
+      }
+      const now = Date.now();
+      if (now - lastPosSyncAt > 650) {
+        lastPosSyncAt = now;
+        syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y) });
       }
     }
 
