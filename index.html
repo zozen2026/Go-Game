@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - Infinite Social Plaza</title>
+  <title>NC Go - Live Multiplayer Plaza</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -66,7 +66,7 @@
       left: 50%;
       transform: translateX(-50%);
       width: min(94%, 640px);
-      background: rgba(15, 23, 42, 0.94);
+      background: rgba(15, 23, 42, 0.95);
       border: 1px solid #38bdf8;
       border-radius: 14px;
       padding: 8px 10px;
@@ -103,7 +103,7 @@
       max-width: min(92%, 420px);
       max-height: 110px;
       overflow-y: auto;
-      background: rgba(15, 23, 42, 0.72);
+      background: rgba(15, 23, 42, 0.75);
       border: 1px solid rgba(148, 163, 184, 0.25);
       border-radius: 12px;
       padding: 7px 10px;
@@ -216,7 +216,7 @@
     <canvas id="gameCanvas"></canvas>
 
     <form class="chat-composer-bar" id="chatComposerBar" onsubmit="sendChatMessage(event)">
-      <input type="text" id="chatInput" class="chat-input" maxlength="160" placeholder="اكتب رسالتك ليراها كل اللاعبين في الساحة..." autocomplete="off">
+      <input type="text" id="chatInput" class="chat-input" maxlength="160" placeholder="اكتب رسالتك لتظهر فوق رأسك للجميع..." autocomplete="off">
       <button type="submit" class="btn-send-chat">إرسال ➤</button>
     </form>
 
@@ -244,7 +244,7 @@
         </div>
         <div class="mode-card" onclick="startGame('chat')">
           <div class="icon">💬</div>
-          <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>امشِ بلا حدود مع رسبن فوري وتحدث مع اللاعبين بخلفية خاصة ثابتة!</p></div>
+          <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>تظهر شخصيات اللاعبين من كل الأجهزة وتظهر كل رسالة فوق رأس كاتبها!</p></div>
         </div>
       </div>
     </div>
@@ -348,7 +348,7 @@
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
-    let plazaPlayers = [], playerBubbles = {}, chatSendersSeen = {}, lastPosSyncAt = 0;
+    let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0;
 
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
@@ -360,7 +360,7 @@
 
     function respawnPlayerInPlaza() {
       if (currentMode !== 'chat') return;
-      player.worldX = Math.floor((Math.random() - 0.5) * 240);
+      player.worldX = Math.floor((Math.random() - 0.5) * 140);
       player.worldY = 0;
       player.y = groundY - player.height;
       player.dy = 0;
@@ -524,41 +524,10 @@
       }
     }
 
-    function rebuildPlazaPlayers() {
-      const map = new Map();
-      Object.values(chatSendersSeen).forEach(s => {
-        if (s.id && s.id !== accountId && Date.now() - s.seenAt < 60000) {
-          map.set(s.id, {
-            id: s.id,
-            username: s.username || 'Player',
-            shirt: '#10b981',
-            hat: 'cap',
-            world_x: s.worldX || 120,
-            pos_y: groundY - 60
-          });
-        }
-      });
-      plazaPlayers.forEach(r => {
-        if (r.id && r.id !== accountId) {
-          const prev = map.get(r.id) || {};
-          map.set(r.id, {
-            ...prev,
-            id: r.id,
-            username: r.username || prev.username || 'Player',
-            shirt: r.shirt || prev.shirt || '#3b82f6',
-            hat: r.hat || prev.hat || 'none',
-            world_x: typeof r.world_x === 'number' ? r.world_x : (prev.world_x || 120),
-            pos_y: typeof r.pos_y === 'number' ? r.pos_y : (groundY - 60)
-          });
-        }
-      });
-      plazaPlayers = Array.from(map.values());
-    }
-
     async function syncActivePlayers() {
       try {
         await syncAccountState();
-        const cutoff = new Date(Date.now() - 60000).toISOString();
+        const cutoff = new Date(Date.now() - 120000).toISOString();
         let res = await fetch(
           `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message,last_msg_at`,
           { headers: sbHeaders }
@@ -574,22 +543,20 @@
         if (Array.isArray(rows)) {
           const el = document.getElementById('onlineCount');
           if (el) el.textContent = Math.max(1, rows.length);
-          plazaPlayers = rows.filter(r => r.id !== accountId);
+          remoteAccounts = rows.filter(r => r && r.id && r.id !== accountId);
           rows.forEach(r => {
-            if (r.last_message && r.last_msg_at) {
-              const ageMs = Date.now() - new Date(r.last_msg_at).getTime();
-              if (ageMs >= 0 && ageMs < 12000) {
-                playerBubbles[r.id] = { text: r.last_message, until: Date.now() + (12000 - ageMs) };
-              }
+            if (r.last_message) {
+              const until = Date.now() + 18000;
+              playerBubbles[r.id] = { text: r.last_message, until };
+              if (r.username) bubblesByName[r.username] = { text: r.last_message, until };
             }
           });
-          rebuildPlazaPlayers();
         }
       } catch (_) {}
     }
 
     ensureUniqueAccount().then(syncActivePlayers);
-    setInterval(syncActivePlayers, 1500);
+    setInterval(syncActivePlayers, 1200);
 
     function toggleChatComposer() {
       if (currentMode !== 'chat') return;
@@ -615,29 +582,17 @@
 
     async function loadChatFeed() {
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=15`, { headers: sbHeaders });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=20`, { headers: sbHeaders });
         if (!res.ok) return;
         const rows = await res.json();
         if (Array.isArray(rows)) {
           const asc = rows.reverse();
           renderMiniChat(asc);
-          asc.forEach((m, idx) => {
-            if (m.sender_id && m.sender_id !== accountId) {
-              chatSendersSeen[m.sender_id] = {
-                id: m.sender_id,
-                username: m.sender_name || 'Player',
-                worldX: ((idx % 5) - 2) * 90,
-                seenAt: Date.now()
-              };
-            }
-            if (m.created_at) {
-              const age = Date.now() - new Date(m.created_at).getTime();
-              if (age >= 0 && age < 12000) {
-                playerBubbles[m.sender_id] = { text: m.message, until: Date.now() + (12000 - age) };
-              }
-            }
+          asc.forEach(m => {
+            const until = Date.now() + 18000;
+            if (m.sender_id) playerBubbles[m.sender_id] = { text: m.message, until };
+            if (m.sender_name) bubblesByName[m.sender_name] = { text: m.message, until };
           });
-          rebuildPlazaPlayers();
         }
       } catch (_) {}
     }
@@ -650,7 +605,10 @@
       if (!accountReady) await ensureUniqueAccount();
       input.value = '';
       const sender = currentUsername || 'Player';
-      playerBubbles[accountId] = { text, until: Date.now() + 12000 };
+      const until = Date.now() + 18000;
+      playerBubbles[accountId] = { text, until };
+      bubblesByName[sender] = { text, until };
+      draw();
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
           method: 'POST',
@@ -664,7 +622,7 @@
 
     setInterval(() => {
       if (currentMode === 'chat') loadChatFeed();
-    }, 1800);
+    }, 1400);
 
     function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
@@ -965,7 +923,8 @@
     function restartCurrentMode() {
       isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
       obstacles = []; coinItems = []; friend.active = false; friend.x = canvas.width + 80;
-      player.worldX = 0; player.worldY = 0;
+      player.worldX = currentMode === 'chat' ? Math.floor((Math.random() - 0.5) * 90) : 0;
+      player.worldY = 0;
       player.x = currentMode === 'chat' ? Math.floor(canvas.width * 0.5) : (currentMode === 'monster' ? Math.min(240, Math.floor(canvas.width * 0.28)) : Math.min(160, Math.floor(canvas.width * 0.16)));
       player.y = groundY - player.height; player.dy = 0; player.grounded = true;
       monster.x = 45; monster.y = groundY - monster.height;
@@ -983,7 +942,7 @@
 
       if (isWar) { goalLabel.textContent = 'القتلى'; setScoreDisplay(0); joinOrCreateOnlineWar(); }
       else if (currentMode === 'rescue') { goalLabel.textContent = 'التقدم'; setScoreDisplay(0); }
-      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(0); loadChatFeed(); syncActivePlayers(); }
+      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(Math.round(player.worldX)); loadChatFeed(); syncActivePlayers(); }
       else { goalLabel.textContent = 'النقاط'; setScoreDisplay(0); }
 
       endScreen.style.display = 'none'; shopModal.style.display = 'none';
@@ -1124,22 +1083,28 @@
       ctx.restore();
     }
 
+    function getActiveBubble(id, username) {
+      const now = Date.now();
+      if (playerBubbles[id] && playerBubbles[id].until > now) return playerBubbles[id].text;
+      if (username && bubblesByName[username] && bubblesByName[username].until > now) return bubblesByName[username].text;
+      return '';
+    }
+
     function drawPlayer() {
       const moving = currentMode === 'chat' ? (walkDir !== 0) : player.grounded;
-      const bubble = playerBubbles[accountId] && playerBubbles[accountId].until > Date.now() ? playerBubbles[accountId].text : '';
+      const bubble = getActiveBubble(accountId, currentUsername);
       const drawX = currentMode === 'chat' ? (canvas.width * 0.5 - player.width * 0.5) : player.x;
       drawCharacterSprite(drawX, player.y, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble);
     }
 
     function drawChatPlazaPlayers() {
-      const now = Date.now();
       let offscreenIndex = 0;
-      plazaPlayers.forEach(p => {
+      remoteAccounts.forEach((p, idx) => {
         const wx = Number(p.world_x);
-        const remoteWorldX = Number.isFinite(wx) ? wx : 0;
+        const remoteWorldX = Number.isFinite(wx) ? wx : ((idx + 1) * 65);
         let screenX = canvas.width * 0.5 + (remoteWorldX - player.worldX) - player.width * 0.5;
         const py = Math.min(groundY - 60, Math.max(40, Number(p.pos_y) || (groundY - 60)));
-        const bubble = playerBubbles[p.id] && playerBubbles[p.id].until > now ? playerBubbles[p.id].text : '';
+        const bubble = getActiveBubble(p.id, p.username);
 
         if (screenX < 20 || screenX > canvas.width - 54) {
           const side = screenX < 20 ? -1 : 1;
