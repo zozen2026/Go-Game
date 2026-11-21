@@ -3,23 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NC Go - Online War & Auto Accounts</title>
+  <title>NC Go - Fullscreen & Live Chat</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
-    body {
+    html, body {
+      width: 100%;
+      min-height: 100dvh;
       background-color: #121216;
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100dvh;
-      padding: 10px 0 28px;
       overflow-x: hidden;
     }
-    .top-bar { width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
+    body {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 10px 24px;
+      gap: 8px;
+    }
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
     .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .score-board { font-size: 0.9rem; font-weight: bold; background: #1e1e26; padding: 8px 11px; border-radius: 10px; border: 1px solid #333; }
     .coin-board { color: #fbbf24; border-color: #78350f; }
@@ -33,19 +42,98 @@
     .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
     .btn-sound.muted { opacity: 0.65; }
 
-    .game-container { position: relative; width: 95%; max-width: 800px; height: 360px; background: #0f172a; border: 2px solid #334155; border-radius: 16px; overflow: hidden; }
+    /* مساحة لعب ديناميكية تملأ الشاشة المتاحة */
+    .game-container {
+      position: relative;
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 56dvh;
+      height: calc(100dvh - 195px);
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+    }
     canvas { display: block; width: 100%; height: 100%; }
-    .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
+
+    .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.96); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
     .overlay-screen h2 { font-size: 1.5rem; margin-bottom: 4px; color: #f8fafc; }
     .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 14px; font-size: 0.9rem; }
-    .mode-cards { display: flex; gap: 10px; width: 100%; max-width: 740px; justify-content: center; flex-wrap: wrap; }
-    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 14px 12px; width: 170px; cursor: pointer; }
+    .mode-cards { display: flex; gap: 10px; width: 100%; max-width: 980px; justify-content: center; flex-wrap: wrap; }
+    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 14px 12px; width: 175px; cursor: pointer; }
     .mode-card:hover { border-color: #6366f1; background: #263349; }
     .mode-card .icon { font-size: 1.8rem; margin-bottom: 6px; }
     .mode-card h3 { font-size: 1rem; margin-bottom: 4px; color: #fff; }
     .mode-card p { font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; }
+
+    /* واجهة طور الدردشة مع اللاعبين داخل مساحة اللعب */
+    .chat-panel {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.96);
+      z-index: 22;
+      flex-direction: column;
+      padding: 14px;
+      gap: 10px;
+    }
+    .chat-panel.active { display: flex; }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chat-messages {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 6px 2px;
+    }
+    .chat-bubble {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px 12px;
+      max-width: 85%;
+      align-self: flex-start;
+      user-select: text;
+    }
+    .chat-bubble.mine {
+      background: #1d4ed8;
+      border-color: #3b82f6;
+      align-self: flex-end;
+    }
+    .chat-meta { font-size: 0.76rem; color: #cbd5e1; margin-bottom: 3px; font-weight: bold; }
+    .chat-text { font-size: 0.92rem; color: #fff; word-break: break-word; }
+    .chat-form { display: flex; gap: 8px; }
+    .chat-input {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 0.95rem;
+      user-select: text;
+    }
+    .btn-send-chat {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     @media (max-width: 680px) {
-      .game-container { height: 320px; }
+      .game-container { height: calc(100dvh - 235px); min-height: 52dvh; }
       .overlay-screen { justify-content: flex-start; padding: 14px 12px 22px; }
       .mode-cards { flex-direction: column; align-items: stretch; gap: 8px; }
       .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 10px 12px; gap: 10px; }
@@ -53,7 +141,7 @@
       .mode-card-text { display: flex; flex-direction: column; }
     }
 
-    .modal-box { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 35; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
+    .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 35; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
     .account-modal { border-color: #38bdf8; }
     .modal-box h3 { margin-bottom: 6px; font-size: 1.15rem; color: #fbbf24; }
     .account-modal h3 { color: #38bdf8; }
@@ -81,7 +169,7 @@
     .btn-restart { background: #10b981; }
     .btn-menu { background: #475569; }
 
-    .weapons-bar { display: none; margin-top: 10px; width: 95%; max-width: 800px; background: #1e1e26; border: 1px solid #475569; border-radius: 14px; padding: 10px 12px; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .weapons-bar { display: none; width: 100%; background: #1e1e26; border: 1px solid #475569; border-radius: 14px; padding: 10px 12px; justify-content: center; gap: 8px; flex-wrap: wrap; }
     .weapons-bar.active { display: flex; }
     .btn-weapon { border: none; border-radius: 11px; padding: 9px 12px; font-size: 0.88rem; font-weight: bold; cursor: pointer; color: #fff; transition: transform 0.1s, opacity 0.2s; }
     .btn-weapon:active { transform: scale(0.96); }
@@ -92,18 +180,18 @@
     .w-buy-rocket { background: #d97706; color: #000; box-shadow: 0 4px 0 #92400e; }
     .w-buy-tank { background: #059669; box-shadow: 0 4px 0 #065f46; }
 
-    .controls { margin-top: 12px; width: 95%; max-width: 800px; display: flex; justify-content: center; gap: 10px; }
-    .btn-jump { flex: 2; max-width: 320px; padding: 14px; background: #f59e0b; color: #000; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
-    .btn-stop-run { flex: 1; max-width: 170px; padding: 14px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
+    .controls { width: 100%; display: flex; justify-content: center; gap: 10px; }
+    .btn-jump { flex: 2; max-width: 360px; padding: 13px; background: #f59e0b; color: #000; font-size: 1.15rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
+    .btn-stop-run { flex: 1; max-width: 190px; padding: 13px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
 
-    .share-box { margin-top: 14px; width: 95%; max-width: 800px; background: #1e1e26; border: 1px solid #334155; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-    .share-label { font-size: 0.9rem; font-weight: bold; color: #e2e8f0; }
+    .share-box { width: 100%; background: #1e1e26; border: 1px solid #334155; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+    .share-label { font-size: 0.88rem; font-weight: bold; color: #e2e8f0; }
     .share-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .share-input { flex: 1; min-width: 210px; background: #0f172a; color: #93c5fd; border: 1px solid #334155; border-radius: 10px; padding: 9px 12px; font-size: 0.88rem; direction: ltr; text-align: left; user-select: text; }
-    .btn-copy, .btn-share-native { border: none; border-radius: 10px; padding: 9px 14px; font-size: 0.88rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .share-input { flex: 1; min-width: 210px; background: #0f172a; color: #93c5fd; border: 1px solid #334155; border-radius: 10px; padding: 8px 12px; font-size: 0.86rem; direction: ltr; text-align: left; user-select: text; }
+    .btn-copy, .btn-share-native { border: none; border-radius: 10px; padding: 8px 14px; font-size: 0.86rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
     .btn-copy { background: #334155; color: #fff; }
     .btn-share-native { background: #10b981; color: #fff; }
-    .share-status { font-size: 0.8rem; color: #34d399; min-height: 18px; }
+    .share-status { font-size: 0.78rem; color: #34d399; min-height: 16px; }
     .watermark { position: fixed; bottom: 4px; right: 12px; font-size: 11px; color: #64748b; }
   </style>
 </head>
@@ -126,8 +214,21 @@
     </div>
   </div>
 
-  <div class="game-container">
-    <canvas id="gameCanvas" width="800" height="360"></canvas>
+  <div class="game-container" id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-header">
+        <div>💬 <strong>الدردشة مع اللاعبين</strong> — تتحدث باسم: <span id="chatSenderBadge" style="color:#93c5fd;">...</span></div>
+        <button type="button" class="btn-top btn-modes" onclick="openModeMenu()">🎮 تغيير الطور</button>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <form class="chat-form" onsubmit="sendChatMessage(event)">
+        <input type="text" id="chatInput" class="chat-input" maxlength="220" placeholder="اكتب رسالتك للاعبين..." autocomplete="off">
+        <button type="submit" class="btn-send-chat">إرسال ➤</button>
+      </form>
+    </div>
+
     <div class="overlay-screen" id="modeMenu">
       <h2>اختر طور اللعب</h2>
       <p class="subtitle">حسابك التلقائي جاهز — اختر الطور المناسب</p>
@@ -147,6 +248,10 @@
         <div class="mode-card" onclick="startGame('war')">
           <div class="icon">⚔️</div>
           <div class="mode-card-text"><h3>4. حرب أونلاين</h3><p>مواجهة أونلاين عبر Supabase مع إطلاق فوري متزامن وشراء الصواريخ والدبابات!</p></div>
+        </div>
+        <div class="mode-card" onclick="startGame('chat')">
+          <div class="icon">💬</div>
+          <div class="mode-card-text"><h3>5. الدردشة مع اللاعبين</h3><p>تواصل مباشرة مع اللاعبين النشطين باسمك الفريد عبر Supabase!</p></div>
         </div>
       </div>
     </div>
@@ -191,7 +296,7 @@
     <button type="button" class="btn-weapon w-buy-tank" onclick="buyTank()">🛡️ شراء دبابة (25 🪙)</button>
   </div>
 
-  <div class="controls">
+  <div class="controls" id="gameControls">
     <button type="button" class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
     <button type="button" class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
   </div>
@@ -209,8 +314,11 @@
   <div class="watermark">NC Studio © 2026</div>
 
   <script>
+    const gameContainer = document.getElementById('gameContainer');
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const chatPanel = document.getElementById('chatPanel');
+    const gameControls = document.getElementById('gameControls');
     const goalLabel = document.getElementById('goalLabel');
     const scoreText = document.getElementById('scoreText');
     const coinText = document.getElementById('coinText');
@@ -234,6 +342,34 @@
       'Content-Type': 'application/json'
     };
 
+    let groundY = 300;
+    const RESCUE_TARGET_SCORE = 100;
+    const stars = Array.from({ length: 45 }, (_, i) => ({ x: (i * 97) % 1200, y: (i * 53) % 420, r: (i % 2) + 1.2 }));
+    const player = { x: 210, y: 240, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
+    const monster = { x: 45, y: 215, width: 65, height: 85 };
+    const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
+
+    function resizeCanvasToScreen() {
+      const rect = gameContainer.getBoundingClientRect();
+      const w = Math.max(320, Math.floor(rect.width));
+      const h = Math.max(240, Math.floor(rect.height));
+      if (canvas.width !== w || canvas.height !== h) {
+        const prevGround = groundY;
+        canvas.width = w;
+        canvas.height = h;
+        groundY = Math.max(180, canvas.height - 56);
+        const deltaGround = groundY - prevGround;
+        player.y = Math.min(groundY - player.height, player.y + deltaGround);
+        monster.y = groundY - monster.height;
+        friend.y = groundY - friend.height;
+        if (currentMode === 'war') {
+          tanks.forEach(t => { t.y = groundY - t.height; });
+        }
+        draw();
+      }
+    }
+    window.addEventListener('resize', resizeCanvasToScreen);
+
     const accountId = localStorage.getItem('ncgo_acc_id') || ('acc_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36));
     localStorage.setItem('ncgo_acc_id', accountId);
     let currentUsername = localStorage.getItem('ncgo_username') || '';
@@ -245,8 +381,10 @@
     }
 
     function updateAccountUi(msg = '') {
-      document.getElementById('accountNameDisplay').textContent = currentUsername || 'جاري الإنشاء...';
-      document.getElementById('modalCurrentName').textContent = currentUsername || 'جاري الإنشاء...';
+      const label = currentUsername || 'جاري الإنشاء...';
+      document.getElementById('accountNameDisplay').textContent = label;
+      document.getElementById('modalCurrentName').textContent = label;
+      document.getElementById('chatSenderBadge').textContent = label;
       if (msg) document.getElementById('accountMsg').textContent = msg;
     }
 
@@ -263,7 +401,6 @@
             return;
           }
         }
-
         for (let attempt = 0; attempt < 8; attempt++) {
           const candidate = currentUsername || generateUniqueCandidateName();
           const createRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts`, {
@@ -299,36 +436,21 @@
     async function changeAccountUsername() {
       const input = document.getElementById('newUsernameInput');
       const desired = (input.value || '').trim();
-      if (desired.length < 3) {
-        updateAccountUi('الاسم يجب أن يكون 3 أحرف على الأقل.');
-        return;
-      }
-      if (desired === currentUsername) {
-        updateAccountUi('هذا هو اسمك الحالي بالفعل.');
-        return;
-      }
-
+      if (desired.length < 3) return updateAccountUi('الاسم يجب أن يكون 3 أحرف على الأقل.');
+      if (desired === currentUsername) return updateAccountUi('هذا هو اسمك الحالي بالفعل.');
       try {
         const checkRes = await fetch(
           `${SUPABASE_URL}/rest/v1/accounts?username=eq.${encodeURIComponent(desired)}&id=neq.${encodeURIComponent(accountId)}&select=id`,
           { headers: sbHeaders }
         );
         const dupes = await checkRes.json();
-        if (Array.isArray(dupes) && dupes.length > 0) {
-          updateAccountUi('هذا الاسم مستخدم مسبقاً من لاعب آخر، اختر اسماً مختلفاً.');
-          return;
-        }
-
+        if (Array.isArray(dupes) && dupes.length > 0) return updateAccountUi('هذا الاسم مستخدم مسبقاً من لاعب آخر، اختر اسماً مختلفاً.');
         const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
           method: 'PATCH',
           headers: sbHeaders,
           body: JSON.stringify({ username: desired, last_seen: new Date().toISOString() })
         });
-        if (!patchRes.ok) {
-          updateAccountUi('تعذر حفظ الاسم (قد يكون مكرراً أو غير مسموح).');
-          return;
-        }
-
+        if (!patchRes.ok) return updateAccountUi('تعذر حفظ الاسم (قد يكون مكرراً أو غير مسموح).');
         currentUsername = desired;
         localStorage.setItem('ncgo_username', currentUsername);
         input.value = '';
@@ -346,7 +468,7 @@
         accountModal.style.display = 'block';
       } else {
         accountModal.style.display = 'none';
-        if (currentMode && !isGameOver && shopModal.style.display !== 'block') {
+        if (currentMode && currentMode !== 'chat' && !isGameOver && shopModal.style.display !== 'block') {
           isPaused = false;
           cancelAnimationFrame(animationId);
           animationId = requestAnimationFrame(update);
@@ -358,10 +480,7 @@
       try {
         await syncAccountHeartbeat();
         const cutoff = new Date(Date.now() - 45000).toISOString();
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id`,
-          { headers: sbHeaders }
-        );
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id`, { headers: sbHeaders });
         if (!res.ok) return;
         const rows = await res.json();
         const el = document.getElementById('onlineCount');
@@ -371,6 +490,56 @@
 
     ensureUniqueAccount().then(syncActivePlayers);
     setInterval(syncActivePlayers, 15000);
+
+    // نظام الدردشة المباشرة مع اللاعبين عبر chat_messages
+    let lastChatId = 0;
+    function renderChatMessages(rows) {
+      const box = document.getElementById('chatMessages');
+      if (!Array.isArray(rows) || rows.length === 0) return;
+      const shouldScroll = box.scrollTop + box.clientHeight >= box.scrollHeight - 40;
+      box.innerHTML = '';
+      rows.forEach(m => {
+        const isMine = m.sender_id === accountId;
+        const div = document.createElement('div');
+        div.className = 'chat-bubble' + (isMine ? ' mine' : '');
+        const timeStr = m.created_at ? new Date(m.created_at).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' }) : '';
+        div.innerHTML = `<div class="chat-meta">${m.sender_name || 'Player'} • ${timeStr}</div><div class="chat-text"></div>`;
+        div.querySelector('.chat-text').textContent = m.message || '';
+        box.appendChild(div);
+        if (typeof m.id === 'number' && m.id > lastChatId) lastChatId = m.id;
+      });
+      if (shouldScroll || box.scrollTop === 0) box.scrollTop = box.scrollHeight;
+    }
+
+    async function loadChatMessages() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=40`, { headers: sbHeaders });
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (Array.isArray(rows)) renderChatMessages(rows.reverse());
+      } catch (_) {}
+    }
+
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      if (!accountReady) await ensureUniqueAccount();
+      input.value = '';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
+          method: 'POST',
+          headers: sbHeaders,
+          body: JSON.stringify({ sender_id: accountId, sender_name: currentUsername || 'Player', message: text })
+        });
+        if (res.ok) await loadChatMessages();
+      } catch (_) {}
+    }
+
+    setInterval(() => {
+      if (currentMode === 'chat') loadChatMessages();
+    }, 2000);
 
     function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
     async function copyShareLink() {
@@ -442,13 +611,7 @@
       ]
     };
 
-    const groundY = 300, RESCUE_TARGET_SCORE = 100;
-    const stars = Array.from({ length: 35 }, (_, i) => ({ x: (i * 97) % 800, y: (i * 53) % 260, r: (i % 2) + 1.2 }));
-    const player = { x: 210, y: groundY - 60, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
-    const monster = { x: 45, y: groundY - 85, width: 65, height: 85 };
-    const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
     let obstacles = [], coinItems = [];
-
     let warMatchId = null, isHost = false, opponentName = 'خصم أونلاين', myWarHp = 150, oppWarHp = 150, lastSeenActionSeq = 0;
     let tanks = [], projectiles = [], flashes = [], laserBeamTimer = 0, rocketsAmmo = 2, cooldowns = { gun: 0, rocket: 0, laser: 0 };
 
@@ -520,7 +683,6 @@
         const r = rows[0];
         if (!isHost && r.player1_name) opponentName = r.player1_name;
         if (isHost && r.player2_name) opponentName = r.player2_name;
-
         const remoteHp = isHost ? r.player2_hp : r.player1_hp;
         if (typeof remoteHp === 'number') oppWarHp = remoteHp;
 
@@ -530,8 +692,9 @@
           if (actorId && actorId !== accountId) {
             const dmg = weaponType === 'laser' ? 28 : weaponType === 'rocket' ? 24 : 10;
             myWarHp = Math.max(0, myWarHp - dmg);
-            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: 630, y: groundY - 24, vx: -13, dmg: 0, radius: weaponType === 'rocket' ? 9 : 5 });
-            flashes.push({ x: 630, y: groundY - 24, color: weaponType === 'rocket' ? '#fb923c' : '#f87171', life: 8 });
+            const oppX = canvas.width - 170;
+            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: oppX, y: groundY - 24, vx: -13, dmg: 0, radius: weaponType === 'rocket' ? 9 : 5 });
+            flashes.push({ x: oppX, y: groundY - 24, color: weaponType === 'rocket' ? '#fb923c' : '#f87171', life: 8 });
             const hpPatch = isHost ? { player1_hp: myWarHp, updated_at: new Date().toISOString() } : { player2_hp: myWarHp, updated_at: new Date().toISOString() };
             await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(hpPatch) });
           }
@@ -562,10 +725,8 @@
       const count = kind === 'gun' ? 3 : 2;
       for (let i = 0; i < count; i++) {
         projectiles.push({
-          fromAlly: true,
-          kind,
-          x: x + i * 16,
-          y: y + (i - 1) * 4,
+          fromAlly: true, kind,
+          x: x + i * 16, y: y + (i - 1) * 4,
           vx: kind === 'rocket' ? 13 : 15,
           dmg: kind === 'rocket' ? 26 : 12,
           radius: kind === 'rocket' ? 9 : 5
@@ -602,8 +763,7 @@
         const hpField = isHost ? { player2_hp: oppWarHp } : { player1_hp: oppWarHp };
         try {
           await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, {
-            method: 'PATCH',
-            headers: sbHeaders,
+            method: 'PATCH', headers: sbHeaders,
             body: JSON.stringify({ ...hpField, last_action: `${accountId}:${type}`, action_seq: nextSeq, updated_at: new Date().toISOString() })
           });
         } catch (_) {}
@@ -612,14 +772,10 @@
 
     function saveProgress() {
       localStorage.setItem('gogame_coins', coins);
-      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts));
-      localStorage.setItem('gogame_eq_shirt', equippedShirt);
-      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats));
-      localStorage.setItem('gogame_eq_hat', equippedHat);
-      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs));
-      localStorage.setItem('gogame_eq_bg', equippedBg);
-      coinText.textContent = coins;
-      shopCoinText.textContent = coins;
+      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts)); localStorage.setItem('gogame_eq_shirt', equippedShirt);
+      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats)); localStorage.setItem('gogame_eq_hat', equippedHat);
+      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs)); localStorage.setItem('gogame_eq_bg', equippedBg);
+      coinText.textContent = coins; shopCoinText.textContent = coins;
     }
 
     function bindShopGrid(elId, list, ownedArr, setEq, getEq, renderCell) {
@@ -651,66 +807,64 @@
     }
 
     function toggleShopModal() {
-      if (!currentMode || isGameOver) return;
+      if (!currentMode || currentMode === 'chat' || isGameOver) return;
       const vis = shopModal.style.display === 'block';
-      if (!vis) {
-        isPaused = true;
-        renderShop();
-        shopModal.style.display = 'block';
-      } else {
-        shopModal.style.display = 'none';
-        isPaused = false;
-        cancelAnimationFrame(animationId);
-        animationId = requestAnimationFrame(update);
-      }
+      if (!vis) { isPaused = true; renderShop(); shopModal.style.display = 'block'; }
+      else { shopModal.style.display = 'none'; isPaused = false; cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update); }
     }
 
     function openModeMenu() {
-      isPaused = true;
-      cancelAnimationFrame(animationId);
-      shopModal.style.display = 'none';
-      accountModal.style.display = 'none';
-      endScreen.style.display = 'none';
-      modeMenu.style.display = 'flex';
-      modeMenu.scrollTop = 0;
+      isPaused = true; cancelAnimationFrame(animationId);
+      chatPanel.classList.remove('active');
+      shopModal.style.display = 'none'; accountModal.style.display = 'none'; endScreen.style.display = 'none';
+      modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0;
     }
 
     function startGame(mode) {
       getAudioCtx();
       currentMode = mode;
       modeMenu.style.display = 'none';
+      resizeCanvasToScreen();
+
+      if (mode === 'chat') {
+        isPaused = true;
+        cancelAnimationFrame(animationId);
+        weaponsBar.classList.remove('active');
+        warTeamStatus.style.display = 'none';
+        gameControls.style.display = 'none';
+        chatPanel.classList.add('active');
+        updateAccountUi();
+        loadChatMessages();
+        return;
+      }
+
+      chatPanel.classList.remove('active');
+      gameControls.style.display = 'flex';
       restartCurrentMode();
     }
 
     function restartCurrentMode() {
       isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
-      obstacles = []; coinItems = []; friend.active = false; friend.x = 860;
-      player.x = currentMode === 'monster' ? 210 : 120; player.y = groundY - player.height; player.dy = 0; player.grounded = true; monster.x = 45;
+      obstacles = []; coinItems = []; friend.active = false; friend.x = canvas.width + 80;
+      player.x = currentMode === 'monster' ? Math.min(240, Math.floor(canvas.width * 0.28)) : Math.min(160, Math.floor(canvas.width * 0.16));
+      player.y = groundY - player.height; player.dy = 0; player.grounded = true;
+      monster.x = 45; monster.y = groundY - monster.height;
 
       const isWar = currentMode === 'war';
       weaponsBar.classList.toggle('active', isWar);
       warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
 
-      if (isWar) {
-        goalLabel.textContent = 'القتلى';
-        setScoreDisplay(0);
-        joinOrCreateOnlineWar();
-      } else if (currentMode === 'rescue') {
-        goalLabel.textContent = 'التقدم';
-        setScoreDisplay(0);
-      } else {
-        goalLabel.textContent = 'النقاط';
-        setScoreDisplay(0);
-      }
+      if (isWar) { goalLabel.textContent = 'القتلى'; setScoreDisplay(0); joinOrCreateOnlineWar(); }
+      else if (currentMode === 'rescue') { goalLabel.textContent = 'التقدم'; setScoreDisplay(0); }
+      else { goalLabel.textContent = 'النقاط'; setScoreDisplay(0); }
 
-      endScreen.style.display = 'none';
-      shopModal.style.display = 'none';
-      cancelAnimationFrame(animationId);
-      animationId = requestAnimationFrame(update);
+      endScreen.style.display = 'none'; shopModal.style.display = 'none';
+      cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
     }
 
-    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
+    function jump() { if (!isGameOver && !isPaused && player.grounded && currentMode !== 'chat') { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
     window.addEventListener('keydown', e => {
+      if (currentMode === 'chat') return;
       if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
       if (currentMode === 'war') {
         if (e.key === '1') fireOnlineWeapon('gun');
@@ -729,7 +883,7 @@
       const scroll = frameCount * (currentMode === 'war' ? 2 : gameSpeed), sky = ctx.createLinearGradient(0, 0, 0, groundY);
       if (equippedBg === 'desert') { sky.addColorStop(0, '#ea580c'); sky.addColorStop(1, '#fde047'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#d97706'; for (let x = -((scroll * 0.25) % 260); x < canvas.width + 260; x += 260) { ctx.beginPath(); ctx.moveTo(x, groundY); ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY); ctx.fill(); } ctx.fillStyle = '#b45309'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#fbbf24'; }
       else if (equippedBg === 'forest') { sky.addColorStop(0, '#3b0764'); sky.addColorStop(1, '#1e1b4b'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); for (let x = -((scroll * 0.35) % 140); x < canvas.width + 140; x += 140) { ctx.fillStyle = '#14532d'; ctx.beginPath(); ctx.moveTo(x + 25, groundY - 85); ctx.lineTo(x, groundY); ctx.lineTo(x + 50, groundY); ctx.closePath(); ctx.fill(); } ctx.fillStyle = '#166534'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#4ade80'; }
-      else if (equippedBg === 'space') { sky.addColorStop(0, '#020617'); sky.addColorStop(1, '#172554'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#f8fafc'; stars.forEach(s => { const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width; ctx.beginPath(); ctx.arc(sx, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#0f172a'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#38bdf8'; }
+      else if (equippedBg === 'space') { sky.addColorStop(0, '#020617'); sky.addColorStop(1, '#172554'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#f8fafc'; stars.forEach(s => { const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width; const sy = s.y % Math.max(120, groundY - 20); ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#0f172a'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#38bdf8'; }
       else { sky.addColorStop(0, '#1e293b'); sky.addColorStop(1, '#0f172a'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#334155'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#475569'; }
       for (let x = -(scroll % 40); x < canvas.width; x += 40) ctx.fillRect(x, groundY + 10, 20, 4);
     }
@@ -746,6 +900,7 @@
     }
 
     function drawOnlineWarScene() {
+      const oppX = Math.max(260, canvas.width - 170);
       ctx.save();
       ctx.fillStyle = equippedShirt; ctx.fillRect(140, groundY - 34, 28, 24);
       ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(154, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
@@ -758,13 +913,13 @@
         ctx.fillStyle = '#14532d'; ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
       });
 
-      ctx.fillStyle = '#ef4444'; ctx.fillRect(630, groundY - 34, 28, 24);
-      ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(644, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(opponentName, 608, groundY - 58);
+      ctx.fillStyle = '#ef4444'; ctx.fillRect(oppX, groundY - 34, 28, 24);
+      ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(oppX + 14, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(opponentName, oppX - 22, groundY - 58);
 
       if (laserBeamTimer > 0) {
         ctx.fillStyle = 'rgba(167, 139, 250, 0.85)';
-        ctx.fillRect(170, groundY - 26, 465, 10);
+        ctx.fillRect(170, groundY - 26, Math.max(60, oppX - 170), 10);
       }
 
       flashes.forEach(f => {
@@ -829,26 +984,24 @@
     }
 
     function updateOnlineWar() {
+      const oppX = Math.max(260, canvas.width - 170);
       if (cooldowns.gun > 0) cooldowns.gun--;
       if (cooldowns.rocket > 0) cooldowns.rocket--;
       if (cooldowns.laser > 0) cooldowns.laser--;
       if (laserBeamTimer > 0) laserBeamTimer--;
 
-      for (let i = flashes.length - 1; i >= 0; i--) {
-        flashes[i].life--;
-        if (flashes[i].life <= 0) flashes.splice(i, 1);
-      }
+      for (let i = flashes.length - 1; i >= 0; i--) { flashes[i].life--; if (flashes[i].life <= 0) flashes.splice(i, 1); }
 
       for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
         p.x += p.vx;
         if (p.x < -20 || p.x > canvas.width + 20) { projectiles.splice(i, 1); continue; }
-        if (p.fromAlly && p.x >= 630) {
+        if (p.fromAlly && p.x >= oppX) {
           oppWarHp = Math.max(0, oppWarHp - p.dmg);
           setScoreDisplay(score + 5);
           coins += 1;
           saveProgress();
-          flashes.push({ x: 630, y: p.y, color: '#fbbf24', life: 6 });
+          flashes.push({ x: oppX, y: p.y, color: '#fbbf24', life: 6 });
           projectiles.splice(i, 1);
           updateWarUi();
           if (oppWarHp <= 0) { endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`); return; }
@@ -872,10 +1025,7 @@
       if (frameCount % 95 === 0) spawnObstacle();
       if (frameCount % 130 === 0) spawnCoinLine();
       if (frameCount % 450 === 0 && gameSpeed < 12) gameSpeed += 0.4;
-      if (frameCount % 12 === 0) {
-        setScoreDisplay(score + 1);
-        if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true;
-      }
+      if (frameCount % 12 === 0) { setScoreDisplay(score + 1); if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true; }
       if (currentMode === 'monster') {
         const hit = obstacles.some(o => o.x < player.x && o.x + o.width > monster.x);
         monster.x = hit ? monster.x + 1.4 : Math.max(45, monster.x - 0.35);
@@ -888,7 +1038,7 @@
     }
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); }); }
-    updateSoundButton(); saveProgress(); draw();
+    updateSoundButton(); saveProgress(); resizeCanvasToScreen(); draw();
   </script>
 </body>
 </html>
