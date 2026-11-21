@@ -110,7 +110,7 @@
 <body>
   <div class="top-bar">
     <div class="stats-group">
-      <div class="score-board" id="goalDisplay">النقاط: <span id="scoreText">0</span></div>
+      <div class="score-board" id="goalDisplay"><span id="goalLabel">النقاط</span>: <span id="scoreText">0</span></div>
       <div class="score-board coin-board">🪙 <span id="coinText">0</span></div>
       <div class="score-board online-board">🟢 نشط الآن: <span id="onlineCount">1</span></div>
       <div class="score-board acc-board">👤 <span id="accountNameDisplay">...</span></div>
@@ -119,10 +119,10 @@
       </div>
     </div>
     <div class="actions-group">
-      <button class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
-      <button class="btn-top btn-account" onclick="toggleAccountModal()">👤 الحساب</button>
-      <button class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر</button>
-      <button class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
+      <button type="button" class="btn-top btn-sound" id="soundBtn" onclick="toggleSound()">🔊</button>
+      <button type="button" class="btn-top btn-account" onclick="toggleAccountModal()">👤 الحساب</button>
+      <button type="button" class="btn-top btn-shop" onclick="toggleShopModal()">🛒 المتجر</button>
+      <button type="button" class="btn-top btn-modes" onclick="openModeMenu()">🎮 الأطوار</button>
     </div>
   </div>
 
@@ -146,7 +146,7 @@
         </div>
         <div class="mode-card" onclick="startGame('war')">
           <div class="icon">⚔️</div>
-          <div class="mode-card-text"><h3>4. حرب أونلاين</h3><p>مواجهة أونلاين عبر Supabase مع إطلاق جماعي وشراء الصواريخ والدبابات!</p></div>
+          <div class="mode-card-text"><h3>4. حرب أونلاين</h3><p>مواجهة أونلاين عبر Supabase مع إطلاق فوري متزامن وشراء الصواريخ والدبابات!</p></div>
         </div>
       </div>
     </div>
@@ -170,30 +170,30 @@
       <div class="shop-grid" id="hatsGrid"></div>
       <div class="shop-section-title">🖼️ الخلفيات</div>
       <div class="bg-grid" id="backgroundsGrid"></div>
-      <button class="btn-close" onclick="toggleShopModal()">متابعة الركض ▶️</button>
+      <button type="button" class="btn-close" onclick="toggleShopModal()">متابعة الركض ▶️</button>
     </div>
 
     <div class="end-screen" id="endScreen">
       <h2 id="endTitle">لقد خسرت!</h2>
       <p id="endMessage">مجموع نقاطك: 0</p>
       <div class="end-buttons">
-        <button class="btn-restart" onclick="restartCurrentMode()">العب مرة أخرى</button>
-        <button class="btn-menu" onclick="openModeMenu()">تغيير الطور</button>
+        <button type="button" class="btn-restart" onclick="restartCurrentMode()">العب مرة أخرى</button>
+        <button type="button" class="btn-menu" onclick="openModeMenu()">تغيير الطور</button>
       </div>
     </div>
   </div>
 
   <div class="weapons-bar" id="weaponsBar">
-    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireOnlineWeapon('gun')">🔫 إطلاق جماعي (مسدس)</button>
-    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireOnlineWeapon('rocket')">🚀 إطلاق صواريخ (<span id="btnRocketCount">2</span>)</button>
-    <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireOnlineWeapon('laser')">⚡ شعاع طاقة جماعي</button>
+    <button type="button" class="btn-weapon w-gun" id="btnGun" onclick="fireOnlineWeapon('gun')">🔫 إطلاق جماعي فوري (مسدس)</button>
+    <button type="button" class="btn-weapon w-rocket" id="btnRocket" onclick="fireOnlineWeapon('rocket')">🚀 إطلاق صواريخ فوري (<span id="btnRocketCount">2</span>)</button>
+    <button type="button" class="btn-weapon w-laser" id="btnLaser" onclick="fireOnlineWeapon('laser')">⚡ شعاع طاقة فوري</button>
     <button type="button" class="btn-weapon w-buy-rocket" onclick="buyRocket()">➕ شراء صاروخ (10 🪙)</button>
     <button type="button" class="btn-weapon w-buy-tank" onclick="buyTank()">🛡️ شراء دبابة (25 🪙)</button>
   </div>
 
   <div class="controls">
-    <button class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
-    <button class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
+    <button type="button" class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
+    <button type="button" class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
   </div>
 
   <div class="share-box">
@@ -209,13 +209,21 @@
   <div class="watermark">NC Studio © 2026</div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
-    const goalDisplay = document.getElementById('goalDisplay'), coinText = document.getElementById('coinText');
-    const shopCoinText = document.getElementById('shopCoinText'), modeMenu = document.getElementById('modeMenu');
-    const shopModal = document.getElementById('shopModal'), accountModal = document.getElementById('accountModal');
-    const endScreen = document.getElementById('endScreen'), endTitle = document.getElementById('endTitle');
-    const endMessage = document.getElementById('endMessage'), soundBtn = document.getElementById('soundBtn');
-    const weaponsBar = document.getElementById('weaponsBar'), warTeamStatus = document.getElementById('warTeamStatus');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const goalLabel = document.getElementById('goalLabel');
+    const scoreText = document.getElementById('scoreText');
+    const coinText = document.getElementById('coinText');
+    const shopCoinText = document.getElementById('shopCoinText');
+    const modeMenu = document.getElementById('modeMenu');
+    const shopModal = document.getElementById('shopModal');
+    const accountModal = document.getElementById('accountModal');
+    const endScreen = document.getElementById('endScreen');
+    const endTitle = document.getElementById('endTitle');
+    const endMessage = document.getElementById('endMessage');
+    const soundBtn = document.getElementById('soundBtn');
+    const weaponsBar = document.getElementById('weaponsBar');
+    const warTeamStatus = document.getElementById('warTeamStatus');
     const SHARE_URL = 'https://zozen2026.github.io/Go-Game/';
 
     const SUPABASE_URL = 'https://lzvtnfdgynwczrkwlwhf.supabase.co';
@@ -226,10 +234,10 @@
       'Content-Type': 'application/json'
     };
 
-    // إدارة الحساب التلقائي والاسم الفريد في جدول accounts
     const accountId = localStorage.getItem('ncgo_acc_id') || ('acc_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36));
     localStorage.setItem('ncgo_acc_id', accountId);
     let currentUsername = localStorage.getItem('ncgo_username') || '';
+    let accountReady = false;
 
     function generateUniqueCandidateName() {
       const rand = Math.floor(1000 + Math.random() * 9000);
@@ -245,36 +253,46 @@
     async function ensureUniqueAccount() {
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=id,username,coins`, { headers: sbHeaders });
-        const existing = await res.json();
-        if (Array.isArray(existing) && existing.length > 0) {
-          currentUsername = existing[0].username;
-          localStorage.setItem('ncgo_username', currentUsername);
-          updateAccountUi();
-          await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
-            method: 'PATCH',
-            headers: sbHeaders,
-            body: JSON.stringify({ last_seen: new Date().toISOString() })
-          });
-          return;
+        if (res.ok) {
+          const existing = await res.json();
+          if (Array.isArray(existing) && existing.length > 0) {
+            currentUsername = existing[0].username;
+            localStorage.setItem('ncgo_username', currentUsername);
+            accountReady = true;
+            updateAccountUi();
+            return;
+          }
         }
 
-        // إنشاء حساب جديد تلقائياً مع ضمان عدم تشابه الاسم
         for (let attempt = 0; attempt < 8; attempt++) {
           const candidate = currentUsername || generateUniqueCandidateName();
           const createRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts`, {
             method: 'POST',
             headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-            body: JSON.stringify({ id: accountId, username: candidate, coins: 30, last_seen: new Date().toISOString() })
+            body: JSON.stringify({ id: accountId, username: candidate, coins, last_seen: new Date().toISOString() })
           });
           if (createRes.ok) {
             const created = await createRes.json();
             currentUsername = (Array.isArray(created) && created[0]?.username) || candidate;
             localStorage.setItem('ncgo_username', currentUsername);
+            accountReady = true;
             updateAccountUi('تم إنشاء حسابك التلقائي باسم فريد.');
             return;
           }
           currentUsername = generateUniqueCandidateName();
         }
+      } catch (_) {}
+    }
+
+    async function syncAccountHeartbeat() {
+      if (!accountReady) await ensureUniqueAccount();
+      if (!accountReady) return;
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
+          method: 'PATCH',
+          headers: sbHeaders,
+          body: JSON.stringify({ coins, last_seen: new Date().toISOString() })
+        });
       } catch (_) {}
     }
 
@@ -330,20 +348,21 @@
         accountModal.style.display = 'none';
         if (currentMode && !isGameOver && shopModal.style.display !== 'block') {
           isPaused = false;
+          cancelAnimationFrame(animationId);
           animationId = requestAnimationFrame(update);
         }
       }
     }
 
-    // عداد النشطين الآن عبر accounts (آخر 45 ثانية)
     async function syncActivePlayers() {
       try {
-        await ensureUniqueAccount();
+        await syncAccountHeartbeat();
         const cutoff = new Date(Date.now() - 45000).toISOString();
         const res = await fetch(
           `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id`,
           { headers: sbHeaders }
         );
+        if (!res.ok) return;
         const rows = await res.json();
         const el = document.getElementById('onlineCount');
         if (el && Array.isArray(rows)) el.textContent = Math.max(1, rows.length);
@@ -430,9 +449,13 @@
     const friend = { active: false, x: 850, y: groundY - 65, width: 48, height: 65 };
     let obstacles = [], coinItems = [];
 
-    // حالة حرب الأونلاين عبر Supabase
     let warMatchId = null, isHost = false, opponentName = 'خصم أونلاين', myWarHp = 150, oppWarHp = 150, lastSeenActionSeq = 0;
-    let tanks = [], projectiles = [], laserBeamTimer = 0, rocketsAmmo = 2, cooldowns = { gun: 0, rocket: 0, laser: 0 };
+    let tanks = [], projectiles = [], flashes = [], laserBeamTimer = 0, rocketsAmmo = 2, cooldowns = { gun: 0, rocket: 0, laser: 0 };
+
+    function setScoreDisplay(val) {
+      score = val;
+      scoreText.textContent = currentMode === 'rescue' ? `${score} / ${RESCUE_TARGET_SCORE}` : score;
+    }
 
     function updateWarUi() {
       document.getElementById('warMatchState').textContent = warMatchId ? `ضد ${opponentName}` : 'بحث عن خصم...';
@@ -448,23 +471,27 @@
 
     async function joinOrCreateOnlineWar() {
       warMatchId = null; isHost = false; opponentName = 'في الانتظار...';
-      myWarHp = 150; oppWarHp = 150; lastSeenActionSeq = 0; tanks = []; projectiles = []; rocketsAmmo = 2;
+      myWarHp = 150; oppWarHp = 150; lastSeenActionSeq = 0; tanks = []; projectiles = []; flashes = []; rocketsAmmo = 2;
       updateWarUi();
       try {
         const openRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?status=eq.waiting&player1_id=neq.${encodeURIComponent(accountId)}&select=*&limit=1`, { headers: sbHeaders });
-        const openRooms = await openRes.json();
-        if (Array.isArray(openRooms) && openRooms.length > 0) {
-          const room = openRooms[0];
-          const joinRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(room.id)}`, {
-            method: 'PATCH',
-            headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-            body: JSON.stringify({ player2_id: accountId, player2_name: currentUsername || 'Player', status: 'active', updated_at: new Date().toISOString() })
-          });
-          const joined = await joinRes.json();
-          if (Array.isArray(joined) && joined[0]) {
-            warMatchId = joined[0].id; isHost = false; opponentName = joined[0].player1_name || 'خصم أونلاين';
-            updateWarUi();
-            return;
+        if (openRes.ok) {
+          const openRooms = await openRes.json();
+          if (Array.isArray(openRooms) && openRooms.length > 0) {
+            const room = openRooms[0];
+            const joinRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(room.id)}`, {
+              method: 'PATCH',
+              headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+              body: JSON.stringify({ player2_id: accountId, player2_name: currentUsername || 'Player', status: 'active', updated_at: new Date().toISOString() })
+            });
+            if (joinRes.ok) {
+              const joined = await joinRes.json();
+              if (Array.isArray(joined) && joined[0]) {
+                warMatchId = joined[0].id; isHost = false; opponentName = joined[0].player1_name || 'خصم أونلاين';
+                updateWarUi();
+                return;
+              }
+            }
           }
         }
         const newId = 'room_' + accountId + '_' + Date.now().toString(36);
@@ -473,10 +500,12 @@
           headers: { ...sbHeaders, 'Prefer': 'return=representation' },
           body: JSON.stringify({ id: newId, player1_id: accountId, player1_name: currentUsername || 'Player', player1_hp: 150, player2_hp: 150, status: 'waiting', updated_at: new Date().toISOString() })
         });
-        const created = await createRes.json();
-        if (Array.isArray(created) && created[0]) {
-          warMatchId = created[0].id; isHost = true;
-          updateWarUi();
+        if (createRes.ok) {
+          const created = await createRes.json();
+          if (Array.isArray(created) && created[0]) {
+            warMatchId = created[0].id; isHost = true;
+            updateWarUi();
+          }
         }
       } catch (_) {}
     }
@@ -485,6 +514,7 @@
       if (currentMode !== 'war' || !warMatchId || isPaused || isGameOver) return;
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}&select=*`, { headers: sbHeaders });
+        if (!res.ok) return;
         const rows = await res.json();
         if (!Array.isArray(rows) || !rows[0]) return;
         const r = rows[0];
@@ -500,7 +530,8 @@
           if (actorId && actorId !== accountId) {
             const dmg = weaponType === 'laser' ? 28 : weaponType === 'rocket' ? 24 : 10;
             myWarHp = Math.max(0, myWarHp - dmg);
-            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: 640, y: groundY - 24, vx: -9, dmg: 0, radius: weaponType === 'rocket' ? 8 : 5 });
+            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: 630, y: groundY - 24, vx: -13, dmg: 0, radius: weaponType === 'rocket' ? 9 : 5 });
+            flashes.push({ x: 630, y: groundY - 24, color: weaponType === 'rocket' ? '#fb923c' : '#f87171', life: 8 });
             const hpPatch = isHost ? { player1_hp: myWarHp, updated_at: new Date().toISOString() } : { player2_hp: myWarHp, updated_at: new Date().toISOString() };
             await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(hpPatch) });
           }
@@ -526,24 +557,45 @@
       sfx.buy(); saveProgress(); updateWarUi();
     }
 
+    function spawnImmediateBurst(x, y, kind) {
+      flashes.push({ x, y, color: kind === 'rocket' ? '#fb923c' : kind === 'laser' ? '#c084fc' : '#93c5fd', life: 8 });
+      const count = kind === 'gun' ? 3 : 2;
+      for (let i = 0; i < count; i++) {
+        projectiles.push({
+          fromAlly: true,
+          kind,
+          x: x + i * 16,
+          y: y + (i - 1) * 4,
+          vx: kind === 'rocket' ? 13 : 15,
+          dmg: kind === 'rocket' ? 26 : 12,
+          radius: kind === 'rocket' ? 9 : 5
+        });
+      }
+    }
+
     async function fireOnlineWeapon(type) {
       if (currentMode !== 'war' || isPaused || isGameOver) return;
       if (type === 'gun' && cooldowns.gun <= 0) {
-        projectiles.push({ fromAlly: true, kind: 'gun', x: 180, y: groundY - 24, vx: 11.5, dmg: 12, radius: 5 });
-        tanks.forEach(t => { if (t.alive) projectiles.push({ fromAlly: true, kind: 'gun', x: t.x + t.width, y: t.y + 12, vx: 11, dmg: 12, radius: 6 }); });
-        cooldowns.gun = 14; sfx.gun();
+        spawnImmediateBurst(175, groundY - 24, 'gun');
+        tanks.forEach(t => { if (t.alive) spawnImmediateBurst(t.x + t.width, t.y + 12, 'gun'); });
+        cooldowns.gun = 12; sfx.gun();
       } else if (type === 'rocket' && cooldowns.rocket <= 0 && rocketsAmmo > 0) {
         rocketsAmmo -= 1;
-        projectiles.push({ fromAlly: true, kind: 'rocket', x: 185, y: groundY - 26, vx: 9.5, dmg: 26, radius: 9 });
-        cooldowns.rocket = 35; sfx.rocket();
+        spawnImmediateBurst(180, groundY - 26, 'rocket');
+        tanks.forEach(t => { if (t.alive) spawnImmediateBurst(t.x + t.width, t.y + 10, 'rocket'); });
+        cooldowns.rocket = 30; sfx.rocket();
       } else if (type === 'laser' && cooldowns.laser <= 0) {
-        laserBeamTimer = 14; cooldowns.laser = 95; sfx.laser();
+        laserBeamTimer = 14; cooldowns.laser = 85; sfx.laser();
+        spawnImmediateBurst(180, groundY - 24, 'laser');
         oppWarHp = Math.max(0, oppWarHp - (24 + tanks.filter(t => t.alive).length * 6));
-        score += 10; coins += 2; saveProgress();
-        const el = document.getElementById('scoreText'); if (el) el.textContent = score;
+        setScoreDisplay(score + 10);
+        coins += 2;
+        saveProgress();
       } else return;
 
       updateWarUi();
+      draw();
+
       if (warMatchId) {
         const nextSeq = lastSeenActionSeq + 1;
         lastSeenActionSeq = nextSeq;
@@ -560,10 +612,14 @@
 
     function saveProgress() {
       localStorage.setItem('gogame_coins', coins);
-      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts)); localStorage.setItem('gogame_eq_shirt', equippedShirt);
-      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats)); localStorage.setItem('gogame_eq_hat', equippedHat);
-      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs)); localStorage.setItem('gogame_eq_bg', equippedBg);
-      coinText.textContent = coins; shopCoinText.textContent = coins;
+      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts));
+      localStorage.setItem('gogame_eq_shirt', equippedShirt);
+      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats));
+      localStorage.setItem('gogame_eq_hat', equippedHat);
+      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs));
+      localStorage.setItem('gogame_eq_bg', equippedBg);
+      coinText.textContent = coins;
+      shopCoinText.textContent = coins;
     }
 
     function bindShopGrid(elId, list, ownedArr, setEq, getEq, renderCell) {
@@ -597,14 +653,37 @@
     function toggleShopModal() {
       if (!currentMode || isGameOver) return;
       const vis = shopModal.style.display === 'block';
-      if (!vis) { isPaused = true; renderShop(); shopModal.style.display = 'block'; }
-      else { shopModal.style.display = 'none'; isPaused = false; animationId = requestAnimationFrame(update); }
+      if (!vis) {
+        isPaused = true;
+        renderShop();
+        shopModal.style.display = 'block';
+      } else {
+        shopModal.style.display = 'none';
+        isPaused = false;
+        cancelAnimationFrame(animationId);
+        animationId = requestAnimationFrame(update);
+      }
     }
-    function openModeMenu() { isPaused = true; cancelAnimationFrame(animationId); shopModal.style.display = 'none'; accountModal.style.display = 'none'; endScreen.style.display = 'none'; modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0; }
-    function startGame(mode) { getAudioCtx(); currentMode = mode; modeMenu.style.display = 'none'; restartCurrentMode(); }
+
+    function openModeMenu() {
+      isPaused = true;
+      cancelAnimationFrame(animationId);
+      shopModal.style.display = 'none';
+      accountModal.style.display = 'none';
+      endScreen.style.display = 'none';
+      modeMenu.style.display = 'flex';
+      modeMenu.scrollTop = 0;
+    }
+
+    function startGame(mode) {
+      getAudioCtx();
+      currentMode = mode;
+      modeMenu.style.display = 'none';
+      restartCurrentMode();
+    }
 
     function restartCurrentMode() {
-      isGameOver = false; isPaused = false; score = 0; gameSpeed = 6; frameCount = 0;
+      isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
       obstacles = []; coinItems = []; friend.active = false; friend.x = 860;
       player.x = currentMode === 'monster' ? 210 : 120; player.y = groundY - player.height; player.dy = 0; player.grounded = true; monster.x = 45;
 
@@ -613,16 +692,21 @@
       warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
 
       if (isWar) {
-        goalDisplay.innerHTML = `القتلى: <span id="scoreText">0</span>`;
+        goalLabel.textContent = 'القتلى';
+        setScoreDisplay(0);
         joinOrCreateOnlineWar();
       } else if (currentMode === 'rescue') {
-        goalDisplay.innerHTML = `التقدم: <span id="scoreText">0</span> / ${RESCUE_TARGET_SCORE}`;
+        goalLabel.textContent = 'التقدم';
+        setScoreDisplay(0);
       } else {
-        goalDisplay.innerHTML = `النقاط: <span id="scoreText">0</span>`;
+        goalLabel.textContent = 'النقاط';
+        setScoreDisplay(0);
       }
 
-      endScreen.style.display = 'none'; shopModal.style.display = 'none';
-      cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
+      endScreen.style.display = 'none';
+      shopModal.style.display = 'none';
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(update);
     }
 
     function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); } }
@@ -663,12 +747,10 @@
 
     function drawOnlineWarScene() {
       ctx.save();
-      // لاعبك في اليسار مع اسمه
       ctx.fillStyle = equippedShirt; ctx.fillRect(140, groundY - 34, 28, 24);
       ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(154, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(currentUsername || 'أنت', 125, groundY - 58);
 
-      // الدبابات المشتراة
       tanks.forEach(t => {
         if (!t.alive) return;
         ctx.fillStyle = '#15803d'; ctx.fillRect(t.x, t.y + 12, t.width, 16);
@@ -676,15 +758,19 @@
         ctx.fillStyle = '#14532d'; ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
       });
 
-      // الخصم الأونلاين في اليمين
       ctx.fillStyle = '#ef4444'; ctx.fillRect(630, groundY - 34, 28, 24);
       ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(644, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(opponentName, 608, groundY - 58);
 
       if (laserBeamTimer > 0) {
-        ctx.fillStyle = 'rgba(167, 139, 250, 0.8)';
+        ctx.fillStyle = 'rgba(167, 139, 250, 0.85)';
         ctx.fillRect(170, groundY - 26, 465, 10);
       }
+
+      flashes.forEach(f => {
+        ctx.fillStyle = f.color;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.life * 2.2, 0, Math.PI * 2); ctx.fill();
+      });
 
       projectiles.forEach(p => {
         ctx.fillStyle = p.fromAlly ? (p.kind === 'rocket' ? '#fb923c' : '#60a5fa') : '#f87171';
@@ -748,14 +834,21 @@
       if (cooldowns.laser > 0) cooldowns.laser--;
       if (laserBeamTimer > 0) laserBeamTimer--;
 
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        flashes[i].life--;
+        if (flashes[i].life <= 0) flashes.splice(i, 1);
+      }
+
       for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
         p.x += p.vx;
         if (p.x < -20 || p.x > canvas.width + 20) { projectiles.splice(i, 1); continue; }
         if (p.fromAlly && p.x >= 630) {
           oppWarHp = Math.max(0, oppWarHp - p.dmg);
-          score += 5; coins += 1; saveProgress();
-          const el = document.getElementById('scoreText'); if (el) el.textContent = score;
+          setScoreDisplay(score + 5);
+          coins += 1;
+          saveProgress();
+          flashes.push({ x: 630, y: p.y, color: '#fbbf24', life: 6 });
           projectiles.splice(i, 1);
           updateWarUi();
           if (oppWarHp <= 0) { endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`); return; }
@@ -779,7 +872,10 @@
       if (frameCount % 95 === 0) spawnObstacle();
       if (frameCount % 130 === 0) spawnCoinLine();
       if (frameCount % 450 === 0 && gameSpeed < 12) gameSpeed += 0.4;
-      if (frameCount % 12 === 0) { score++; const el = document.getElementById('scoreText'); if (el) el.textContent = score; if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true; }
+      if (frameCount % 12 === 0) {
+        setScoreDisplay(score + 1);
+        if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true;
+      }
       if (currentMode === 'monster') {
         const hit = obstacles.some(o => o.x < player.x && o.x + o.width > monster.x);
         monster.x = hit ? monster.x + 1.4 : Math.max(45, monster.x - 0.35);
