@@ -570,7 +570,7 @@
     let toastTimer = null;
     const RESCUE_TARGET_SCORE = 100;
     const stars = Array.from({ length: 45 }, (_, i) => ({ x: (i * 97) % 1200, y: (i * 53) % 420, r: (i % 2) + 1.2 }));
-    const player = { x: 210, y: 240, worldX: 0, worldY: 0, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true };
+    const player = { x: 210, y: 240, worldX: 0, worldY: 0, width: 34, height: 60, dy: 0, jumpPower: -13.5, gravity: 0.65, grounded: true, walkCycle: 0 };
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
@@ -1038,7 +1038,7 @@
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            await plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat });
+            await plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat, walkCycle: player.walkCycle });
           }
         });
     }
@@ -1136,6 +1136,7 @@
       player.y = groundY - player.height;
       player.dy = 0;
       player.grounded = true;
+      player.walkCycle = 0;
 
       monster.x = Math.max(12, player.x - 135);
       monster.y = groundY - monster.height;
@@ -1214,11 +1215,15 @@
       if (currentMode === 'chat') {
         if (walkDir !== 0) {
           player.worldX += walkDir * 4.4 * step;
+          player.walkCycle += 0.24 * step;
           if (plazaChannel && now - lastBroadcastAt > 120) {
             lastBroadcastAt = now;
-            plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat }).catch(() => {});
+            plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat, walkCycle: player.walkCycle }).catch(() => {});
           }
+        } else if (player.grounded) {
+          player.walkCycle = 0;
         }
+
         plazaCoins.forEach(c => {
           if (c.collectedAt && now - c.collectedAt > 6000) c.collectedAt = 0;
           if (!c.collectedAt) {
@@ -1260,6 +1265,11 @@
           warProjectiles.push({ fromMe: false, type: 'gun', x: canvas.width - 95, y: groundY - 34, vx: -9.5, dmg: 9 });
         }
         return;
+      }
+
+      // تحريك الساقين أثناء الركض في أطوار monster و rescue و coins
+      if (player.grounded) {
+        player.walkCycle += (0.18 + gameSpeed * 0.025) * step;
       }
 
       score += 0.14 * step;
@@ -1352,24 +1362,38 @@
       ctx.fillRect(0, groundY, canvas.width, 8);
     }
 
-    function drawCharacter(x, y, shirt, hat, label, bubbleText) {
+    function drawCharacter(x, y, shirt, hat, label, bubbleText, walkCycle = 0) {
+      const swing = Math.sin(walkCycle) * 6;
+      const liftLeft = Math.max(0, -Math.cos(walkCycle)) * 4;
+      const liftRight = Math.max(0, Math.cos(walkCycle)) * 4;
+
+      // الساق اليسرى والساق اليمنى المتحركتان
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.roundRect(x + 5 + swing, y + 46 - liftLeft, 9, 13, 4);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.roundRect(x + 20 - swing, y + 46 - liftRight, 9, 13, 4);
+      ctx.fill();
+
+      // الجسم
       ctx.fillStyle = shirt || '#3b82f6';
       ctx.beginPath();
       ctx.roundRect(x, y + 20, 34, 28, 7);
       ctx.fill();
 
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(x + 5, y + 48, 9, 12);
-      ctx.fillRect(x + 20, y + 48, 9, 12);
-
+      // الرأس
       ctx.fillStyle = '#fde68a';
       ctx.beginPath();
       ctx.arc(x + 17, y + 12, 12, 0, Math.PI * 2);
       ctx.fill();
 
+      // العيون
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(x + 20, y + 9, 3, 3);
 
+      // القبعة
       if (hat === 'cap') {
         ctx.fillStyle = '#ef4444';
         ctx.fillRect(x + 6, y - 1, 24, 6);
@@ -1412,7 +1436,7 @@
 
       const myB = playerBubbles[myAccountId] || bubblesByName[currentUsername];
       const myBubbleText = (myB && myB.exp > Date.now()) ? myB.text : '';
-      drawCharacter(player.x, player.y, equippedShirt, equippedHat, currentUsername, myBubbleText);
+      drawCharacter(player.x, player.y, equippedShirt, equippedHat, currentUsername, myBubbleText, player.walkCycle);
 
       if (currentMode === 'monster' && now < spawnGraceUntil) {
         ctx.strokeStyle = '#38bdf8';
@@ -1436,7 +1460,7 @@
       if (currentMode === 'rescue') {
         const progress = Math.min(1, score / RESCUE_TARGET_SCORE);
         const fx = canvas.width - 70 - (progress * (canvas.width - player.x - 120));
-        drawCharacter(fx, groundY - 60, '#10b981', 'cap', 'الصديق 🆘', '');
+        drawCharacter(fx, groundY - 60, '#10b981', 'cap', 'الصديق 🆘', '', 0);
       }
 
       if (currentMode === 'chat') {
@@ -1456,13 +1480,13 @@
           if (sx > -60 && sx < canvas.width + 60) {
             const b = playerBubbles[p.id] || bubblesByName[p.username];
             const bTxt = (b && b.exp > Date.now()) ? b.text : '';
-            drawCharacter(sx, p.y || (groundY - 60), p.shirt || '#a855f7', p.hat || 'none', p.username || 'Player', bTxt);
+            drawCharacter(sx, p.y || (groundY - 60), p.shirt || '#a855f7', p.hat || 'none', p.username || 'Player', bTxt, p.walkCycle || 0);
           }
         });
       }
 
       if (currentMode === 'war') {
-        drawCharacter(canvas.width - 90, groundY - 60, '#ef4444', 'crown', warMatchFound ? 'الخصم ⚔️' : 'روبوت الحرب', '');
+        drawCharacter(canvas.width - 90, groundY - 60, '#ef4444', 'crown', warMatchFound ? 'الخصم ⚔️' : 'روبوت الحرب', '', 0);
         warProjectiles.forEach(p => {
           ctx.fillStyle = p.type === 'rocket' ? '#f97316' : (p.type === 'laser' ? '#a855f7' : '#38bdf8');
           ctx.beginPath();
