@@ -22,21 +22,47 @@
       padding: 8px 10px 24px;
       gap: 8px;
     }
+
+    /* الشريط العلوي متناسق على جميع مقاسات الموبايل */
     .top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
-    .stats-group, .actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .score-board { font-size: 0.9rem; font-weight: bold; background: #050505; padding: 8px 11px; border-radius: 10px; border: 1px solid #333; }
+    .stats-group, .actions-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .score-board {
+      font-size: 0.78rem;
+      font-weight: bold;
+      background: #050505;
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px solid #333;
+      white-space: nowrap;
+    }
     .coin-board { color: #fbbf24; border-color: #78350f; }
     .online-board { color: #34d399; border-color: #065f46; }
     .acc-board { color: #93c5fd; border-color: #1e3a8a; }
     .war-board { color: #f87171; border-color: #7f1d1d; }
-    .btn-top { background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.88rem; font-weight: bold; cursor: pointer; }
+
+    .btn-top {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 7px 10px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
     .btn-shop { background: #eab308; color: #000; }
     .btn-modes { background: #334155; }
     .btn-account { background: #0284c7; color: #fff; }
@@ -45,9 +71,10 @@
     .btn-weather.active { display: inline-block; }
     .btn-respawn-top { background: #8b5cf6; color: #fff; display: none; }
     .btn-respawn-top.active { display: inline-block; }
-    .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 8px 10px; }
+    .btn-sound { background: #1e293b; border: 1px solid #475569; padding: 7px 9px; }
     .btn-sound.muted { opacity: 0.65; }
 
+    /* شريط الدردشة العلوي */
     .top-live-chat-bar {
       display: none;
       width: 100%;
@@ -62,7 +89,7 @@
     .top-live-chat-bar.active { display: flex; }
     .top-live-chat-input {
       flex: 1;
-      min-width: 180px;
+      min-width: 160px;
       padding: 8px 12px;
       border-radius: 9px;
       border: 1px solid #e7eaee;
@@ -77,7 +104,7 @@
       color: #fff;
       border: none;
       border-radius: 9px;
-      padding: 8px 15px;
+      padding: 8px 14px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -92,39 +119,19 @@
     }
     .btn-emote:hover { border-color: #fbbf24; }
 
+    /* حاوية اللعبة وقائمة الأطوار - ثابتة ومريحة على كل أحجام الهواتف */
     .game-container {
       position: relative;
       width: 100%;
       flex: 1 1 auto;
-      min-height: 56dvh;
-      height: calc(100dvh - 235px);
+      min-height: 52dvh;
+      height: calc(100dvh - 265px);
       background: #0f172a;
       border: 2px solid #334155;
       border-radius: 16px;
       overflow: hidden;
     }
     canvas { display: block; width: 100%; height: 100%; }
-
-    .chat-feed-mini {
-      display: none;
-      position: absolute;
-      bottom: 10px;
-      right: 12px;
-      max-width: min(92%, 420px);
-      max-height: 110px;
-      overflow-y: auto;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 12px;
-      padding: 7px 10px;
-      z-index: 18;
-      font-size: 0.8rem;
-      line-height: 1.4;
-      user-select: text;
-    }
-    .chat-feed-mini.active { display: block; }
-    .chat-line { margin-bottom: 3px; word-break: break-word; }
-    .chat-line strong { color: #93c5fd; }
 
     .toast-banner {
       display: none;
@@ -140,28 +147,82 @@
       font-weight: bold;
       z-index: 24;
       pointer-events: none;
+      white-space: nowrap;
     }
 
-    .overlay-screen { display: flex; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.96); flex-direction: column; align-items: center; justify-content: center; z-index: 25; padding: 16px; text-align: center; overflow-y: auto; }
-    .overlay-screen h2 { font-size: 1.5rem; margin-bottom: 4px; color: #f8fafc; }
-    .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 14px; font-size: 0.9rem; }
-    .mode-cards { display: flex; gap: 10px; width: 100%; max-width: 980px; justify-content: center; flex-wrap: wrap; }
-    .mode-card { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: 14px 12px; width: 175px; cursor: pointer; }
-    .mode-card:hover { border-color: #6366f1; background: #263349; }
-    .mode-card .icon { font-size: 1.8rem; margin-bottom: 6px; }
-    .mode-card h3 { font-size: 1rem; margin-bottom: 4px; color: #fff; }
+    /* شاشة اختيار الأطوار - تصميم عمودي موحد لكل الهواتف الصغيرة والكبيرة */
+    .overlay-screen {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.97);
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      z-index: 25;
+      padding: 14px 12px 20px;
+      text-align: center;
+      overflow-y: auto;
+      gap: 8px;
+    }
+    .overlay-screen h2 { font-size: 1.35rem; margin-bottom: 2px; color: #f8fafc; }
+    .overlay-screen p.subtitle { color: #94a3b8; margin-bottom: 6px; font-size: 0.82rem; }
+
+    .mode-cards {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 9px;
+      width: 100%;
+      max-width: 100%;
+    }
+    .mode-card {
+      width: 100%;
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 14px;
+      padding: 11px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      text-align: right;
+      gap: 12px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .mode-card:hover, .mode-card:active {
+      border-color: #6366f1;
+      background: #263349;
+    }
+    .mode-card-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+    .mode-card h3 { font-size: 0.98rem; margin-bottom: 3px; color: #fff; }
     .mode-card p { font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; }
+    .mode-card .icon { font-size: 1.7rem; flex-shrink: 0; line-height: 1; }
 
-    @media (max-width: 680px) {
-      .game-container { height: calc(100dvh - 280px); min-height: 50dvh; }
-      .overlay-screen { justify-content: flex-start; padding: 14px 12px 22px; }
-      .mode-cards { flex-direction: column; align-items: stretch; gap: 8px; }
-      .mode-card { width: 100%; display: flex; align-items: center; text-align: right; padding: 10px 12px; gap: 10px; }
-      .mode-card .icon { font-size: 1.7rem; margin-bottom: 0; flex-shrink: 0; }
-      .mode-card-text { display: flex; flex-direction: column; }
+    /* النوافذ المنبثقة */
+    .modal-box {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e26;
+      border: 2px solid #eab308;
+      padding: 16px;
+      border-radius: 14px;
+      z-index: 35;
+      text-align: center;
+      width: 92%;
+      max-width: 450px;
+      max-height: 88dvh;
+      overflow-y: auto;
     }
-
-    .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e26; border: 2px solid #eab308; padding: 16px; border-radius: 14px; z-index: 35; text-align: center; width: 92%; max-width: 450px; max-height: 90%; overflow-y: auto; }
     .account-modal { border-color: #38bdf8; }
     .friends-modal { border-color: #14b8a6; }
     .friends-modal h3 { color: #2dd4bf; }
@@ -196,89 +257,21 @@
       font-size: 0.88rem;
     }
     .friend-actions { display: flex; gap: 5px; align-items: center; }
-    .btn-mini-chat {
-      background: #0284c7;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 5px 9px;
-      font-size: 0.78rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .btn-mini-add {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 5px 10px;
-      font-size: 0.78rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .btn-mini-remove {
-      background: #ef4444;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 5px 10px;
-      font-size: 0.78rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .dm-panel {
-      display: none;
-      margin-top: 10px;
-      background: #0f172a;
-      border: 1px solid #38bdf8;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: right;
-    }
+    .btn-mini-chat { background: #0284c7; color: #fff; border: none; border-radius: 8px; padding: 5px 9px; font-size: 0.78rem; font-weight: bold; cursor: pointer; }
+    .btn-mini-add { background: #10b981; color: #fff; border: none; border-radius: 8px; padding: 5px 10px; font-size: 0.78rem; font-weight: bold; cursor: pointer; }
+    .btn-mini-remove { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 5px 10px; font-size: 0.78rem; font-weight: bold; cursor: pointer; }
+    .dm-panel { display: none; margin-top: 10px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 12px; padding: 10px; text-align: right; }
     .dm-panel.active { display: block; }
-    .dm-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.88rem;
-      color: #7dd3fc;
-      font-weight: bold;
-    }
-    .dm-messages {
-      max-height: 150px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin-bottom: 8px;
-      padding: 6px;
-      background: #020617;
-      border-radius: 8px;
-      user-select: text;
-    }
-    .dm-bubble {
-      padding: 6px 9px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      max-width: 85%;
-      word-break: break-word;
-    }
+    .dm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.88rem; color: #7dd3fc; font-weight: bold; }
+    .dm-messages { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; padding: 6px; background: #020617; border-radius: 8px; user-select: text; }
+    .dm-bubble { padding: 6px 9px; border-radius: 8px; font-size: 0.82rem; max-width: 85%; word-break: break-word; }
     .dm-bubble.mine { background: #1d4ed8; color: #fff; align-self: flex-start; }
     .dm-bubble.theirs { background: #1e293b; color: #e2e8f0; align-self: flex-end; }
     .dm-form { display: flex; gap: 6px; }
-    .dm-input {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #475569;
-      background: #020617;
-      color: #fff;
-      font-size: 0.86rem;
-      user-select: text;
-    }
+    .dm-input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #475569; background: #020617; color: #fff; font-size: 0.86rem; user-select: text; }
 
-    .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.84); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
+    /* شاشة النهاية */
+    .end-screen { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.86); flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
     .end-screen h2 { font-size: 1.7rem; margin-bottom: 10px; }
     .end-screen p { font-size: 1.05rem; margin-bottom: 18px; color: #e2e8f0; }
     .end-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
@@ -286,6 +279,7 @@
     .btn-restart { background: #10b981; }
     .btn-menu { background: #475569; }
 
+    /* شريط الأسلحة */
     .weapons-bar { display: none; width: 100%; background: #1e1e26; border: 1px solid #475569; border-radius: 14px; padding: 10px 12px; justify-content: center; gap: 8px; flex-wrap: wrap; }
     .weapons-bar.active { display: flex; }
     .btn-weapon { border: none; border-radius: 11px; padding: 9px 12px; font-size: 0.88rem; font-weight: bold; cursor: pointer; color: #fff; transition: transform 0.1s, opacity 0.2s; }
@@ -297,21 +291,100 @@
     .w-buy-rocket { background: #d97706; color: #000; box-shadow: 0 4px 0 #92400e; }
     .w-buy-tank { background: #059669; box-shadow: 0 4px 0 #065f46; }
 
-    .controls { width: 100%; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-    .btn-move { width: 64px; padding: 13px 0; background: #1e293b; color: #fff; border: 1px solid #475569; border-radius: 14px; font-size: 1.15rem; font-weight: bold; cursor: pointer; display: none; }
+    /* أزرار التحكم السفلية - مرتبة ومتساوية التناسق على جميع الهواتف */
+    .controls {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+    .btn-move {
+      width: 58px;
+      flex-shrink: 0;
+      padding: 13px 0;
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid #475569;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
     .btn-move.active { display: inline-block; }
-    .btn-jump { flex: 2; max-width: 340px; padding: 13px; background: #f59e0b; color: #000; font-size: 1.15rem; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #b45309; }
-    .btn-stop-run { flex: 1; max-width: 190px; padding: 13px; background: #3b82f6; color: #fff; font-size: 1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 5px 0 #1d4ed8; }
+    .btn-jump {
+      flex: 1.4;
+      min-width: 0;
+      padding: 13px 10px;
+      background: #f59e0b;
+      color: #000;
+      font-size: 1.05rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #b45309;
+      white-space: nowrap;
+    }
+    .btn-stop-run {
+      flex: 1;
+      min-width: 0;
+      padding: 13px 10px;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #1d4ed8;
+      white-space: nowrap;
+    }
 
+    /* صندوق المشاركة */
     .share-box { width: 100%; background: #1e1e26; border: 1px solid #334155; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
     .share-label { font-size: 0.88rem; font-weight: bold; color: #e2e8f0; }
     .share-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .share-input { flex: 1; min-width: 210px; background: #0f172a; color: #93c5fd; border: 1px solid #334155; border-radius: 10px; padding: 8px 12px; font-size: 0.86rem; direction: ltr; text-align: left; user-select: text; }
+    .share-input { flex: 1; min-width: 180px; background: #0f172a; color: #93c5fd; border: 1px solid #334155; border-radius: 10px; padding: 8px 12px; font-size: 0.86rem; direction: ltr; text-align: left; user-select: text; }
     .btn-copy, .btn-share-native { border: none; border-radius: 10px; padding: 8px 14px; font-size: 0.86rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
     .btn-copy { background: #334155; color: #fff; }
     .btn-share-native { background: #10b981; color: #fff; }
     .share-status { font-size: 0.78rem; color: #34d399; min-height: 16px; }
     .watermark { position: fixed; bottom: 4px; right: 12px; font-size: 11px; color: #64748b; }
+
+    /* التخطيط الشبكي للشاشات الكبيرة فقط (تابلت / لابتوب) */
+    @media (min-width: 768px) {
+      .game-container {
+        height: calc(100dvh - 235px);
+        min-height: 56dvh;
+      }
+      .overlay-screen {
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .mode-cards {
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: 980px;
+        justify-content: center;
+      }
+      .mode-card {
+        width: 185px;
+        flex-direction: column;
+        justify-content: flex-start;
+        text-align: center;
+        padding: 14px 12px;
+      }
+      .mode-card .icon { order: -1; font-size: 1.8rem; margin-bottom: 4px; }
+      .mode-card h3 { font-size: 1rem; margin-bottom: 4px; }
+      .mode-card p { font-size: 0.78rem; }
+      .controls { justify-content: center; }
+      .btn-jump { flex: 2; max-width: 340px; }
+      .btn-stop-run { flex: 1; max-width: 190px; }
+    }
   </style>
 </head>
 <body>
@@ -350,31 +423,30 @@
     <canvas id="gameCanvas"></canvas>
 
     <div class="toast-banner" id="toastBanner"></div>
-    <div class="chat-feed-mini" id="chatFeedMini"></div>
 
     <div class="overlay-screen" id="modeMenu">
       <h2>اختر طور اللعب</h2>
       <p class="subtitle">حسابك التلقائي جاهز — اختر الطور المناسب</p>
       <div class="mode-cards">
         <div class="mode-card" onclick="startGame('monster')">
-          <div class="icon">👾</div>
           <div class="mode-card-text"><h3>1. الهروب من الوحش</h3><p>اركض واقفز فوق العوائق قبل أن يمسك بك الوحش الغاضب!</p></div>
+          <div class="icon">👾</div>
         </div>
         <div class="mode-card" onclick="startGame('rescue')">
-          <div class="icon">🦸‍♂️</div>
           <div class="mode-card-text"><h3>2. إنقاذ الصديق</h3><p>تجاوز العوائق حتى تصل إلى 100 نقطة وتنقذ صديقك المحتجز!</p></div>
+          <div class="icon">🦸‍♂️</div>
         </div>
         <div class="mode-card" onclick="startGame('coins')">
-          <div class="icon">🪙</div>
           <div class="mode-card-text"><h3>3. جمع الأموال والمتجر</h3><p>اجمع العملات وتوقف عن الركض في أي وقت لشراء الملابس والخلفيات!</p></div>
+          <div class="icon">🪙</div>
         </div>
         <div class="mode-card" onclick="startGame('war')">
-          <div class="icon">⚔️</div>
           <div class="mode-card-text"><h3>4. حرب أونلاين</h3><p>مواجهة أونلاين عبر Supabase مع إطلاق فوري متزامن وشراء الصواريخ والدبابات!</p></div>
+          <div class="icon">⚔️</div>
         </div>
         <div class="mode-card" onclick="startGame('chat')">
-          <div class="icon">💬</div>
           <div class="mode-card-text"><h3>5. ساحة الدردشة اللامحدودة</h3><p>الجميع على الأرض، عملات متجددة، إيماءات، دردشة علوية، وأصدقاء!</p></div>
+          <div class="icon">💬</div>
         </div>
       </div>
     </div>
@@ -447,7 +519,7 @@
   <div class="controls" id="gameControls">
     <button type="button" class="btn-move" id="moveLeftBtn" onmousedown="setWalk(-1,true)" onmouseup="setWalk(-1,false)" onmouseleave="setWalk(-1,false)" ontouchstart="event.preventDefault();setWalk(-1,true)" ontouchend="setWalk(-1,false)">⬅️</button>
     <button type="button" class="btn-move" id="moveRightBtn" onmousedown="setWalk(1,true)" onmouseup="setWalk(1,false)" onmouseleave="setWalk(1,false)" ontouchstart="event.preventDefault();setWalk(1,true)" ontouchend="setWalk(1,false)">➡️</button>
-    <button type="button" class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="jump()">⬆️ قفز</button>
+    <button type="button" class="btn-jump" id="jumpBtn" onmousedown="jump()" ontouchstart="event.preventDefault();jump()">⬆️ قفز</button>
     <button type="button" class="btn-stop-run" id="pauseRunBtn" onclick="toggleShopModal()">⏸️ توقف / شراء</button>
   </div>
 
@@ -470,7 +542,6 @@
     const topLiveChatBar = document.getElementById('topLiveChatBar');
     const weatherBtn = document.getElementById('weatherBtn');
     const topRespawnBtn = document.getElementById('topRespawnBtn');
-    const chatFeedMini = document.getElementById('chatFeedMini');
     const toastBanner = document.getElementById('toastBanner');
     const moveLeftBtn = document.getElementById('moveLeftBtn');
     const moveRightBtn = document.getElementById('moveRightBtn');
@@ -493,11 +564,6 @@
 
     const SUPABASE_URL = 'https://lzvtnfdgynwczrkwlwhf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6dnRuZmRneW53Y3pya3dsd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDIxMTEsImV4cCI6MjEwNDcxODExMX0.w2hNlJ4SszyMBkUVjr1qiWNTTPxHMHkM9YOFtVP-pVI';
-    const sbHeaders = {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    };
     const sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     let groundY = 300;
@@ -508,11 +574,101 @@
     const monster = { x: 45, y: 215, width: 65, height: 85 };
     const friend = { active: false, x: 860, y: 235, width: 48, height: 65 };
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
-    let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastPosSyncAt = 0, lastBroadcastAt = 0;
+    let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastBroadcastAt = 0;
     let plazaChannel = null;
     let plazaCoins = [];
     const weatherModes = ['day', 'sunset', 'night'];
     let plazaWeather = 'day';
+
+    let currentMode = null;
+    let isGameRunning = false;
+    let isPaused = false;
+    let animFrameId = null;
+    let lastFrameTime = 0;
+    let spawnGraceUntil = 0;
+
+    let score = 0;
+    let gameSpeed = 5.2;
+    let obstacles = [];
+    let runnerCoins = [];
+    let nextObstacleTimer = 0;
+    let nextCoinTimer = 0;
+
+    let coins = parseInt(localStorage.getItem('ncgo_coins') || '50', 10);
+    let ownedShirts = JSON.parse(localStorage.getItem('ncgo_shirts') || '["#3b82f6"]');
+    let ownedHats = JSON.parse(localStorage.getItem('ncgo_hats') || '["none"]');
+    let ownedBgs = JSON.parse(localStorage.getItem('ncgo_bgs') || '["sky"]');
+    let equippedShirt = localStorage.getItem('ncgo_eq_shirt') || '#3b82f6';
+    let equippedHat = localStorage.getItem('ncgo_eq_hat') || 'none';
+    let equippedBg = localStorage.getItem('ncgo_eq_bg') || 'sky';
+
+    let myWarHp = 150;
+    let oppWarHp = 150;
+    let rocketAmmo = 2;
+    let tankCount = 0;
+    let warProjectiles = [];
+    let warChannel = null;
+    let warMatchFound = false;
+
+    const myAccountId = localStorage.getItem('ncgo_acc_id') || ('acc_' + Math.random().toString(36).slice(2, 10));
+    localStorage.setItem('ncgo_acc_id', myAccountId);
+    let currentUsername = localStorage.getItem('ncgo_username') || ('Player_' + Math.floor(10000 + Math.random() * 89999));
+    localStorage.setItem('ncgo_username', currentUsername);
+
+    let soundEnabled = true;
+    const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+    function playTone(freq, type, dur, vol = 0.08) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+    const sfx = {
+      jump: () => playTone(440, 'sine', 0.14, 0.08),
+      coin: () => { playTone(760, 'triangle', 0.09, 0.08); setTimeout(() => playTone(980, 'triangle', 0.11, 0.08), 60); },
+      buy: () => playTone(620, 'sine', 0.16, 0.09),
+      hit: () => playTone(140, 'sawtooth', 0.25, 0.12),
+      win: () => { playTone(520, 'triangle', 0.12); setTimeout(() => playTone(660, 'triangle', 0.12), 110); setTimeout(() => playTone(880, 'triangle', 0.2), 220); },
+      shoot: () => playTone(320, 'square', 0.09, 0.07)
+    };
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+      soundBtn.classList.toggle('muted', !soundEnabled);
+    }
+
+    function showToast(msg) {
+      toastBanner.textContent = msg;
+      toastBanner.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toastBanner.style.display = 'none'; }, 2600);
+    }
+
+    function resizeCanvas() {
+      const rect = gameContainer.getBoundingClientRect();
+      canvas.width = Math.max(280, Math.floor(rect.width));
+      canvas.height = Math.max(240, Math.floor(rect.height));
+      groundY = Math.max(180, canvas.height - 54);
+      if (player.grounded || player.y + player.height > groundY) {
+        player.y = groundY - player.height;
+        player.dy = 0;
+        player.grounded = true;
+      }
+      monster.y = groundY - monster.height;
+      friend.y = groundY - friend.height;
+    }
+    window.addEventListener('resize', resizeCanvas);
 
     let friendsList = JSON.parse(localStorage.getItem('ncgo_friends') || '[]');
     let privateChats = JSON.parse(localStorage.getItem('ncgo_private_chats') || '{}');
@@ -523,49 +679,35 @@
       document.getElementById('friendsCountText').textContent = friendsList.length;
       renderFriendsModal();
     }
-
-    function savePrivateChats() {
-      localStorage.setItem('ncgo_private_chats', JSON.stringify(privateChats));
-    }
-
-    function isFriendName(name) {
-      if (!name) return false;
-      return friendsList.some(f => f.toLowerCase() === String(name).toLowerCase());
-    }
-
+    function savePrivateChats() { localStorage.setItem('ncgo_private_chats', JSON.stringify(privateChats)); }
+    function isFriendName(name) { return !!name && friendsList.some(f => f.toLowerCase() === String(name).toLowerCase()); }
     function addFriendByName(name) {
       const clean = (name || '').trim();
       if (!clean) return;
       if (clean === currentUsername) return showToast('لا يمكنك إضافة نفسك كصديق');
-      if (!friendsList.some(f => f.toLowerCase() === clean.toLowerCase())) {
+      if (!isFriendName(clean)) {
         friendsList.push(clean);
         saveFriendsList();
         sfx.buy();
         showToast(`تمت إضافة ${clean} إلى الأصدقاء ⭐`);
       }
     }
-
     function removeFriendByName(name) {
       friendsList = friendsList.filter(f => f.toLowerCase() !== String(name).toLowerCase());
-      if (activeFriendChatName && activeFriendChatName.toLowerCase() === String(name).toLowerCase()) {
-        closeFriendChat();
-      }
+      if (activeFriendChatName && activeFriendChatName.toLowerCase() === String(name).toLowerCase()) closeFriendChat();
       saveFriendsList();
       showToast(`تمت إزالة ${name}`);
     }
-
     function addFriendFromInput() {
       const inp = document.getElementById('addFriendInput');
       addFriendByName(inp.value);
       inp.value = '';
     }
-
     function getFriendThread(friendName) {
       const key = String(friendName || '').toLowerCase();
       if (!privateChats[key]) privateChats[key] = [];
       return privateChats[key];
     }
-
     function renderFriendMessages() {
       const box = document.getElementById('dmMessagesBox');
       if (!box || !activeFriendChatName) return;
@@ -575,15 +717,13 @@
         return;
       }
       box.innerHTML = thread.map(m => {
-        const cls = m.mine ? 'mine' : 'theirs';
         const div = document.createElement('div');
-        div.className = `dm-bubble ${cls}`;
+        div.className = `dm-bubble ${m.mine ? 'mine' : 'theirs'}`;
         div.textContent = m.text;
         return div.outerHTML;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
-
     function openFriendChat(friendName) {
       if (!friendName) return;
       activeFriendChatName = friendName;
@@ -592,21 +732,17 @@
       renderFriendMessages();
       setTimeout(() => document.getElementById('dmInput').focus(), 40);
     }
-
     function closeFriendChat() {
       activeFriendChatName = '';
       friendDmPanel.classList.remove('active');
     }
-
     async function sendPrivateFriendMessage(e) {
       e.preventDefault();
       if (!activeFriendChatName) return;
       const inp = document.getElementById('dmInput');
       const text = (inp.value || '').trim();
       if (!text) return;
-      if (!accountReady) await ensureUniqueAccount();
       inp.value = '';
-
       const sender = currentUsername || 'Player';
       const key = activeFriendChatName.toLowerCase();
       if (!privateChats[key]) privateChats[key] = [];
@@ -614,28 +750,21 @@
       savePrivateChats();
       renderFriendMessages();
       sfx.buy();
-
-      const dmPayload = {
-        private_dm: {
-          from_username: sender,
-          to_username: activeFriendChatName,
-          text,
-          sent_at: Date.now()
-        }
-      };
       if (plazaChannel) {
-        plazaChannel.send({ type: 'broadcast', event: 'friend_dm', payload: dmPayload }).catch(() => {});
+        plazaChannel.send({
+          type: 'broadcast',
+          event: 'friend_dm',
+          payload: { private_dm: { from_username: sender, to_username: activeFriendChatName, text, sent_at: Date.now() } }
+        }).catch(() => {});
       }
     }
-
     function handleIncomingFriendDm(data) {
       const dm = data && data.private_dm;
       if (!dm || !dm.from_username || !dm.to_username || !dm.text) return;
       const myName = (currentUsername || '').toLowerCase();
       if (!myName || dm.to_username.toLowerCase() !== myName) return;
-
       const senderName = dm.from_username;
-      if (!friendsList.some(f => f.toLowerCase() === senderName.toLowerCase())) {
+      if (!isFriendName(senderName)) {
         friendsList.push(senderName);
         saveFriendsList();
       }
@@ -643,21 +772,15 @@
       if (!privateChats[key]) privateChats[key] = [];
       privateChats[key].push({ mine: false, text: dm.text, at: Date.now() });
       savePrivateChats();
-
-      if (friendsModal.style.display === 'block' && activeFriendChatName.toLowerCase() === key) {
-        renderFriendMessages();
-      } else {
-        showToast(`رسالة خاصة من ${senderName}: ${dm.text.slice(0, 28)}`);
-      }
+      if (friendsModal.style.display === 'block' && activeFriendChatName.toLowerCase() === key) renderFriendMessages();
+      else showToast(`رسالة خاصة من ${senderName}: ${dm.text.slice(0, 28)}`);
       sfx.coin();
     }
-
     function renderFriendsModal() {
       document.getElementById('friendsCountText').textContent = friendsList.length;
       const candBox = document.getElementById('plazaCandidatesList');
       const savedBox = document.getElementById('savedFriendsList');
       if (!candBox || !savedBox) return;
-
       if (remoteAccounts.length === 0) {
         candBox.innerHTML = '<div class="shop-info">لا يوجد لاعبون آخرون في الساحة حالياً.</div>';
       } else {
@@ -668,19 +791,16 @@
             <span>👤 ${p.username || 'Player'}</span>
             <div class="friend-actions">
               <button type="button" class="btn-mini-chat" onclick="openFriendChat('${safeName}')">💬 دردشة</button>
-              ${already
-                ? '<span class="item-owned">صديق ⭐</span>'
-                : `<button type="button" class="btn-mini-add" onclick="addFriendByName('${safeName}')">+ إضافة</button>`}
+              ${already ? '' : `<button type="button" class="btn-mini-add" onclick="addFriendByName('${safeName}')">➕ إضافة</button>`}
             </div>
           </div>`;
         }).join('');
       }
-
       if (friendsList.length === 0) {
-        savedBox.innerHTML = '<div class="shop-info">قائمة أصدقائك فارغة بعد.</div>';
+        savedBox.innerHTML = '<div class="shop-info">قائمة أصدقائك فارغة حالياً.</div>';
       } else {
         savedBox.innerHTML = friendsList.map(name => {
-          const safeName = String(name).replace(/'/g, '');
+          const safeName = name.replace(/'/g, '');
           return `<div class="friend-row">
             <span>⭐ ${name}</span>
             <div class="friend-actions">
@@ -692,1202 +812,714 @@
       }
     }
 
-    function toggleFriendsModal() {
-      const vis = friendsModal.style.display === 'block';
-      if (!vis) {
-        isPaused = true;
-        renderFriendsModal();
-        friendsModal.style.display = 'block';
-      } else {
-        friendsModal.style.display = 'none';
-        if (currentMode && !isGameOver && shopModal.style.display !== 'block' && accountModal.style.display !== 'block') {
-          isPaused = false;
-          cancelAnimationFrame(animationId);
-          animationId = requestAnimationFrame(update);
-        }
+    function toggleAccountModal() {
+      const open = accountModal.style.display === 'block';
+      accountModal.style.display = open ? 'none' : 'block';
+      if (!open) {
+        document.getElementById('modalCurrentName').textContent = currentUsername;
+        document.getElementById('newUsernameInput').value = currentUsername;
+        document.getElementById('accountMsg').textContent = '';
       }
     }
-
-    function showToast(msg) {
-      toastBanner.textContent = msg;
-      toastBanner.style.display = 'block';
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { toastBanner.style.display = 'none'; }, 2600);
-    }
-
-    function cyclePlazaWeather() {
-      const idx = weatherModes.indexOf(plazaWeather);
-      plazaWeather = weatherModes[(idx + 1) % weatherModes.length];
-      if (plazaWeather === 'day') weatherBtn.textContent = '🌅 نهار';
-      else if (plazaWeather === 'sunset') weatherBtn.textContent = '🌆 غروب';
-      else weatherBtn.textContent = '🌙 ليل';
+    function changeAccountUsername() {
+      const val = (document.getElementById('newUsernameInput').value || '').trim();
+      if (val.length < 2) {
+        document.getElementById('accountMsg').textContent = 'اكتب اسماً من حرفين على الأقل.';
+        return;
+      }
+      currentUsername = val;
+      localStorage.setItem('ncgo_username', currentUsername);
+      document.getElementById('accountNameDisplay').textContent = currentUsername;
+      document.getElementById('modalCurrentName').textContent = currentUsername;
+      document.getElementById('accountMsg').textContent = 'تم حفظ الاسم بنجاح ✅';
       sfx.buy();
-      draw();
+    }
+    function toggleFriendsModal() {
+      const open = friendsModal.style.display === 'block';
+      friendsModal.style.display = open ? 'none' : 'block';
+      if (!open) renderFriendsModal();
     }
 
-    function initPlazaCoins() {
-      plazaCoins = [];
-      for (let i = -8; i <= 8; i++) {
-        if (i === 0) continue;
-        plazaCoins.push({
-          id: 'pc_' + i + '_' + Math.random().toString(36).slice(2, 6),
-          worldX: i * 130,
-          collected: false
-        });
+    const SHIRTS = [
+      { id: '#3b82f6', name: 'أزرق كلاسيك', price: 0 },
+      { id: '#ef4444', name: 'أحمر ناري', price: 20 },
+      { id: '#10b981', name: 'أخضر زمردي', price: 30 },
+      { id: '#a855f7', name: 'بنفسجي ملكي', price: 45 },
+      { id: '#f59e0b', name: 'ذهبي لامع', price: 60 },
+      { id: '#111827', name: 'أسود النينجا', price: 80 }
+    ];
+    const HATS = [
+      { id: 'none', name: 'بدون قبعة', price: 0 },
+      { id: 'cap', name: 'كاب رياضي', price: 25 },
+      { id: 'crown', name: 'تاج ذهبي', price: 75 }
+    ];
+    const BACKGROUNDS = [
+      { id: 'sky', name: 'نهار صافٍ', price: 0, grad: 'linear-gradient(#38bdf8,#bae6fd)' },
+      { id: 'sunset', name: 'غروب دافئ', price: 35, grad: 'linear-gradient(#f97316,#fde047)' },
+      { id: 'night', name: 'ليل النجوم', price: 50, grad: 'linear-gradient(#090d16,#1e293b)' },
+      { id: 'forest', name: 'غابة خضراء', price: 65, grad: 'linear-gradient(#065f46,#6ee7b7)' }
+    ];
+
+    function saveShopState() {
+      localStorage.setItem('ncgo_coins', String(coins));
+      localStorage.setItem('ncgo_shirts', JSON.stringify(ownedShirts));
+      localStorage.setItem('ncgo_hats', JSON.stringify(ownedHats));
+      localStorage.setItem('ncgo_bgs', JSON.stringify(ownedBgs));
+      localStorage.setItem('ncgo_eq_shirt', equippedShirt);
+      localStorage.setItem('ncgo_eq_hat', equippedHat);
+      localStorage.setItem('ncgo_eq_bg', equippedBg);
+      coinText.textContent = coins;
+      shopCoinText.textContent = coins;
+    }
+
+    function renderShop() {
+      shopCoinText.textContent = coins;
+      document.getElementById('shirtsGrid').innerHTML = SHIRTS.map(s => {
+        const owned = ownedShirts.includes(s.id);
+        const eq = equippedShirt === s.id;
+        return `<div class="shop-item ${eq ? 'equipped' : ''}" onclick="buyOrEquip('shirt','${s.id}',${s.price})">
+          <div class="color-dot" style="background:${s.id}"></div>
+          <div>${s.name}</div>
+          <div class="${owned ? 'item-owned' : 'item-price'}">${eq ? 'مُجهّز ✅' : (owned ? 'مملوك' : s.price + ' 🪙')}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('hatsGrid').innerHTML = HATS.map(h => {
+        const owned = ownedHats.includes(h.id);
+        const eq = equippedHat === h.id;
+        return `<div class="shop-item ${eq ? 'equipped' : ''}" onclick="buyOrEquip('hat','${h.id}',${h.price})">
+          <div style="font-size:1.3rem;">${h.id === 'crown' ? '👑' : (h.id === 'cap' ? '🧢' : '🙂')}</div>
+          <div>${h.name}</div>
+          <div class="${owned ? 'item-owned' : 'item-price'}">${eq ? 'مُجهّز ✅' : (owned ? 'مملوك' : h.price + ' 🪙')}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('backgroundsGrid').innerHTML = BACKGROUNDS.map(b => {
+        const owned = ownedBgs.includes(b.id);
+        const eq = equippedBg === b.id;
+        return `<div class="shop-item ${eq ? 'equipped' : ''}" onclick="buyOrEquip('bg','${b.id}',${b.price})">
+          <div class="bg-preview" style="background:${b.grad}"></div>
+          <div>${b.name}</div>
+          <div class="${owned ? 'item-owned' : 'item-price'}">${eq ? 'مُجهّز ✅' : (owned ? 'مملوك' : b.price + ' 🪙')}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function buyOrEquip(type, id, price) {
+      if (type === 'shirt') {
+        if (!ownedShirts.includes(id)) {
+          if (coins < price) return showToast('عملاتك غير كافية!');
+          coins -= price; ownedShirts.push(id); sfx.buy();
+        }
+        equippedShirt = id;
+      } else if (type === 'hat') {
+        if (!ownedHats.includes(id)) {
+          if (coins < price) return showToast('عملاتك غير كافية!');
+          coins -= price; ownedHats.push(id); sfx.buy();
+        }
+        equippedHat = id;
+      } else if (type === 'bg') {
+        if (!ownedBgs.includes(id)) {
+          if (coins < price) return showToast('عملاتك غير كافية!');
+          coins -= price; ownedBgs.push(id); sfx.buy();
+        }
+        equippedBg = id;
       }
+      saveShopState();
+      renderShop();
     }
 
-    function getGroundCharacterY() {
-      return groundY - player.height;
-    }
-
-    function updateOnlineCounterUi() {
-      const el = document.getElementById('onlineCount');
-      if (!el) return;
-      el.textContent = currentMode === 'chat' ? Math.max(1, remoteAccounts.length + 1) : 1;
-    }
-
-    function removeRemotePlayer(id) {
-      if (!id) return;
-      remoteAccounts = remoteAccounts.filter(p => p.id !== id);
-      updateOnlineCounterUi();
-      draw();
+    function toggleShopModal() {
+      const opening = shopModal.style.display !== 'block';
+      shopModal.style.display = opening ? 'block' : 'none';
+      if (opening) {
+        isPaused = true;
+        renderShop();
+      } else {
+        isPaused = false;
+        lastFrameTime = performance.now();
+      }
     }
 
     function setWalk(dir, pressed) {
       if (dir === -1) walkLeftPressed = pressed;
       if (dir === 1) walkRightPressed = pressed;
-      if (walkLeftPressed && !walkRightPressed) walkDir = -1;
-      else if (walkRightPressed && !walkLeftPressed) walkDir = 1;
-      else walkDir = 0;
+      walkDir = (walkRightPressed ? 1 : 0) - (walkLeftPressed ? 1 : 0);
     }
 
-    function respawnPlayerInPlaza() {
-      if (currentMode !== 'chat') return;
-      player.worldX = Math.floor((Math.random() - 0.5) * 140);
-      player.worldY = 0;
-      player.y = getGroundCharacterY();
-      player.dy = 0;
-      player.grounded = true;
-      setScoreDisplay(Math.round(player.worldX));
-      sfx.jump();
-      broadcastPlazaPresence();
-      syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(player.y), in_chat: true });
-      draw();
-    }
-
-    function resizeCanvasToScreen() {
-      const rect = gameContainer.getBoundingClientRect();
-      const w = Math.max(320, Math.floor(rect.width));
-      const h = Math.max(240, Math.floor(rect.height));
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        groundY = Math.max(180, canvas.height - 56);
-        player.y = getGroundCharacterY();
-        if (currentMode !== 'chat') {
-          player.x = Math.min(Math.max(20, player.x), Math.max(20, canvas.width - player.width - 20));
-        }
-        monster.y = groundY - monster.height;
-        friend.y = groundY - friend.height;
-        if (currentMode === 'war') {
-          tanks.forEach(t => { t.y = groundY - t.height; });
-        }
-        draw();
-      }
-    }
-    window.addEventListener('resize', resizeCanvasToScreen);
-
-    const accountId = localStorage.getItem('ncgo_acc_id') || ('acc_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36));
-    localStorage.setItem('ncgo_acc_id', accountId);
-    let currentUsername = localStorage.getItem('ncgo_username') || '';
-    let accountReady = false;
-
-    function generateUniqueCandidateName() {
-      const rand = Math.floor(10000 + Math.random() * 90000);
-      return `Player_${rand}`;
-    }
-
-    function updateAccountUi(msg = '') {
-      const label = currentUsername || 'جاري الإنشاء...';
-      document.getElementById('accountNameDisplay').textContent = label;
-      document.getElementById('modalCurrentName').textContent = label;
-      if (msg) document.getElementById('accountMsg').textContent = msg;
-    }
-
-    async function ensureUniqueAccount() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=id,username,coins`, { headers: sbHeaders });
-        if (res.ok) {
-          const existing = await res.json();
-          if (Array.isArray(existing) && existing.length > 0) {
-            currentUsername = existing[0].username;
-            localStorage.setItem('ncgo_username', currentUsername);
-            accountReady = true;
-            updateAccountUi();
-            return;
-          }
-        }
-        for (let attempt = 0; attempt < 8; attempt++) {
-          const candidate = currentUsername || generateUniqueCandidateName();
-          const createRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts`, {
-            method: 'POST',
-            headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-            body: JSON.stringify({
-              id: accountId, username: candidate, coins,
-              shirt: equippedShirt, hat: equippedHat,
-              world_x: Math.round(player.worldX), world_y: Math.round(player.worldY),
-              pos_x: Math.round(player.x), pos_y: Math.round(getGroundCharacterY()),
-              in_chat: currentMode === 'chat', last_seen: new Date().toISOString()
-            })
-          });
-          if (createRes.ok) {
-            const created = await createRes.json();
-            currentUsername = (Array.isArray(created) && created[0]?.username) || candidate;
-            localStorage.setItem('ncgo_username', currentUsername);
-            accountReady = true;
-            updateAccountUi('تم إنشاء حسابك التلقائي باسم فريد.');
-            return;
-          }
-          currentUsername = generateUniqueCandidateName();
-        }
-      } catch (_) {}
-    }
-
-    async function syncAccountState(extra = {}) {
-      if (!accountReady) await ensureUniqueAccount();
-      if (!accountReady) return;
-      try {
-        const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
-          method: 'PATCH',
-          headers: sbHeaders,
-          body: JSON.stringify({
-            coins,
-            shirt: equippedShirt,
-            hat: equippedHat,
-            world_x: Math.round(player.worldX),
-            world_y: Math.round(player.worldY),
-            pos_x: Math.round(player.x),
-            pos_y: Math.round(getGroundCharacterY()),
-            in_chat: currentMode === 'chat',
-            last_seen: new Date().toISOString(),
-            ...extra
-          })
-        });
-        if (!patchRes.ok) {
-          await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
-            method: 'PATCH',
-            headers: sbHeaders,
-            body: JSON.stringify({ coins, last_seen: new Date().toISOString() })
-          });
-        }
-      } catch (_) {}
-    }
-
-    async function changeAccountUsername() {
-      const input = document.getElementById('newUsernameInput');
-      const desired = (input.value || '').trim();
-      if (desired.length < 2) return updateAccountUi('الاسم يجب أن يكون حرفين على الأقل.');
-      if (desired === currentUsername) return updateAccountUi('هذا هو اسمك الحالي بالفعل.');
-      try {
-        const checkRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?username=eq.${encodeURIComponent(desired)}&id=neq.${encodeURIComponent(accountId)}&select=id`,
-          { headers: sbHeaders }
-        );
-        const dupes = await checkRes.json();
-        if (Array.isArray(dupes) && dupes.length > 0) return updateAccountUi('هذا الاسم مستخدم مسبقاً من لاعب آخر، اختر اسماً مختلفاً.');
-        const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
-          method: 'PATCH',
-          headers: sbHeaders,
-          body: JSON.stringify({ username: desired, last_seen: new Date().toISOString() })
-        });
-        if (!patchRes.ok) return updateAccountUi('تعذر حفظ الاسم (قد يكون مكرراً أو غير مسموح).');
-        currentUsername = desired;
-        localStorage.setItem('ncgo_username', currentUsername);
-        input.value = '';
-        updateAccountUi('تم حفظ اسمك الجديد بنجاح!');
-        showToast(`أهلاً بك يا ${currentUsername}`);
-        broadcastPlazaPresence();
-      } catch (_) {
-        updateAccountUi('حدث خطأ أثناء الاتصال بقاعدة البيانات.');
+    function jump() {
+      if (!isGameRunning || isPaused) return;
+      if (player.grounded) {
+        player.dy = player.jumpPower;
+        player.grounded = false;
+        sfx.jump();
       }
     }
 
-    function toggleAccountModal() {
-      const vis = accountModal.style.display === 'block';
-      if (!vis) {
-        isPaused = true;
-        document.getElementById('accountMsg').textContent = '';
-        accountModal.style.display = 'block';
-        setTimeout(() => document.getElementById('newUsernameInput').focus(), 40);
-      } else {
-        accountModal.style.display = 'none';
-        if (currentMode && !isGameOver && shopModal.style.display !== 'block' && friendsModal.style.display !== 'block') {
-          isPaused = false;
-          cancelAnimationFrame(animationId);
-          animationId = requestAnimationFrame(update);
-        }
-      }
-    }
-
-    function upsertRemotePlayer(data) {
-      if (!data || !data.id || data.id === accountId) return;
-      if (data.in_chat === false || data.left === true) {
-        removeRemotePlayer(data.id);
-        return;
-      }
-      const idx = remoteAccounts.findIndex(p => p.id === data.id);
-      const existing = idx >= 0 ? remoteAccounts[idx] : null;
-      const parsedX = Number(data.world_x);
-      const nextWorldX = Number.isFinite(parsedX)
-        ? parsedX
-        : (existing ? existing.world_x : 0);
-
-      const entry = {
-        id: data.id,
-        username: data.username || (existing && existing.username) || 'Player',
-        shirt: data.shirt || (existing && existing.shirt) || '#3b82f6',
-        hat: data.hat || (existing && existing.hat) || 'none',
-        world_x: nextWorldX,
-        pos_y: getGroundCharacterY(),
-        updatedAt: Date.now()
-      };
-
-      if (idx >= 0) remoteAccounts[idx] = entry;
-      else remoteAccounts.push(entry);
-
-      updateOnlineCounterUi();
-    }
-
-    function broadcastPlazaPresence(extra = {}) {
-      if (currentMode !== 'chat' && !extra.left) return;
-      const payload = {
-        id: accountId,
-        username: currentUsername || 'Player',
-        shirt: equippedShirt,
-        hat: equippedHat,
-        world_x: Math.round(player.worldX),
-        pos_y: Math.round(getGroundCharacterY()),
-        in_chat: currentMode === 'chat' && !extra.left,
-        ...extra
-      };
-      if (plazaChannel) {
-        plazaChannel.send({
-          type: 'broadcast',
-          event: 'player_state',
-          payload
-        }).catch(() => {});
-      }
-    }
-
-    function notifyPlazaLeave() {
-      remoteAccounts = [];
-      updateOnlineCounterUi();
-      broadcastPlazaPresence({ left: true, in_chat: false });
-      try {
-        fetch(`${SUPABASE_URL}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}`, {
-          method: 'PATCH',
-          headers: sbHeaders,
-          body: JSON.stringify({ in_chat: false, last_seen: new Date().toISOString() }),
-          keepalive: true
-        }).catch(() => {});
-      } catch (_) {}
-    }
-
-    function setupPlazaRealtime() {
-      if (!sbClient || plazaChannel) return;
-      plazaChannel = sbClient.channel('ncgo-live-plaza-room', {
-        config: { broadcast: { self: false } }
-      });
-
-      plazaChannel
-        .on('broadcast', { event: 'player_state' }, ({ payload }) => {
-          if (!payload || currentMode !== 'chat') return;
-          upsertRemotePlayer(payload);
-          if (payload.collectedCoinId) {
-            const target = plazaCoins.find(c => c.id === payload.collectedCoinId);
-            if (target) target.collected = true;
-          }
-          if (payload.message) {
-            const until = Date.now() + 20000;
-            playerBubbles[payload.id] = { text: payload.message, until };
-            if (payload.username) bubblesByName[payload.username] = { text: payload.message, until };
-            appendMiniChatLine(payload.username || 'Player', payload.message);
-          }
-          draw();
-        })
-        .on('broadcast', { event: 'friend_dm' }, ({ payload }) => {
-          handleIncomingFriendDm(payload);
-        })
-        .subscribe(status => {
-          if (status === 'SUBSCRIBED' && currentMode === 'chat') {
-            broadcastPlazaPresence();
-          }
-        });
-    }
-
-    function appendMiniChatLine(sender, text) {
-      const div = document.createElement('div');
-      div.className = 'chat-line';
-      const strong = document.createElement('strong');
-      strong.textContent = `${isFriendName(sender) ? '⭐ ' : ''}${sender}: `;
-      div.appendChild(strong);
-      div.appendChild(document.createTextNode(text));
-      chatFeedMini.appendChild(div);
-      while (chatFeedMini.children.length > 8) {
-        chatFeedMini.removeChild(chatFeedMini.firstChild);
-      }
-      chatFeedMini.scrollTop = chatFeedMini.scrollHeight;
-    }
-
-    async function syncActivePlayers() {
-      setupPlazaRealtime();
-      if (currentMode !== 'chat') {
-        remoteAccounts = [];
-        updateOnlineCounterUi();
-        return;
-      }
-      broadcastPlazaPresence();
-      try {
-        await syncAccountState({ in_chat: true, pos_y: Math.round(getGroundCharacterY()) });
-        const cutoff = new Date(Date.now() - 35000).toISOString();
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/accounts?last_seen=gte.${encodeURIComponent(cutoff)}&select=id,username,shirt,hat,world_x,pos_y,in_chat,last_message`,
-          { headers: sbHeaders }
-        );
-        if (!res.ok) return;
-        const rows = await res.json();
-        if (Array.isArray(rows) && currentMode === 'chat') {
-          const now = Date.now();
-          rows.forEach(r => {
-            if (!r || !r.id || r.id === accountId) return;
-            if (r.in_chat === false) {
-              removeRemotePlayer(r.id);
-              return;
-            }
-            upsertRemotePlayer(r);
-            if (r.last_message) {
-              const until = now + 20000;
-              playerBubbles[r.id] = { text: r.last_message, until };
-              if (r.username) bubblesByName[r.username] = { text: r.last_message, until };
-            }
-          });
-          remoteAccounts = remoteAccounts.filter(p => now - (p.updatedAt || now) < 25000);
-          updateOnlineCounterUi();
-        }
-      } catch (_) {}
-    }
-
-    ensureUniqueAccount().then(syncActivePlayers);
-    setInterval(syncActivePlayers, 1000);
-    window.addEventListener('pagehide', notifyPlazaLeave);
-    window.addEventListener('beforeunload', notifyPlazaLeave);
-
-    function renderMiniChat(rows) {
-      if (!Array.isArray(rows)) return;
-      chatFeedMini.innerHTML = rows.slice(-6).map(m => {
-        const sender = m.sender_name || 'Player';
-        const div = document.createElement('div');
-        div.className = 'chat-line';
-        const strong = document.createElement('strong');
-        strong.textContent = `${isFriendName(sender) ? '⭐ ' : ''}${sender}: `;
-        div.appendChild(strong);
-        div.appendChild(document.createTextNode(m.message || ''));
-        return div.outerHTML;
-      }).join('');
-      chatFeedMini.scrollTop = chatFeedMini.scrollHeight;
-    }
-
-    async function loadChatFeed() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_messages?select=id,sender_id,sender_name,message,created_at&order=id.desc&limit=20`, { headers: sbHeaders });
-        if (!res.ok) return;
-        const rows = await res.json();
-        if (Array.isArray(rows)) {
-          const asc = rows.reverse();
-          renderMiniChat(asc);
-          asc.forEach(m => {
-            const until = Date.now() + 20000;
-            if (m.sender_id) playerBubbles[m.sender_id] = { text: m.message, until };
-            if (m.sender_name) bubblesByName[m.sender_name] = { text: m.message, until };
-          });
-        }
-      } catch (_) {}
-    }
-
-    async function publishChatText(text) {
-      const clean = (text || '').trim();
-      if (!clean) return;
-      if (!accountReady) await ensureUniqueAccount();
-      const sender = currentUsername || 'Player';
-      const until = Date.now() + 20000;
-      playerBubbles[accountId] = { text: clean, until };
-      bubblesByName[sender] = { text: clean, until };
-      appendMiniChatLine(sender, clean);
-      broadcastPlazaPresence({ message: clean });
-      draw();
-
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
-          method: 'POST',
-          headers: sbHeaders,
-          body: JSON.stringify({ sender_id: accountId, sender_name: sender, message: clean })
-        });
-        await syncAccountState({ last_message: clean, last_msg_at: new Date().toISOString(), in_chat: true });
-      } catch (_) {}
-    }
-
-    async function sendChatMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = (input.value || '').trim();
-      if (!text) return;
-      input.value = '';
-      await publishChatText(text);
-    }
-
-    function sendQuickEmote(emoji) {
-      if (currentMode !== 'chat') return;
-      sfx.buy();
-      publishChatText(emoji);
-    }
-
-    setInterval(() => {
-      if (currentMode === 'chat') loadChatFeed();
-    }, 1500);
-
-    function showShareStatus(msg) { const el = document.getElementById('shareStatus'); if (el) el.textContent = msg; }
-    async function copyShareLink() {
-      const input = document.getElementById('shareUrlInput');
-      if (input) { input.focus(); input.select(); }
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(SHARE_URL);
-        else document.execCommand('copy');
-        showShareStatus('تم نسخ الرابط بنجاح! يمكنك لصقه في واتساب أو تيليجرام أو سناب.');
-      } catch (_) { showShareStatus('حدد الرابط واضغط نسخ يدوياً.'); }
-    }
-    async function shareGameLink() {
-      if (navigator.share) {
-        try { await navigator.share({ title: 'NC Go', text: 'العب لعبة NC Go وشارك التحدي!', url: SHARE_URL }); return; }
-        catch (err) { if (err && err.name === 'AbortError') return; }
-      }
-      await copyShareLink();
-    }
-
-    let soundEnabled = localStorage.getItem('gogame_sfx') !== 'false', audioCtx = null;
-    function getAudioCtx() {
-      if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
-    }
-    function playTone(freq, endFreq, duration, type = 'sine', delay = 0, volume = 0.12) {
-      if (!soundEnabled) return;
-      const c = getAudioCtx(); if (!c) return;
-      const t = c.currentTime + delay, osc = c.createOscillator(), gain = c.createGain();
-      osc.type = type; osc.frequency.setValueAtTime(freq, t);
-      if (endFreq !== null) osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), t + duration);
-      gain.gain.setValueAtTime(volume, t); gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-      osc.connect(gain); gain.connect(c.destination); osc.start(t); osc.stop(t + duration);
-    }
-    const sfx = {
-      jump: () => playTone(260, 520, 0.13, 'triangle', 0, 0.12),
-      coin: () => { playTone(780, 980, 0.07, 'sine', 0, 0.11); playTone(1040, 1250, 0.09, 'sine', 0.06, 0.11); },
-      buy: () => { playTone(520, 680, 0.08, 'triangle', 0, 0.11); playTone(780, 920, 0.1, 'triangle', 0.07, 0.11); },
-      gun: () => playTone(640, 210, 0.09, 'square', 0, 0.08),
-      rocket: () => playTone(190, 65, 0.24, 'sawtooth', 0, 0.12),
-      laser: () => playTone(980, 320, 0.15, 'triangle', 0, 0.1),
-      win: () => { playTone(523, 523, 0.1, 'triangle', 0, 0.12); playTone(659, 659, 0.1, 'triangle', 0.1, 0.12); playTone(784, 1046, 0.22, 'triangle', 0.2, 0.13); },
-      lose: () => playTone(280, 110, 0.25, 'sawtooth', 0, 0.11)
-    };
-    function updateSoundButton() { soundBtn.textContent = soundEnabled ? '🔊' : '🔇'; soundBtn.classList.toggle('muted', !soundEnabled); }
-    function toggleSound() { soundEnabled = !soundEnabled; localStorage.setItem('gogame_sfx', soundEnabled); updateSoundButton(); if (soundEnabled) sfx.buy(); }
-
-    let currentMode = null, isPaused = true, isGameOver = false, score = 0;
-    let coins = parseInt(localStorage.getItem('gogame_coins')) || 30, gameSpeed = 6, frameCount = 0, animationId = null;
-    let ownedShirts = JSON.parse(localStorage.getItem('gogame_shirts')) || ['#3b82f6'], equippedShirt = localStorage.getItem('gogame_eq_shirt') || '#3b82f6';
-    let ownedHats = JSON.parse(localStorage.getItem('gogame_hats')) || ['none'], equippedHat = localStorage.getItem('gogame_eq_hat') || 'none';
-    let ownedBgs = JSON.parse(localStorage.getItem('gogame_bgs')) || ['night'], equippedBg = localStorage.getItem('gogame_eq_bg') || 'night';
-
-    const shopCatalog = {
-      shirts: [
-        { id: '#3b82f6', name: 'أزرق كلاسيك', price: 0 }, { id: '#ef4444', name: 'أحمر ناري', price: 20 },
-        { id: '#10b981', name: 'أخضر زمردي', price: 30 }, { id: '#eab308', name: 'ذهبي ملكي', price: 50 },
-        { id: '#a855f7', name: 'بنفسجي', price: 70 }, { id: '#f97316', name: 'برتقالي', price: 90 }
-      ],
-      hats: [
-        { id: 'none', name: 'بدون قبعة', icon: '🚫', price: 0 }, { id: 'cap', name: 'كاب رياضي', icon: '🧢', price: 40 },
-        { id: 'crown', name: 'تاج البطل', icon: '👑', price: 100 }
-      ],
-      backgrounds: [
-        { id: 'night', name: 'ليل المدينة', price: 0, preview: 'linear-gradient(to bottom, #1e293b, #0f172a)' },
-        { id: 'desert', name: 'غروب الصحراء', price: 35, preview: 'linear-gradient(to bottom, #f97316, #fef08a)' },
-        { id: 'forest', name: 'غابة الشفق', price: 60, preview: 'linear-gradient(to bottom, #4c1d95, #1e1b4b)' },
-        { id: 'space', name: 'فضاء النجوم', price: 85, preview: 'linear-gradient(to bottom, #020617, #172554)' }
-      ]
-    };
-
-    let obstacles = [], coinItems = [];
-    let warMatchId = null, isHost = false, opponentName = 'خصم أونلاين', myWarHp = 150, oppWarHp = 150, lastSeenActionSeq = 0;
-    let tanks = [], projectiles = [], flashes = [], laserBeamTimer = 0, rocketsAmmo = 2, cooldowns = { gun: 0, rocket: 0, laser: 0 };
-
-    function setScoreDisplay(val) {
-      score = val;
-      scoreText.textContent = currentMode === 'rescue' ? `${score} / ${RESCUE_TARGET_SCORE}` : score;
-    }
-
-    function updateWarUi() {
-      document.getElementById('warMatchState').textContent = warMatchId ? `ضد ${opponentName}` : 'بحث عن خصم...';
-      document.getElementById('myWarHp').textContent = Math.max(0, myWarHp);
-      document.getElementById('oppWarHp').textContent = Math.max(0, oppWarHp);
-      document.getElementById('rocketAmmoText').textContent = rocketsAmmo;
-      document.getElementById('btnRocketCount').textContent = rocketsAmmo;
-      document.getElementById('tankCountText').textContent = tanks.filter(t => t.alive).length;
-      document.getElementById('btnGun').disabled = cooldowns.gun > 0;
-      document.getElementById('btnRocket').disabled = cooldowns.rocket > 0 || rocketsAmmo <= 0;
-      document.getElementById('btnLaser').disabled = cooldowns.laser > 0;
-    }
-
-    async function joinOrCreateOnlineWar() {
-      warMatchId = null; isHost = false; opponentName = 'في الانتظار...';
-      myWarHp = 150; oppWarHp = 150; lastSeenActionSeq = 0; tanks = []; projectiles = []; flashes = []; rocketsAmmo = 2;
-      updateWarUi();
-      try {
-        const openRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?status=eq.waiting&player1_id=neq.${encodeURIComponent(accountId)}&select=*&limit=1`, { headers: sbHeaders });
-        if (openRes.ok) {
-          const openRooms = await openRes.json();
-          if (Array.isArray(openRooms) && openRooms.length > 0) {
-            const room = openRooms[0];
-            const joinRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(room.id)}`, {
-              method: 'PATCH',
-              headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-              body: JSON.stringify({ player2_id: accountId, player2_name: currentUsername || 'Player', status: 'active', updated_at: new Date().toISOString() })
-            });
-            if (joinRes.ok) {
-              const joined = await joinRes.json();
-              if (Array.isArray(joined) && joined[0]) {
-                warMatchId = joined[0].id; isHost = false; opponentName = joined[0].player1_name || 'خصم أونلاين';
-                updateWarUi();
-                return;
-              }
-            }
-          }
-        }
-        const newId = 'room_' + accountId + '_' + Date.now().toString(36);
-        const createRes = await fetch(`${SUPABASE_URL}/rest/v1/war_matches`, {
-          method: 'POST',
-          headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-          body: JSON.stringify({ id: newId, player1_id: accountId, player1_name: currentUsername || 'Player', player1_hp: 150, player2_hp: 150, status: 'waiting', updated_at: new Date().toISOString() })
-        });
-        if (createRes.ok) {
-          const created = await createRes.json();
-          if (Array.isArray(created) && created[0]) {
-            warMatchId = created[0].id; isHost = true;
-            updateWarUi();
-          }
-        }
-      } catch (_) {}
-    }
-
-    async function pollOnlineWarRoom() {
-      if (currentMode !== 'war' || !warMatchId || isPaused || isGameOver) return;
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}&select=*`, { headers: sbHeaders });
-        if (!res.ok) return;
-        const rows = await res.json();
-        if (!Array.isArray(rows) || !rows[0]) return;
-        const r = rows[0];
-        if (!isHost && r.player1_name) opponentName = r.player1_name;
-        if (isHost && r.player2_name) opponentName = r.player2_name;
-        const remoteHp = isHost ? r.player2_hp : r.player1_hp;
-        if (typeof remoteHp === 'number') oppWarHp = remoteHp;
-
-        if (r.action_seq > lastSeenActionSeq && r.last_action) {
-          lastSeenActionSeq = r.action_seq;
-          const [actorId, weaponType] = String(r.last_action).split(':');
-          if (actorId && actorId !== accountId) {
-            const dmg = weaponType === 'laser' ? 28 : weaponType === 'rocket' ? 24 : 10;
-            myWarHp = Math.max(0, myWarHp - dmg);
-            const oppX = canvas.width - 170;
-            projectiles.push({ fromAlly: false, kind: weaponType || 'gun', x: oppX, y: groundY - 24, vx: -13, dmg: 0, radius: weaponType === 'rocket' ? 9 : 5 });
-            flashes.push({ x: oppX, y: groundY - 24, color: weaponType === 'rocket' ? '#fb923c' : '#f87171', life: 8 });
-            const hpPatch = isHost ? { player1_hp: myWarHp, updated_at: new Date().toISOString() } : { player2_hp: myWarHp, updated_at: new Date().toISOString() };
-            await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(hpPatch) });
-          }
-        }
-        updateWarUi();
-        if (oppWarHp <= 0) endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`);
-        else if (myWarHp <= 0) endGame(false, 'خسرت في الحرب الأونلاين! 💥', `تغلب عليك ${opponentName} | نقاطك: ${score}`);
-      } catch (_) {}
-    }
-    setInterval(pollOnlineWarRoom, 1800);
-
-    function buyRocket() {
-      if (currentMode !== 'war' || isPaused || isGameOver) return;
-      if (coins < 10) return showToast('تحتاج إلى 10 عملات لشراء صاروخ');
-      coins -= 10; rocketsAmmo += 1; sfx.buy(); saveProgress(); updateWarUi();
-    }
-
-    function buyTank() {
-      if (currentMode !== 'war' || isPaused || isGameOver) return;
-      if (coins < 25) return showToast('تحتاج إلى 25 عملة لشراء دبابة');
-      coins -= 25;
-      tanks.push({ x: 80 + (tanks.length % 3) * 56, y: groundY - 34, width: 48, height: 34, alive: true });
-      sfx.buy(); saveProgress(); updateWarUi();
-    }
-
-    function spawnImmediateBurst(x, y, kind) {
-      flashes.push({ x, y, color: kind === 'rocket' ? '#fb923c' : kind === 'laser' ? '#c084fc' : '#93c5fd', life: 8 });
-      const count = kind === 'gun' ? 3 : 2;
-      for (let i = 0; i < count; i++) {
-        projectiles.push({
-          fromAlly: true, kind,
-          x: x + i * 16, y: y + (i - 1) * 4,
-          vx: kind === 'rocket' ? 13 : 15,
-          dmg: kind === 'rocket' ? 26 : 12,
-          radius: kind === 'rocket' ? 9 : 5
-        });
-      }
-    }
-
-    async function fireOnlineWeapon(type) {
-      if (currentMode !== 'war' || isPaused || isGameOver) return;
-      if (type === 'gun' && cooldowns.gun <= 0) {
-        spawnImmediateBurst(175, groundY - 24, 'gun');
-        tanks.forEach(t => { if (t.alive) spawnImmediateBurst(t.x + t.width, t.y + 12, 'gun'); });
-        cooldowns.gun = 12; sfx.gun();
-      } else if (type === 'rocket' && cooldowns.rocket <= 0 && rocketsAmmo > 0) {
-        rocketsAmmo -= 1;
-        spawnImmediateBurst(180, groundY - 26, 'rocket');
-        tanks.forEach(t => { if (t.alive) spawnImmediateBurst(t.x + t.width, t.y + 10, 'rocket'); });
-        cooldowns.rocket = 30; sfx.rocket();
-      } else if (type === 'laser' && cooldowns.laser <= 0) {
-        laserBeamTimer = 14; cooldowns.laser = 85; sfx.laser();
-        spawnImmediateBurst(180, groundY - 24, 'laser');
-        oppWarHp = Math.max(0, oppWarHp - (24 + tanks.filter(t => t.alive).length * 6));
-        setScoreDisplay(score + 10);
-        coins += 2;
-        saveProgress();
-      } else return;
-
-      updateWarUi();
-      draw();
-
-      if (warMatchId) {
-        const nextSeq = lastSeenActionSeq + 1;
-        lastSeenActionSeq = nextSeq;
-        const hpField = isHost ? { player2_hp: oppWarHp } : { player1_hp: oppWarHp };
-        try {
-          await fetch(`${SUPABASE_URL}/rest/v1/war_matches?id=eq.${encodeURIComponent(warMatchId)}`, {
-            method: 'PATCH', headers: sbHeaders,
-            body: JSON.stringify({ ...hpField, last_action: `${accountId}:${type}`, action_seq: nextSeq, updated_at: new Date().toISOString() })
-          });
-        } catch (_) {}
-      }
-    }
-
-    function saveProgress() {
-      localStorage.setItem('gogame_coins', coins);
-      localStorage.setItem('gogame_shirts', JSON.stringify(ownedShirts)); localStorage.setItem('gogame_eq_shirt', equippedShirt);
-      localStorage.setItem('gogame_hats', JSON.stringify(ownedHats)); localStorage.setItem('gogame_eq_hat', equippedHat);
-      localStorage.setItem('gogame_bgs', JSON.stringify(ownedBgs)); localStorage.setItem('gogame_eq_bg', equippedBg);
-      coinText.textContent = coins; shopCoinText.textContent = coins;
-      syncAccountState();
-      broadcastPlazaPresence();
-    }
-
-    function bindShopGrid(elId, list, ownedArr, setEq, getEq, renderCell) {
-      const grid = document.getElementById(elId); grid.innerHTML = '';
-      list.forEach(item => {
-        const owned = ownedArr.includes(item.id), eq = getEq() === item.id;
-        const div = document.createElement('div');
-        div.className = 'shop-item' + (eq ? ' equipped' : '');
-        div.innerHTML = renderCell(item, owned, eq);
-        div.onclick = () => {
-          if (owned) { setEq(item.id); sfx.buy(); }
-          else if (coins >= item.price) { coins -= item.price; ownedArr.push(item.id); setEq(item.id); sfx.buy(); }
-          else return showToast('رصيدك من العملات لا يكفي');
-          saveProgress(); renderShop(); draw();
-        };
-        grid.appendChild(div);
-      });
-    }
-
-    function renderShop() {
-      shopCoinText.textContent = coins;
-      const badge = (o, e) => e ? '<span class="item-owned">مُرتدى ✓</span>' : o ? '<span class="item-owned">مملوك</span>' : '';
-      bindShopGrid('shirtsGrid', shopCatalog.shirts, ownedShirts, v => equippedShirt = v, () => equippedShirt,
-        (i, o, e) => `<div class="color-dot" style="background:${i.id}"></div><span>${i.name}</span>${badge(o, e) || `<span class="item-price">🪙 ${i.price}</span>`}`);
-      bindShopGrid('hatsGrid', shopCatalog.hats, ownedHats, v => equippedHat = v, () => equippedHat,
-        (i, o, e) => `<div style="font-size:1.3rem">${i.icon}</div><span>${i.name}</span>${badge(o, e) || `<span class="item-price">🪙 ${i.price}</span>`}`);
-      bindShopGrid('backgroundsGrid', shopCatalog.backgrounds, ownedBgs, v => equippedBg = v, () => equippedBg,
-        (i, o, e) => `<div class="bg-preview" style="background:${i.preview}"></div><span>${i.name}</span>${e ? '<span class="item-owned">مُفعّل ✓</span>' : o ? '<span class="item-owned">مملوك</span>' : `<span class="item-price">🪙 ${i.price}</span>`}`);
-    }
-
-    function toggleShopModal() {
-      if (!currentMode || isGameOver) return;
-      const vis = shopModal.style.display === 'block';
-      if (!vis) { isPaused = true; renderShop(); shopModal.style.display = 'block'; }
-      else { shopModal.style.display = 'none'; isPaused = false; cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update); }
-    }
-
-    function openModeMenu() {
-      const wasInChat = currentMode === 'chat';
-      isPaused = true; cancelAnimationFrame(animationId);
-      currentMode = null;
-      remoteAccounts = [];
-      walkDir = 0; walkLeftPressed = false; walkRightPressed = false;
-      topLiveChatBar.classList.remove('active');
-      weatherBtn.classList.remove('active');
-      topRespawnBtn.classList.remove('active');
-      chatFeedMini.classList.remove('active');
-      moveLeftBtn.classList.remove('active');
-      moveRightBtn.classList.remove('active');
-      shopModal.style.display = 'none'; accountModal.style.display = 'none'; friendsModal.style.display = 'none'; endScreen.style.display = 'none';
-      modeMenu.style.display = 'flex'; modeMenu.scrollTop = 0;
-      updateOnlineCounterUi();
-      if (wasInChat) notifyPlazaLeave();
-      else syncAccountState({ in_chat: false });
-      draw();
-    }
-
-    function startGame(mode) {
-      getAudioCtx();
-      currentMode = mode;
-      modeMenu.style.display = 'none';
-      resizeCanvasToScreen();
-      restartCurrentMode();
-    }
-
-    function restartCurrentMode() {
-      isGameOver = false; isPaused = false; gameSpeed = 6; frameCount = 0;
-      obstacles = []; coinItems = []; friend.active = false; friend.x = canvas.width + 80;
-      remoteAccounts = [];
-      initPlazaCoins();
-      player.worldX = currentMode === 'chat' ? Math.floor((Math.random() - 0.5) * 90) : 0;
-      player.worldY = 0;
-      player.x = currentMode === 'chat' ? Math.floor(canvas.width * 0.5) : (currentMode === 'monster' ? Math.min(240, Math.floor(canvas.width * 0.28)) : Math.min(160, Math.floor(canvas.width * 0.16)));
-      player.y = getGroundCharacterY(); player.dy = 0; player.grounded = true;
-      monster.x = 45; monster.y = groundY - monster.height;
-
-      const isWar = currentMode === 'war';
-      const isChat = currentMode === 'chat';
-      weaponsBar.classList.toggle('active', isWar);
-      warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
-      topLiveChatBar.classList.toggle('active', isChat);
-      weatherBtn.classList.toggle('active', isChat);
-      topRespawnBtn.classList.toggle('active', isChat);
-      chatFeedMini.classList.toggle('active', isChat);
-      moveLeftBtn.classList.toggle('active', isChat);
-      moveRightBtn.classList.toggle('active', isChat);
-
-      if (isWar) { goalLabel.textContent = 'القتلى'; setScoreDisplay(0); updateOnlineCounterUi(); joinOrCreateOnlineWar(); }
-      else if (currentMode === 'rescue') { goalLabel.textContent = 'التقدم'; setScoreDisplay(0); updateOnlineCounterUi(); }
-      else if (isChat) { goalLabel.textContent = 'الموقع X'; setScoreDisplay(Math.round(player.worldX)); updateOnlineCounterUi(); setupPlazaRealtime(); loadChatFeed(); syncActivePlayers(); }
-      else { goalLabel.textContent = 'النقاط'; setScoreDisplay(0); updateOnlineCounterUi(); }
-
-      endScreen.style.display = 'none'; shopModal.style.display = 'none';
-      cancelAnimationFrame(animationId); animationId = requestAnimationFrame(update);
-    }
-
-    function jump() { if (!isGameOver && !isPaused && player.grounded) { player.dy = player.jumpPower; player.grounded = false; sfx.jump(); broadcastPlazaPresence(); } }
-
-    window.addEventListener('keydown', e => {
-      if (
-        document.activeElement === document.getElementById('chatInput') ||
-        document.activeElement === document.getElementById('newUsernameInput') ||
-        document.activeElement === document.getElementById('addFriendInput') ||
-        document.activeElement === document.getElementById('dmInput')
-      ) return;
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); jump(); }
-      if (currentMode === 'chat') {
-        if (e.code === 'ArrowLeft' || e.code === 'KeyA') setWalk(-1, true);
-        if (e.code === 'ArrowRight' || e.code === 'KeyD') setWalk(1, true);
-        if (e.code === 'KeyR') respawnPlayerInPlaza();
-      }
-      if (currentMode === 'war') {
-        if (e.key === '1') fireOnlineWeapon('gun');
-        if (e.key === '2') fireOnlineWeapon('rocket');
-        if (e.key === '3') fireOnlineWeapon('laser');
-      }
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') setWalk(-1, true);
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') setWalk(1, true);
     });
-
-    window.addEventListener('keyup', e => {
+    window.addEventListener('keyup', (e) => {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') setWalk(-1, false);
       if (e.code === 'ArrowRight' || e.code === 'KeyD') setWalk(1, false);
     });
 
-    function spawnObstacle() { obstacles.push({ x: canvas.width + 20, y: groundY - (Math.floor(Math.random() * 25) + 30), width: 28, height: Math.floor(Math.random() * 25) + 30 }); }
-    function spawnCoinLine() {
-      const count = Math.floor(Math.random() * 3) + 3, high = Math.random() > 0.5;
-      for (let i = 0; i < count; i++) coinItems.push({ x: canvas.width + 20 + i * 34, y: high ? groundY - 95 : groundY - 35, radius: 10 });
+    function cyclePlazaWeather() {
+      const idx = (weatherModes.indexOf(plazaWeather) + 1) % weatherModes.length;
+      plazaWeather = weatherModes[idx];
+      const labels = { day: '🌅 نهار', sunset: '🌇 غروب', night: '🌙 ليل' };
+      weatherBtn.textContent = labels[plazaWeather];
     }
 
-    function drawFixedSocialPlazaBackground() {
-      const sky = ctx.createLinearGradient(0, 0, 0, groundY);
-      if (plazaWeather === 'sunset') {
-        sky.addColorStop(0, '#4c1d95');
-        sky.addColorStop(0.55, '#ea580c');
-        sky.addColorStop(1, '#fde047');
-      } else if (plazaWeather === 'night') {
-        sky.addColorStop(0, '#020617');
-        sky.addColorStop(0.6, '#0f172a');
-        sky.addColorStop(1, '#1e293b');
-      } else {
-        sky.addColorStop(0, '#0f172a');
-        sky.addColorStop(0.55, '#1e3a5f');
-        sky.addColorStop(1, '#38bdf8');
+    function respawnPlayerInPlaza() {
+      player.worldX = 0;
+      player.x = Math.min(210, Math.floor(canvas.width * 0.35));
+      player.y = groundY - player.height;
+      player.dy = 0;
+      player.grounded = true;
+      showToast('تمت إعادة رسبنة اللاعب 🔄');
+    }
+
+    function spawnPlazaCoins() {
+      plazaCoins = [];
+      for (let i = -8; i <= 14; i++) {
+        if (i === 0) continue;
+        plazaCoins.push({ worldX: i * 165, yOffset: (Math.abs(i) % 3) * 32, collectedAt: 0 });
       }
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, canvas.width, groundY);
+    }
 
-      const sunOffset = ((player.worldX * -0.08) % canvas.width + canvas.width) % canvas.width;
-      ctx.fillStyle = plazaWeather === 'night' ? 'rgba(226, 232, 240, 0.25)' : 'rgba(254, 240, 138, 0.25)';
-      ctx.beginPath(); ctx.arc(sunOffset, 75, 42, 0, Math.PI * 2); ctx.fill();
+    function sendChatMessage(e) {
+      e.preventDefault();
+      const inp = document.getElementById('chatInput');
+      const text = (inp.value || '').trim();
+      if (!text) return;
+      inp.value = '';
+      showBubbleAboveHead(currentUsername, myAccountId, text);
+      if (plazaChannel) {
+        plazaChannel.send({ type: 'broadcast', event: 'plaza_chat', payload: { id: myAccountId, username: currentUsername, text } }).catch(() => {});
+      }
+    }
+    function sendQuickEmote(em) {
+      showBubbleAboveHead(currentUsername, myAccountId, em);
+      if (plazaChannel) {
+        plazaChannel.send({ type: 'broadcast', event: 'plaza_chat', payload: { id: myAccountId, username: currentUsername, text: em } }).catch(() => {});
+      }
+    }
+    function showBubbleAboveHead(username, id, text) {
+      const exp = Date.now() + 5500;
+      if (id) playerBubbles[id] = { text, exp };
+      if (username) bubblesByName[username] = { text, exp };
+    }
 
-      const blockSpan = 120;
-      const startIndex = Math.floor((player.worldX - canvas.width) / blockSpan);
-      const endIndex = Math.ceil((player.worldX + canvas.width) / blockSpan);
-      for (let idx = startIndex; idx <= endIndex; idx++) {
-        const worldBx = idx * blockSpan;
-        const screenBx = canvas.width * 0.5 + (worldBx - player.worldX);
-        const bh = 55 + (Math.abs(idx * 23) % 60);
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
-        ctx.fillRect(screenBx, groundY - bh, 72, bh);
-        ctx.fillStyle = 'rgba(253, 224, 71, 0.45)';
-        for (let wy = groundY - bh + 10; wy < groundY - 12; wy += 16) {
-          ctx.fillRect(screenBx + 14, wy, 9, 8);
-          ctx.fillRect(screenBx + 42, wy, 9, 8);
-        }
+    function setupPlazaRealtime() {
+      if (!sbClient || plazaChannel) return;
+      plazaChannel = sbClient.channel('ncgo_plaza_v1', { config: { presence: { key: myAccountId } } });
+      plazaChannel
+        .on('presence', { event: 'sync' }, () => {
+          const state = plazaChannel.presenceState();
+          const list = [];
+          Object.keys(state).forEach(k => {
+            if (k !== myAccountId && state[k] && state[k][0]) list.push(state[k][0]);
+          });
+          remoteAccounts = list;
+          document.getElementById('onlineCount').textContent = list.length + 1;
+          renderFriendsModal();
+        })
+        .on('broadcast', { event: 'plaza_chat' }, ({ payload }) => {
+          if (payload && payload.id !== myAccountId) {
+            showBubbleAboveHead(payload.username || 'Player', payload.id, payload.text || '');
+          }
+        })
+        .on('broadcast', { event: 'friend_dm' }, ({ payload }) => {
+          handleIncomingFriendDm(payload);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat });
+          }
+        });
+    }
+
+    function updateWarHud() {
+      document.getElementById('myWarHp').textContent = Math.max(0, myWarHp);
+      document.getElementById('oppWarHp').textContent = Math.max(0, oppWarHp);
+      document.getElementById('rocketAmmoText').textContent = rocketAmmo;
+      document.getElementById('btnRocketCount').textContent = rocketAmmo;
+      document.getElementById('tankCountText').textContent = tankCount;
+    }
+    function buyRocket() {
+      if (coins < 10) return showToast('تحتاج 10 🪙 لشراء صاروخ');
+      coins -= 10; rocketAmmo += 1; saveShopState(); updateWarHud(); sfx.buy();
+    }
+    function buyTank() {
+      if (coins < 25) return showToast('تحتاج 25 🪙 لشراء دبابة');
+      coins -= 25; tankCount += 1; myWarHp += 40; saveShopState(); updateWarHud(); sfx.buy();
+    }
+    function fireOnlineWeapon(type) {
+      if (currentMode !== 'war' || !isGameRunning) return;
+      if (type === 'rocket') {
+        if (rocketAmmo <= 0) return showToast('نفدت الصواريخ! اشترِ صاروخاً من الشريط');
+        rocketAmmo -= 1;
+        updateWarHud();
+      }
+      const dmg = type === 'rocket' ? 28 : (type === 'laser' ? 18 : 10);
+      const speed = type === 'laser' ? 16 : (type === 'rocket' ? 11 : 13);
+      warProjectiles.push({ fromMe: true, type, x: player.x + player.width + 6, y: player.y + 24, vx: speed, dmg });
+      sfx.shoot();
+      if (warChannel) {
+        warChannel.send({ type: 'broadcast', event: 'war_shot', payload: { id: myAccountId, type, dmg } }).catch(() => {});
+      }
+    }
+    function setupWarRealtime() {
+      if (!sbClient) return;
+      if (warChannel) { sbClient.removeChannel(warChannel); warChannel = null; }
+      warChannel = sbClient.channel('ncgo_war_arena_v1', { config: { presence: { key: myAccountId } } });
+      warChannel
+        .on('presence', { event: 'sync' }, () => {
+          const keys = Object.keys(warChannel.presenceState()).filter(k => k !== myAccountId);
+          warMatchFound = keys.length > 0;
+          document.getElementById('warMatchState').textContent = warMatchFound ? 'خصم متصل ⚔️' : 'وضع التدريب (بوت)';
+        })
+        .on('broadcast', { event: 'war_shot' }, ({ payload }) => {
+          if (payload && payload.id !== myAccountId) {
+            warProjectiles.push({ fromMe: false, type: payload.type || 'gun', x: canvas.width - 95, y: groundY - 36, vx: -11, dmg: payload.dmg || 10 });
+          }
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') await warChannel.track({ id: myAccountId, username: currentUsername });
+        });
+    }
+
+    function openModeMenu() {
+      isGameRunning = false;
+      isPaused = false;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      endScreen.style.display = 'none';
+      shopModal.style.display = 'none';
+      modeMenu.style.display = 'flex';
+      weaponsBar.classList.remove('active');
+      warTeamStatus.style.display = 'none';
+      topLiveChatBar.classList.remove('active');
+      weatherBtn.classList.remove('active');
+      topRespawnBtn.classList.remove('active');
+      moveLeftBtn.classList.remove('active');
+      moveRightBtn.classList.remove('active');
+    }
+
+    function restartCurrentMode() {
+      if (currentMode) startGame(currentMode);
+      else openModeMenu();
+    }
+
+    function startGame(mode) {
+      resizeCanvas();
+      currentMode = mode;
+      modeMenu.style.display = 'none';
+      endScreen.style.display = 'none';
+      shopModal.style.display = 'none';
+
+      score = 0;
+      gameSpeed = 5.2;
+      obstacles = [];
+      runnerCoins = [];
+      warProjectiles = [];
+      walkDir = 0;
+      walkLeftPressed = false;
+      walkRightPressed = false;
+
+      const safePlayerX = Math.max(135, Math.min(220, Math.floor(canvas.width * 0.34)));
+      player.x = safePlayerX;
+      player.worldX = 0;
+      player.y = groundY - player.height;
+      player.dy = 0;
+      player.grounded = true;
+
+      monster.x = Math.max(12, player.x - 135);
+      monster.y = groundY - monster.height;
+      friend.active = (mode === 'rescue');
+      friend.x = canvas.width + 260;
+      friend.y = groundY - friend.height;
+
+      const now = performance.now();
+      spawnGraceUntil = now + 1600;
+      nextObstacleTimer = 1400;
+      nextCoinTimer = 900;
+      lastFrameTime = now;
+
+      const isChat = (mode === 'chat');
+      const isWar = (mode === 'war');
+
+      topLiveChatBar.classList.toggle('active', isChat);
+      weatherBtn.classList.toggle('active', isChat);
+      topRespawnBtn.classList.toggle('active', isChat);
+      moveLeftBtn.classList.toggle('active', isChat);
+      moveRightBtn.classList.toggle('active', isChat);
+      weaponsBar.classList.toggle('active', isWar);
+      warTeamStatus.style.display = isWar ? 'inline-block' : 'none';
+
+      if (mode === 'rescue') goalLabel.textContent = `الهدف (${RESCUE_TARGET_SCORE})`;
+      else if (mode === 'chat') goalLabel.textContent = 'الساحة';
+      else if (mode === 'war') goalLabel.textContent = 'الانتصارات';
+      else goalLabel.textContent = 'النقاط';
+      scoreText.textContent = '0';
+
+      if (isChat) {
+        spawnPlazaCoins();
+        setupPlazaRealtime();
+      } else if (isWar) {
+        myWarHp = 150 + tankCount * 40;
+        oppWarHp = 150;
+        updateWarHud();
+        setupWarRealtime();
       }
 
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(0, groundY, canvas.width, 5);
-
-      const markerSpan = 160;
-      const mStart = Math.floor((player.worldX - canvas.width) / markerSpan);
-      const mEnd = Math.ceil((player.worldX + canvas.width) / markerSpan);
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      for (let m = mStart; m <= mEnd; m++) {
-        const wx = m * markerSpan;
-        const sx = canvas.width * 0.5 + (wx - player.worldX);
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(sx, groundY + 6, 3, 10);
-        ctx.fillText(`${wx}m`, sx, groundY + 28);
-      }
-
-      plazaCoins.forEach(c => {
-        if (c.collected) return;
-        const cx = canvas.width * 0.5 + (c.worldX - player.worldX);
-        if (cx < -20 || cx > canvas.width + 20) return;
-        const cy = groundY - 22 + Math.sin(frameCount * 0.1 + c.worldX) * 4;
-        ctx.save();
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.stroke();
-        ctx.fillStyle = '#78350f'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('$', cx, cy + 4);
-        ctx.restore();
-      });
+      isGameRunning = true;
+      isPaused = false;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(gameLoop);
     }
 
-    function drawBackgroundAndGround() {
-      if (currentMode === 'chat') {
-        drawFixedSocialPlazaBackground();
-        return;
-      }
-      const scroll = frameCount * (currentMode === 'war' ? 2 : gameSpeed), sky = ctx.createLinearGradient(0, 0, 0, groundY);
-      if (equippedBg === 'desert') { sky.addColorStop(0, '#ea580c'); sky.addColorStop(1, '#fde047'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#d97706'; for (let x = -((scroll * 0.25) % 260); x < canvas.width + 260; x += 260) { ctx.beginPath(); ctx.moveTo(x, groundY); ctx.quadraticCurveTo(x + 130, groundY - 65, x + 260, groundY); ctx.fill(); } ctx.fillStyle = '#b45309'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#fbbf24'; }
-      else if (equippedBg === 'forest') { sky.addColorStop(0, '#3b0764'); sky.addColorStop(1, '#1e1b4b'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); for (let x = -((scroll * 0.35) % 140); x < canvas.width + 140; x += 140) { ctx.fillStyle = '#14532d'; ctx.beginPath(); ctx.moveTo(x + 25, groundY - 85); ctx.lineTo(x, groundY); ctx.lineTo(x + 50, groundY); ctx.closePath(); ctx.fill(); } ctx.fillStyle = '#166534'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#4ade80'; }
-      else if (equippedBg === 'space') { sky.addColorStop(0, '#020617'); sky.addColorStop(1, '#172554'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#f8fafc'; stars.forEach(s => { const sx = (s.x - (scroll * 0.15) % canvas.width + canvas.width) % canvas.width; const sy = s.y % Math.max(120, groundY - 20); ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#0f172a'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#38bdf8'; }
-      else { sky.addColorStop(0, '#1e293b'); sky.addColorStop(1, '#0f172a'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, groundY); ctx.fillStyle = '#334155'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); ctx.fillStyle = '#475569'; }
-      for (let x = -(scroll % 40); x < canvas.width; x += 40) ctx.fillRect(x, groundY + 10, 20, 4);
+    function finishGame(won, title, message) {
+      isGameRunning = false;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      endTitle.textContent = title;
+      endTitle.style.color = won ? '#34d399' : '#f87171';
+      endMessage.textContent = message;
+      endScreen.style.display = 'flex';
+      if (won) sfx.win();
+      else sfx.hit();
     }
 
-    function drawCharacterSprite(x, y, shirt, hat, moving, labelName, bubbleText, friendStar = false) {
-      ctx.save();
-      const swing = (moving && !isPaused) ? Math.sin(frameCount * 0.25) * 8 : 0;
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(x + 6 + swing, y + 40, 8, 20);
-      ctx.fillRect(x + 20 - swing, y + 40, 8, 20);
-      ctx.fillStyle = shirt || '#3b82f6';
-      ctx.fillRect(x + 4, y + 18, 26, 24);
-      ctx.fillStyle = '#fcd34d';
-      ctx.beginPath(); ctx.arc(x + 17, y + 10, 10, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.fillRect(x + 21, y + 7, 3, 3);
-      if (hat === 'cap') {
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect(x + 8, y - 2, 18, 6);
-        ctx.fillRect(x + 18, y + 2, 13, 3);
-      } else if (hat === 'crown') {
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.moveTo(x + 8, y + 2); ctx.lineTo(x + 8, y - 8); ctx.lineTo(x + 13, y - 3);
-        ctx.lineTo(x + 17, y - 10); ctx.lineTo(x + 21, y - 3); ctx.lineTo(x + 26, y - 8); ctx.lineTo(x + 26, y + 2);
-        ctx.closePath(); ctx.fill();
-      }
-      if (labelName) {
-        ctx.font = 'bold 12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = friendStar ? '#fde047' : '#f8fafc';
-        ctx.fillText(`${friendStar ? '⭐ ' : ''}${labelName}`, x + 17, y - 14);
-      }
-      if (bubbleText) {
-        ctx.font = 'bold 12px sans-serif';
-        const padX = 10;
-        const tw = Math.min(220, ctx.measureText(bubbleText).width + padX * 2);
-        const bx = Math.min(Math.max(8, x + 17 - tw / 2), canvas.width - tw - 8);
-        const by = y - 46;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-        ctx.beginPath();
-        ctx.roundRect(bx, by, tw, 24, 8);
-        ctx.fill();
-        ctx.fillStyle = '#0f172a';
-        ctx.textAlign = 'center';
-        ctx.fillText(bubbleText.slice(0, 32), bx + tw / 2, by + 16);
-      }
-      ctx.restore();
+    function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+      return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
     }
 
-    function getActiveBubble(id, username) {
-      const now = Date.now();
-      if (playerBubbles[id] && playerBubbles[id].until > now) return playerBubbles[id].text;
-      if (username && bubblesByName[username] && bubblesByName[username].until > now) return bubblesByName[username].text;
-      return '';
-    }
+    function updatePhysics(dtMs) {
+      const step = Math.min(2.2, Math.max(0.5, dtMs / 16.6667));
+      const now = performance.now();
 
-    function drawPlayer() {
-      const moving = currentMode === 'chat' ? (walkDir !== 0) : player.grounded;
-      const bubble = getActiveBubble(accountId, currentUsername);
-      const drawX = currentMode === 'chat' ? (canvas.width * 0.5 - player.width * 0.5) : player.x;
-      const drawY = currentMode === 'chat' ? Math.min(getGroundCharacterY(), player.y) : player.y;
-      drawCharacterSprite(drawX, drawY, equippedShirt, equippedHat, moving, currentMode === 'chat' ? (currentUsername || 'أنت') : '', bubble, false);
-    }
-
-    function drawChatPlazaPlayers() {
-      if (currentMode !== 'chat') return;
-      const floorY = getGroundCharacterY();
-      remoteAccounts.forEach((p) => {
-        const screenX = canvas.width * 0.5 + (p.world_x - player.worldX) - player.width * 0.5;
-        const bubble = getActiveBubble(p.id, p.username);
-        const starred = isFriendName(p.username);
-
-        if (screenX < -player.width) {
-          ctx.save();
-          ctx.font = 'bold 11px sans-serif';
-          ctx.fillStyle = '#fde047';
-          ctx.textAlign = 'left';
-          ctx.fillText(`⬅️ ${starred ? '⭐ ' : ''}${p.username || 'Player'}`, 10, floorY - 12);
-          ctx.restore();
-          return;
-        }
-
-        if (screenX > canvas.width) {
-          ctx.save();
-          ctx.font = 'bold 11px sans-serif';
-          ctx.fillStyle = '#fde047';
-          ctx.textAlign = 'right';
-          ctx.fillText(`${starred ? '⭐ ' : ''}${p.username || 'Player'} ➡️`, canvas.width - 10, floorY - 12);
-          ctx.restore();
-          return;
-        }
-
-        drawCharacterSprite(screenX, floorY, p.shirt || '#3b82f6', p.hat || 'none', false, p.username || 'Player', bubble, starred);
-      });
-    }
-
-    function drawOnlineWarScene() {
-      const oppX = Math.max(260, canvas.width - 170);
-      ctx.save();
-      ctx.fillStyle = equippedShirt; ctx.fillRect(140, groundY - 34, 28, 24);
-      ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(154, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(currentUsername || 'أنت', 125, groundY - 58);
-
-      tanks.forEach(t => {
-        if (!t.alive) return;
-        ctx.fillStyle = '#15803d'; ctx.fillRect(t.x, t.y + 12, t.width, 16);
-        ctx.fillStyle = '#22c55e'; ctx.fillRect(t.x + 10, t.y + 4, 22, 9);
-        ctx.fillStyle = '#14532d'; ctx.fillRect(t.x + 30, t.y + 7, 22, 4);
-      });
-
-      ctx.fillStyle = '#ef4444'; ctx.fillRect(oppX, groundY - 34, 28, 24);
-      ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(oppX + 14, groundY - 42, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(opponentName, oppX - 22, groundY - 58);
-
-      if (laserBeamTimer > 0) {
-        ctx.fillStyle = 'rgba(167, 139, 250, 0.85)';
-        ctx.fillRect(170, groundY - 26, Math.max(60, oppX - 170), 10);
-      }
-
-      flashes.forEach(f => {
-        ctx.fillStyle = f.color;
-        ctx.beginPath(); ctx.arc(f.x, f.y, f.life * 2.2, 0, Math.PI * 2); ctx.fill();
-      });
-
-      projectiles.forEach(p => {
-        ctx.fillStyle = p.fromAlly ? (p.kind === 'rocket' ? '#fb923c' : '#60a5fa') : '#f87171';
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.restore();
-    }
-
-    function drawMonster() {
-      if (currentMode !== 'monster') return;
-      ctx.save(); const my = monster.y - Math.abs(Math.sin(frameCount * 0.2)) * 8, mx = monster.x;
-      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.roundRect(mx, my, monster.width, monster.height, [25, 25, 5, 5]); ctx.fill();
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath(); ctx.moveTo(mx + 10, my + 5); ctx.lineTo(mx + 2, my - 15); ctx.lineTo(mx + 22, my + 2); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(mx + 45, my + 5); ctx.lineTo(mx + 58, my - 15); ctx.lineTo(mx + 55, my + 5); ctx.fill();
-      ctx.fillStyle = '#fef08a'; ctx.fillRect(mx + 35, my + 20, 16, 10); ctx.fillStyle = '#000'; ctx.fillRect(mx + 44, my + 22, 6, 6);
-      ctx.fillStyle = '#450a0a'; ctx.fillRect(mx + 25, my + 42, 35, 18); ctx.fillStyle = '#fff';
-      for (let i = 0; i < 4; i++) ctx.fillRect(mx + 28 + i * 8, my + 42, 4, 6);
-      ctx.restore();
-    }
-
-    function drawFriendCage() {
-      if (currentMode !== 'rescue' || !friend.active) return;
-      ctx.save(); ctx.fillStyle = '#10b981'; ctx.fillRect(friend.x + 12, friend.y + 22, 24, 24);
-      ctx.fillStyle = '#fcd34d'; ctx.beginPath(); ctx.arc(friend.x + 24, friend.y + 14, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.strokeRect(friend.x, friend.y, friend.width, friend.height);
-      for (let i = 10; i < friend.width; i += 10) { ctx.beginPath(); ctx.moveTo(friend.x + i, friend.y); ctx.lineTo(friend.x + i, friend.y + friend.height); ctx.stroke(); }
-      ctx.restore();
-    }
-
-    function drawCoins() {
-      coinItems.forEach(c => { ctx.save(); ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = '#78350f'; ctx.font = 'bold 11px sans-serif'; ctx.fillText('$', c.x - 3.5, c.y + 4); ctx.restore(); });
-    }
-
-    function drawObstacles() {
-      ctx.fillStyle = '#f43f5e';
-      obstacles.forEach(o => { ctx.beginPath(); ctx.moveTo(o.x, o.y + o.height); ctx.lineTo(o.x + o.width / 2, o.y); ctx.lineTo(o.x + o.width, o.y + o.height); ctx.closePath(); ctx.fill(); });
-    }
-
-    function checkCollision(r1, r2) {
-      const p = 6;
-      return r1.x + p < r2.x + r2.width - p && r1.x + r1.width - p > r2.x + p && r1.y + p < r2.y + r2.height - p && r1.y + r1.height - p > r2.y + p;
-    }
-
-    function draw() {
-      drawBackgroundAndGround();
-      if (currentMode === 'war') drawOnlineWarScene();
-      else if (currentMode === 'chat') { drawChatPlazaPlayers(); drawPlayer(); }
-      else { drawMonster(); drawFriendCage(); drawCoins(); drawObstacles(); drawPlayer(); }
-    }
-
-    function endGame(won, title, message) {
-      isGameOver = true; isPaused = true; cancelAnimationFrame(animationId);
-      endTitle.textContent = title; endTitle.style.color = won ? '#10b981' : '#f43f5e';
-      endMessage.textContent = message; endScreen.style.display = 'flex';
-      if (won) sfx.win(); else sfx.lose();
-    }
-
-    function updateOnlineWar() {
-      const oppX = Math.max(260, canvas.width - 170);
-      if (cooldowns.gun > 0) cooldowns.gun--;
-      if (cooldowns.rocket > 0) cooldowns.rocket--;
-      if (cooldowns.laser > 0) cooldowns.laser--;
-      if (laserBeamTimer > 0) laserBeamTimer--;
-
-      for (let i = flashes.length - 1; i >= 0; i--) { flashes[i].life--; if (flashes[i].life <= 0) flashes.splice(i, 1); }
-
-      for (let i = projectiles.length - 1; i >= 0; i--) {
-        const p = projectiles[i];
-        p.x += p.vx;
-        if (p.x < -20 || p.x > canvas.width + 20) { projectiles.splice(i, 1); continue; }
-        if (p.fromAlly && p.x >= oppX) {
-          oppWarHp = Math.max(0, oppWarHp - p.dmg);
-          setScoreDisplay(score + 5);
-          coins += 1;
-          saveProgress();
-          flashes.push({ x: oppX, y: p.y, color: '#fbbf24', life: 6 });
-          projectiles.splice(i, 1);
-          updateWarUi();
-          if (oppWarHp <= 0) { endGame(true, 'فزت في الحرب الأونلاين! ⚔️🏆', `انتصرت على ${opponentName} | نقاطك: ${score}`); return; }
-        }
-      }
-      updateWarUi();
-    }
-
-    function updateChatPlaza() {
-      const floorY = getGroundCharacterY();
-      if (walkDir !== 0) {
-        player.worldX += walkDir * 5;
-        setScoreDisplay(Math.round(player.worldX));
-      }
       if (!player.grounded) {
-        player.y += player.dy;
-        player.dy += player.gravity;
-        if (player.y >= floorY) {
-          player.y = floorY;
+        player.dy += player.gravity * step;
+        player.y += player.dy * step;
+        if (player.y + player.height >= groundY) {
+          player.y = groundY - player.height;
           player.dy = 0;
           player.grounded = true;
         }
-      } else {
-        player.y = floorY;
-      }
-
-      plazaCoins.forEach(c => {
-        if (!c.collected && Math.abs(player.worldX - c.worldX) < 28) {
-          c.collected = true;
-          coins += 1;
-          sfx.coin();
-          saveProgress();
-          broadcastPlazaPresence({ collectedCoinId: c.id });
-          showToast('+1 عملة 🪙');
-        }
-      });
-
-      const now = Date.now();
-      if (walkDir !== 0 && now - lastBroadcastAt > 120) {
-        lastBroadcastAt = now;
-        broadcastPlazaPresence();
-      }
-      if (now - lastPosSyncAt > 700) {
-        lastPosSyncAt = now;
-        syncAccountState({ world_x: Math.round(player.worldX), world_y: Math.round(player.worldY), pos_y: Math.round(floorY), in_chat: true });
-      }
-    }
-
-    function update() {
-      if (isPaused || isGameOver) return;
-      frameCount++;
-
-      if (currentMode === 'war') {
-        updateOnlineWar();
-        draw();
-        animationId = requestAnimationFrame(update);
-        return;
       }
 
       if (currentMode === 'chat') {
-        updateChatPlaza();
-        draw();
-        animationId = requestAnimationFrame(update);
+        if (walkDir !== 0) {
+          player.worldX += walkDir * 4.4 * step;
+          if (plazaChannel && now - lastBroadcastAt > 120) {
+            lastBroadcastAt = now;
+            plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat }).catch(() => {});
+          }
+        }
+        plazaCoins.forEach(c => {
+          if (c.collectedAt && now - c.collectedAt > 6000) c.collectedAt = 0;
+          if (!c.collectedAt) {
+            const screenX = player.x + (c.worldX - player.worldX);
+            const cy = groundY - 38 - c.yOffset;
+            if (rectsOverlap(player.x, player.y, player.width, player.height, screenX - 12, cy - 12, 24, 24)) {
+              c.collectedAt = now;
+              coins += 2;
+              saveShopState();
+              sfx.coin();
+            }
+          }
+        });
         return;
       }
 
-      if (!player.grounded) { player.y += player.dy; player.dy += player.gravity; if (player.y >= groundY - player.height) { player.y = groundY - player.height; player.dy = 0; player.grounded = true; } }
-      if (frameCount % 95 === 0) spawnObstacle();
-      if (frameCount % 130 === 0) spawnCoinLine();
-      if (frameCount % 450 === 0 && gameSpeed < 12) gameSpeed += 0.4;
-      if (frameCount % 12 === 0) { setScoreDisplay(score + 1); if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) friend.active = true; }
-      if (currentMode === 'monster') {
-        const hit = obstacles.some(o => o.x < player.x && o.x + o.width > monster.x);
-        monster.x = hit ? monster.x + 1.4 : Math.max(45, monster.x - 0.35);
-        if (monster.x + monster.width >= player.x + 8) { endGame(false, 'أمسك بك الوحش! 👾', `مجموع نقاطك: ${score}`); return; }
+      if (currentMode === 'war') {
+        for (let i = warProjectiles.length - 1; i >= 0; i--) {
+          const p = warProjectiles[i];
+          p.x += p.vx * step;
+          if (p.fromMe && p.x >= canvas.width - 95) {
+            oppWarHp -= p.dmg;
+            warProjectiles.splice(i, 1);
+            updateWarHud();
+            if (oppWarHp <= 0) {
+              coins += 20; saveShopState();
+              return finishGame(true, 'انتصرت في المعركة! 🏆', 'حصلت على 20 🪙 مكافأة الفوز!');
+            }
+          } else if (!p.fromMe && p.x <= player.x + player.width) {
+            myWarHp -= p.dmg;
+            warProjectiles.splice(i, 1);
+            updateWarHud();
+            if (myWarHp <= 0) {
+              return finishGame(false, 'هُزمت في المعركة! 💥', 'حاول مجدداً أو اشترِ دبابة لزيادة درعك!');
+            }
+          }
+        }
+        if (!warMatchFound && Math.random() < 0.012 * step) {
+          warProjectiles.push({ fromMe: false, type: 'gun', x: canvas.width - 95, y: groundY - 34, vx: -9.5, dmg: 9 });
+        }
+        return;
       }
-      if (currentMode === 'rescue' && friend.active) { friend.x -= gameSpeed; if (checkCollision(player, friend)) { endGame(true, 'تم إنقاذ الصديق! 🦸‍♂️🎉', `وصلت إلى ${score} نقطة بنجاح!`); return; } }
-      for (let i = obstacles.length - 1; i >= 0; i--) { obstacles[i].x -= gameSpeed; if (checkCollision(player, obstacles[i])) { endGame(false, 'لقد خسرت! 💥', `مجموع نقاطك: ${score} | رصيد العملات: ${coins}`); return; } if (obstacles[i].x + obstacles[i].width < -30) obstacles.splice(i, 1); }
-      for (let i = coinItems.length - 1; i >= 0; i--) { coinItems[i].x -= gameSpeed; const dx = player.x + player.width / 2 - coinItems[i].x, dy = player.y + player.height / 2 - coinItems[i].y; if (Math.hypot(dx, dy) < player.width / 2 + coinItems[i].radius + 4) { coins += 1; saveProgress(); sfx.coin(); coinItems.splice(i, 1); continue; } if (coinItems[i].x < -30) coinItems.splice(i, 1); }
-      draw(); animationId = requestAnimationFrame(update);
+
+      score += 0.14 * step;
+      scoreText.textContent = Math.floor(score);
+      gameSpeed = Math.min(10.5, 5.2 + score * 0.025);
+
+      if (currentMode === 'rescue' && score >= RESCUE_TARGET_SCORE) {
+        coins += 25;
+        saveShopState();
+        return finishGame(true, 'أنقذت صديقك بنجاح! 🦸‍♂️', `وصلت إلى ${RESCUE_TARGET_SCORE} نقطة وحصلت على 25 🪙!`);
+      }
+
+      if (now >= spawnGraceUntil) {
+        nextObstacleTimer -= dtMs;
+        if (nextObstacleTimer <= 0) {
+          const h = 34 + Math.floor(Math.random() * 20);
+          const w = 26 + Math.floor(Math.random() * 14);
+          obstacles.push({ x: canvas.width + 20, y: groundY - h, width: w, height: h });
+          nextObstacleTimer = Math.max(950, 1750 - score * 5 + Math.random() * 650);
+        }
+      }
+
+      nextCoinTimer -= dtMs;
+      if (nextCoinTimer <= 0) {
+        runnerCoins.push({ x: canvas.width + 20, y: groundY - 46 - (Math.random() > 0.5 ? 45 : 0), r: 11 });
+        nextCoinTimer = 850 + Math.random() * 650;
+      }
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const ob = obstacles[i];
+        ob.x -= gameSpeed * step;
+        if (ob.x + ob.width < -20) {
+          obstacles.splice(i, 1);
+          continue;
+        }
+        if (now >= spawnGraceUntil && rectsOverlap(player.x + 5, player.y + 4, player.width - 10, player.height - 6, ob.x + 4, ob.y + 4, ob.width - 8, ob.height - 4)) {
+          return finishGame(false, 'اصطدمت بعائق! 💥', `مجموع نقاطك: ${Math.floor(score)}`);
+        }
+      }
+
+      for (let i = runnerCoins.length - 1; i >= 0; i--) {
+        const c = runnerCoins[i];
+        c.x -= gameSpeed * step;
+        if (c.x < -20) {
+          runnerCoins.splice(i, 1);
+          continue;
+        }
+        if (rectsOverlap(player.x, player.y, player.width, player.height, c.x - c.r, c.y - c.r, c.r * 2, c.r * 2)) {
+          runnerCoins.splice(i, 1);
+          coins += (currentMode === 'coins' ? 3 : 1);
+          saveShopState();
+          sfx.coin();
+        }
+      }
+
+      if (currentMode === 'monster') {
+        const targetMonsterX = Math.max(12, player.x - 125 + Math.sin(now * 0.004) * 14);
+        monster.x += (targetMonsterX - monster.x) * 0.06 * step;
+        monster.y = groundY - monster.height - Math.abs(Math.sin(now * 0.012)) * 6;
+      }
     }
 
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); }); }
-    document.getElementById('friendsCountText').textContent = friendsList.length;
-    updateSoundButton(); saveProgress(); resizeCanvasToScreen(); draw();
+    function drawBackground() {
+      const bg = currentMode === 'chat' ? plazaWeather : equippedBg;
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      if (bg === 'night') {
+        grad.addColorStop(0, '#090d16'); grad.addColorStop(1, '#1e293b');
+      } else if (bg === 'sunset') {
+        grad.addColorStop(0, '#f97316'); grad.addColorStop(1, '#fde047');
+      } else if (bg === 'forest') {
+        grad.addColorStop(0, '#065f46'); grad.addColorStop(1, '#6ee7b7');
+      } else {
+        grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#bae6fd');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (bg === 'night') {
+        ctx.fillStyle = '#fff';
+        stars.forEach(s => {
+          ctx.beginPath();
+          ctx.arc(s.x % canvas.width, s.y % groundY, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      ctx.fillStyle = bg === 'night' ? '#1e293b' : '#15803d';
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+      ctx.fillStyle = bg === 'night' ? '#334155' : '#22c55e';
+      ctx.fillRect(0, groundY, canvas.width, 8);
+    }
+
+    function drawCharacter(x, y, shirt, hat, label, bubbleText) {
+      ctx.fillStyle = shirt || '#3b82f6';
+      ctx.beginPath();
+      ctx.roundRect(x, y + 20, 34, 28, 7);
+      ctx.fill();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(x + 5, y + 48, 9, 12);
+      ctx.fillRect(x + 20, y + 48, 9, 12);
+
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath();
+      ctx.arc(x + 17, y + 12, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(x + 20, y + 9, 3, 3);
+
+      if (hat === 'cap') {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(x + 6, y - 1, 24, 6);
+      } else if (hat === 'crown') {
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.moveTo(x + 7, y + 2);
+        ctx.lineTo(x + 11, y - 7);
+        ctx.lineTo(x + 17, y);
+        ctx.lineTo(x + 23, y - 7);
+        ctx.lineTo(x + 27, y + 2);
+        ctx.fill();
+      }
+
+      if (label) {
+        ctx.font = 'bold 12px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(label, x + 17, y - 12);
+      }
+
+      // فقاعة الرسالة فوق الرأس فقط
+      if (bubbleText) {
+        ctx.font = 'bold 12px system-ui';
+        const tw = Math.min(210, ctx.measureText(bubbleText).width + 18);
+        const bx = x + 17 - tw / 2;
+        const by = y - 44;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.beginPath();
+        ctx.roundRect(bx, by, tw, 24, 8);
+        ctx.fill();
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(bubbleText.slice(0, 28), x + 17, by + 16);
+      }
+    }
+
+    function renderScene() {
+      drawBackground();
+      const now = performance.now();
+
+      const myB = playerBubbles[myAccountId] || bubblesByName[currentUsername];
+      const myBubbleText = (myB && myB.exp > Date.now()) ? myB.text : '';
+      drawCharacter(player.x, player.y, equippedShirt, equippedHat, currentUsername, myBubbleText);
+
+      if (currentMode === 'monster' && now < spawnGraceUntil) {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(player.x + 17, player.y + 30, 38, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      if (currentMode === 'monster') {
+        ctx.fillStyle = '#7f1d1d';
+        ctx.beginPath();
+        ctx.roundRect(monster.x, monster.y, monster.width, monster.height, 14);
+        ctx.fill();
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(monster.x + 38, monster.y + 18, 10, 10);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(monster.x + 34, monster.y + 44, 22, 8);
+      }
+
+      if (currentMode === 'rescue') {
+        const progress = Math.min(1, score / RESCUE_TARGET_SCORE);
+        const fx = canvas.width - 70 - (progress * (canvas.width - player.x - 120));
+        drawCharacter(fx, groundY - 60, '#10b981', 'cap', 'الصديق 🆘', '');
+      }
+
+      if (currentMode === 'chat') {
+        plazaCoins.forEach(c => {
+          if (!c.collectedAt) {
+            const sx = player.x + (c.worldX - player.worldX);
+            if (sx > -30 && sx < canvas.width + 30) {
+              ctx.fillStyle = '#fbbf24';
+              ctx.beginPath();
+              ctx.arc(sx, groundY - 38 - c.yOffset, 10, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        });
+        remoteAccounts.forEach(p => {
+          const sx = player.x + ((p.worldX || 0) - player.worldX);
+          if (sx > -60 && sx < canvas.width + 60) {
+            const b = playerBubbles[p.id] || bubblesByName[p.username];
+            const bTxt = (b && b.exp > Date.now()) ? b.text : '';
+            drawCharacter(sx, p.y || (groundY - 60), p.shirt || '#a855f7', p.hat || 'none', p.username || 'Player', bTxt);
+          }
+        });
+      }
+
+      if (currentMode === 'war') {
+        drawCharacter(canvas.width - 90, groundY - 60, '#ef4444', 'crown', warMatchFound ? 'الخصم ⚔️' : 'روبوت الحرب', '');
+        warProjectiles.forEach(p => {
+          ctx.fillStyle = p.type === 'rocket' ? '#f97316' : (p.type === 'laser' ? '#a855f7' : '#38bdf8');
+          ctx.beginPath();
+          ctx.roundRect(p.x, p.y, p.type === 'laser' ? 26 : 14, 7, 4);
+          ctx.fill();
+        });
+      }
+
+      obstacles.forEach(ob => {
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.roundRect(ob.x, ob.y, ob.width, ob.height, 6);
+        ctx.fill();
+      });
+
+      runnerCoins.forEach(c => {
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#b45309';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    function gameLoop(timestamp) {
+      if (!isGameRunning) return;
+      const dtMs = timestamp - lastFrameTime;
+      lastFrameTime = timestamp;
+
+      if (!isPaused) {
+        updatePhysics(dtMs);
+      }
+      renderScene();
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function copyShareLink() {
+      const inp = document.getElementById('shareUrlInput');
+      inp.select();
+      navigator.clipboard?.writeText(SHARE_URL).catch(() => {});
+      document.getElementById('shareStatus').textContent = 'تم نسخ الرابط ✅';
+    }
+    function shareGameLink() {
+      if (navigator.share) {
+        navigator.share({ title: 'NC Go', url: SHARE_URL }).catch(() => {});
+      } else {
+        copyShareLink();
+      }
+    }
+
+    document.getElementById('accountNameDisplay').textContent = currentUsername;
+    saveShopState();
+    saveFriendsList();
+    resizeCanvas();
+    drawBackground();
   </script>
 </body>
 </html>
