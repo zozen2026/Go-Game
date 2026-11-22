@@ -576,6 +576,7 @@
     let walkDir = 0, walkLeftPressed = false, walkRightPressed = false;
     let remoteAccounts = [], playerBubbles = {}, bubblesByName = {}, lastBroadcastAt = 0;
     let plazaChannel = null;
+    let presenceHeartbeat = null;
     let plazaCoins = [];
     const weatherModes = ['day', 'sunset', 'night'];
     let plazaWeather = 'day';
@@ -782,7 +783,7 @@
       const savedBox = document.getElementById('savedFriendsList');
       if (!candBox || !savedBox) return;
       if (remoteAccounts.length === 0) {
-        candBox.innerHTML = '<div class="shop-info">لا يوجد لاعبون آخرون في الساحة حالياً.</div>';
+        candBox.innerHTML = '<div class="shop-info">لا يوجد لاعبون آخرون متصلون حالياً.</div>';
       } else {
         candBox.innerHTML = remoteAccounts.map(p => {
           const already = isFriendName(p.username);
@@ -832,6 +833,7 @@
       document.getElementById('accountNameDisplay').textContent = currentUsername;
       document.getElementById('modalCurrentName').textContent = currentUsername;
       document.getElementById('accountMsg').textContent = 'تم حفظ الاسم بنجاح ✅';
+      broadcastPresenceNow();
       sfx.buy();
     }
     function toggleFriendsModal() {
@@ -927,6 +929,7 @@
       }
       saveShopState();
       renderShop();
+      broadcastPresenceNow();
     }
 
     function toggleShopModal() {
@@ -981,6 +984,7 @@
       player.dy = 0;
       player.grounded = true;
       player.walkCycle = 0;
+      broadcastPresenceNow();
       showToast('تمت إعادة رسبنة اللاعب 🔄');
     }
 
@@ -1015,19 +1019,51 @@
       if (username) bubblesByName[username] = { text, exp };
     }
 
+    function syncPlazaPresenceList() {
+      if (!plazaChannel) return;
+      const state = plazaChannel.presenceState();
+      const list = [];
+      Object.keys(state).forEach(key => {
+        if (key !== myAccountId && Array.isArray(state[key]) && state[key][0]) {
+          list.push(state[key][0]);
+        }
+      });
+      remoteAccounts = list;
+      document.getElementById('onlineCount').textContent = list.length + 1;
+      renderFriendsModal();
+    }
+
+    function broadcastPresenceNow() {
+      if (!plazaChannel) return;
+      plazaChannel.track({
+        id: myAccountId,
+        username: currentUsername,
+        mode: currentMode || 'menu',
+        worldX: player.worldX,
+        y: player.y,
+        shirt: equippedShirt,
+        hat: equippedHat,
+        walkCycle: player.walkCycle
+      }).catch(() => {});
+    }
+
     function setupPlazaRealtime() {
-      if (!sbClient || plazaChannel) return;
+      if (!sbClient) return;
+      if (plazaChannel) {
+        broadcastPresenceNow();
+        syncPlazaPresenceList();
+        return;
+      }
       plazaChannel = sbClient.channel('ncgo_plaza_v1', { config: { presence: { key: myAccountId } } });
       plazaChannel
         .on('presence', { event: 'sync' }, () => {
-          const state = plazaChannel.presenceState();
-          const list = [];
-          Object.keys(state).forEach(k => {
-            if (k !== myAccountId && state[k] && state[k][0]) list.push(state[k][0]);
-          });
-          remoteAccounts = list;
-          document.getElementById('onlineCount').textContent = list.length + 1;
-          renderFriendsModal();
+          syncPlazaPresenceList();
+        })
+        .on('presence', { event: 'join' }, () => {
+          syncPlazaPresenceList();
+        })
+        .on('presence', { event: 'leave' }, () => {
+          syncPlazaPresenceList();
         })
         .on('broadcast', { event: 'plaza_chat' }, ({ payload }) => {
           if (payload && payload.id !== myAccountId) {
@@ -1039,7 +1075,14 @@
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            await plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat, walkCycle: player.walkCycle });
+            broadcastPresenceNow();
+            syncPlazaPresenceList();
+            if (!presenceHeartbeat) {
+              presenceHeartbeat = setInterval(() => {
+                broadcastPresenceNow();
+                syncPlazaPresenceList();
+              }, 4000);
+            }
           }
         });
     }
@@ -1095,6 +1138,7 @@
     }
 
     function openModeMenu() {
+      currentMode = null;
       isGameRunning = false;
       isPaused = false;
       if (animFrameId) cancelAnimationFrame(animFrameId);
@@ -1108,6 +1152,7 @@
       topRespawnBtn.classList.remove('active');
       moveLeftBtn.classList.remove('active');
       moveRightBtn.classList.remove('active');
+      broadcastPresenceNow();
     }
 
     function restartCurrentMode() {
@@ -1178,6 +1223,7 @@
         setupWarRealtime();
       }
 
+      broadcastPresenceNow();
       isGameRunning = true;
       isPaused = false;
       if (animFrameId) cancelAnimationFrame(animFrameId);
@@ -1219,7 +1265,7 @@
           player.walkCycle += 0.24 * step;
           if (plazaChannel && now - lastBroadcastAt > 120) {
             lastBroadcastAt = now;
-            plazaChannel.track({ id: myAccountId, username: currentUsername, worldX: player.worldX, y: player.y, shirt: equippedShirt, hat: equippedHat, walkCycle: player.walkCycle }).catch(() => {});
+            broadcastPresenceNow();
           }
         } else if (player.grounded) {
           player.walkCycle = 0;
@@ -1491,8 +1537,9 @@
         ctx.fillStyle = '#34d399';
         ctx.fillText(`📍 موقعك: ${dirText}`, 178, 27);
 
-        // 3. أسهم جانبية للاعبين الآخرين إذا كانوا خارج الشاشة
+        // 3. أسهم جانبية للاعبين الموجودين في الساحة إذا كانوا خارج الشاشة
         remoteAccounts.forEach(p => {
+          if (p.mode !== 'chat') return;
           const sx = player.x + ((p.worldX || 0) - player.worldX);
           if (sx < 12) {
             ctx.fillStyle = 'rgba(168, 85, 247, 0.9)';
@@ -1526,7 +1573,9 @@
             }
           }
         });
+
         remoteAccounts.forEach(p => {
+          if (p.mode !== 'chat') return;
           const sx = player.x + ((p.worldX || 0) - player.worldX);
           if (sx > -60 && sx < canvas.width + 60) {
             const b = playerBubbles[p.id] || bubblesByName[p.username];
@@ -1595,6 +1644,7 @@
     saveFriendsList();
     resizeCanvas();
     drawBackground();
+    setupPlazaRealtime();
   </script>
 </body>
 </html>
